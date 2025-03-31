@@ -87,25 +87,24 @@ const TimerApp = ({
     setWeekSessions(weekSessions);
   }, [studySessions]);
 
+  // Gérer le timer
+  useEffect(() => {
+    if (isActive) {
+      intervalRef.current = setInterval(() => {
+        setTimer(prevTimer => {
+          // En mode pomodoro, on compte aussi le temps d'étude effectif
+          if (pomodoroMode && pomodoroState === 'focus') {
+            setEffectiveStudyTime(prev => prev + 1);
+          }
+          return prevTimer + 1;
+        });
+      }, 1000);
+    } else {
+      clearInterval(intervalRef.current);
+    }
 
-// Gérer le timer
-useEffect(() => {
-  if (isActive) {
-    intervalRef.current = setInterval(() => {
-      setTimer(prevTimer => prevTimer + 1);
-      
-      // N'incrémenter le temps effectif que pendant les phases de focus en mode pomodoro
-      // Ou tout le temps quand pomodoro est désactivé
-      if (!pomodoroMode || (pomodoroMode && pomodoroState === 'focus')) {
-        setEffectiveStudyTime(prev => prev + 1);
-      }
-    }, 1000);
-  } else {
-    clearInterval(intervalRef.current);
-  }
-
-  return () => clearInterval(intervalRef.current);
-}, [isActive, pomodoroMode, pomodoroState]);
+    return () => clearInterval(intervalRef.current);
+  }, [isActive, pomodoroMode, pomodoroState]);
 
   // Gestion du mode Pomodoro
   useEffect(() => {
@@ -385,7 +384,12 @@ useEffect(() => {
           }`}>
             {formatTime(timer)}
           </div>
-        
+          
+          {pomodoroMode && pomodoroState === 'focus' && (
+            <div className="text-xl mb-4">
+              Temps d'étude effectif: {formatTime(effectiveStudyTime)}
+            </div>
+          )}
           
           <div className="flex justify-center space-x-4 mt-8">
             {isActive ? (
@@ -426,50 +430,48 @@ useEffect(() => {
 
   // Affichage normal
   return (
-    <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-{/* Sélection d'objectif et mode Pomodoro */}
-<div className="card bg-base-200 shadow-lg">
-  <div className="card-body">
-    <h2 className="card-title">Objectif actuel</h2>
-    
-    <select
-      value={selectedGoal || ''}
-      onChange={(e) => onSelectGoal(e.target.value ? Number(e.target.value) : null)}
-      className="select select-bordered w-full mb-4"
-      disabled={isActive}
-    >
-      <option value="">Sélectionnez un objectif</option>
-      {goals.map(goal => (
-        <option key={goal.id} value={goal.id}>
-          {goal.title} ({goal.minutes} min/jour)
-        </option>
-      ))}
-    </select>
-    
-    {selectedGoal && (
-      <div className="mt-2">
-        {remainingTime > 0 ? (
-          <div className="alert alert-info">
-            <Clock size={18} />
-            <span>
-              Temps restant aujourd'hui : <strong>{formatTime(remainingTime)}</strong>
-            </span>
+    <div className="w-full grid grid-cols- md:grid-cols-2 gap-4 sm:gap-6">
+      {/* Sélection d'objectif et mode Pomodoro */}
+      <div className="bg-base-200 p-4 rounded-box shadow">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-medium">Choisir un objectif</h2>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setShowAllGoals(!showAllGoals)}
+              className="btn btn-sm btn-outline"
+            >
+              {showAllGoals ? "Uniquement aujourd'hui" : "Tous les objectifs"}
+            </button>
           </div>
-        ) : (
-          <div className="alert alert-success">
-            <span>
-              {Object.values(goals.find(g => g.id === selectedGoal)?.days || {}).some(day => day) 
-                ? "Objectif atteint pour aujourd'hui !" 
-                : "Cet objectif n'est pas prévu pour aujourd'hui"}
-            </span>
+        </div>
+        
+        {/* Affichage des cartes d'objectifs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          {getGoalsToDisplay().map(goal => (
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              isSelected={selectedGoal === goal.id}
+              onSelect={onSelectGoal}
+              remainingTime={getRemainingTimeForGoal(goal.id)}
+            />
+          ))}
+          
+          {/* Carte pour ajouter un nouvel objectif */}
+          <div 
+            className="card bg-base-100 border-2 border-dashed border-base-300 cursor-pointer hover:border-primary transition-colors duration-200 flex items-center justify-center min-h-[140px]"
+            onClick={() => document.getElementById('goals_modal').showModal()}
+          >
+            <div className="text-center p-4">
+              <PlusCircle size={32} className="mx-auto mb-2 opacity-60" />
+              <p className="text-sm font-medium">Ajouter un objectif</p>
+            </div>
           </div>
-        )}
-      </div>
-    )}
-    
-    {/* Contrôles du timer ajoutés ici */}
-    {selectedGoal && (
-      <div className="border-t pt-4 mt-4">
+        </div>
+
+        {/* Switch pour le mode Pomodoro */}
+        {selectedGoal && (
+      <div className="border-t pt-4 mt-2">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Coffee size={18} />
@@ -559,13 +561,11 @@ useEffect(() => {
         )}
       </div>
     )}
-  </div>
-</div>
+      </div>
 
       {/* Timer et statistiques */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Timer */}
-        
 
         {/* Statistiques */}
         <div className="card bg-base-200 shadow-lg">
