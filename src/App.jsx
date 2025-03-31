@@ -4,50 +4,23 @@ import StudyGoalApp from './components/StudyGoalApp';
 import TimerApp from './components/TimerApp';
 import { supabase } from './supabase';
 import AuthComponent from './components/Auth';
+import UserSettings from './components/UserSettings';
 
 const App = () => {
-  // Remplacer le simple toggle darkMode par un état plus flexible pour le thème
-  const [theme, setTheme] = useState('cupcake');
+  const [darkMode, setDarkMode] = useState(false);
   const [goals, setGoals] = useState([]);
   const [studySessions, setStudySessions] = useState([]);
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   
-  // Référence pour le modal
-  const modalRef = useRef(null);
+  // Référence pour les modals
+  const goalsModalRef = useRef(null);
+  const settingsModalRef = useRef(null);
   
   // Référence pour suivre si la redirection a déjà eu lieu
   const redirected = useRef(false);
-
-  // Effet pour appliquer le thème à l'élément HTML
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    // Optionnellement, stocker le thème dans localStorage pour se souvenir du choix
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  // Récupérer le thème du localStorage au chargement
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-  }, []);
-
-  // Fonction pour basculer entre thème clair et sombre
-  const toggleTheme = () => {
-    if (theme === 'dark') {
-      setTheme('cupcake');
-    } else {
-      setTheme('dark');
-    }
-  };
-
-  // Fonction pour changer de thème via un menu déroulant
-  const changeTheme = (newTheme) => {
-    setTheme(newTheme);
-  };
 
   // Vérifier si l'utilisateur est connecté au chargement
   useEffect(() => {
@@ -64,11 +37,51 @@ const App = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Chargement du profil utilisateur
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('nickname, avatar_url')
+          .eq('user_id', user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          console.error('Erreur lors du chargement du profil:', error);
+          return;
+        }
+
+        setUserProfile(data || null);
+      } catch (error) {
+        console.error('Erreur lors du chargement du profil:', error);
+      }
+    };
+
+    if (user) {
+      loadUserProfile();
+    }
+  }, [user]);
+
   // Ouvrir le modal des objectifs
   const openGoalsModal = () => {
-    if (modalRef.current) {
-      modalRef.current.showModal();
+    if (goalsModalRef.current) {
+      goalsModalRef.current.showModal();
     }
+  };
+
+  // Ouvrir le modal des paramètres
+  const openSettingsModal = () => {
+    if (settingsModalRef.current) {
+      settingsModalRef.current.showModal();
+    }
+  };
+
+  // Mettre à jour le profil utilisateur
+  const updateUserProfile = (profileData) => {
+    setUserProfile(profileData);
   };
 
   // Chargement des données après connexion
@@ -114,6 +127,9 @@ const App = () => {
     };
     
     loadData();
+    
+    // Ne plus détecter la préférence du système pour utiliser le thème cupcake par défaut
+    setDarkMode(false);
   }, [user]);
 
   const handleGoalsUpdate = async (updatedGoals) => {
@@ -155,8 +171,8 @@ const App = () => {
       }
 
       // Fermer le modal après mise à jour
-      if (modalRef.current) {
-        modalRef.current.close();
+      if (goalsModalRef.current) {
+        goalsModalRef.current.close();
       }
     } catch (error) {
       console.error('Erreur lors de la mise à jour des objectifs:', error);
@@ -211,9 +227,15 @@ const App = () => {
     await supabase.auth.signOut();
   };
 
-  // Fonction pour formater l'email de l'utilisateur
-  const formatUserEmail = (email) => {
+  // Fonction pour formater l'email de l'utilisateur ou afficher le pseudo
+  const getUserDisplayName = () => {
+    if (userProfile?.nickname) {
+      return userProfile.nickname;
+    }
+    
+    const email = user?.email;
     if (!email) return "";
+    
     const atIndex = email.indexOf('@');
     if (atIndex > 10) {
       return email.substring(0, 10) + '...' + email.substring(atIndex);
@@ -238,15 +260,6 @@ const App = () => {
     );
   }
 
-  // Liste des thèmes disponibles dans DaisyUI
-  const availableThemes = [
-    'cupcake', 'dark', 'light', 'bumblebee', 'emerald', 'corporate', 
-    'synthwave', 'retro', 'cyberpunk', 'valentine', 'halloween', 
-    'garden', 'forest', 'aqua', 'lofi', 'pastel', 'fantasy', 
-    'wireframe', 'black', 'luxury', 'dracula', 'cmyk', 'autumn', 
-    'business', 'acid', 'lemonade', 'night', 'coffee', 'winter'
-  ];
-
   return (
     <div className="min-h-screen w-screen overflow-x-hidden bg-base-100 text-base-content">
       <div className="w-full max-w-[80%] mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -254,36 +267,38 @@ const App = () => {
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-extrabold">Studie</h1>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center text-sm opacity-70">
-              <User size={16} className="mr-1" />
-              <span>{formatUserEmail(user.email)}</span>
+            <div className="flex items-center">
+              {userProfile?.avatar_url && (
+                <div className="avatar mr-2">
+                  <div className="w-8 h-8 rounded-full">
+                    <img src={userProfile.avatar_url} alt="Avatar" />
+                  </div>
+                </div>
+              )}
+              <span className="text-sm opacity-70">
+                {userProfile?.avatar_url ? "" : <User size={16} className="mr-1 inline-block" />}
+                {getUserDisplayName()}
+              </span>
             </div>
-            
-            {/* Menu déroulant pour sélectionner le thème */}
-            <div className="dropdown dropdown-end">
-              <div tabIndex={0} role="button" className="btn btn-sm btn-ghost">
-                {theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
-              </div>
-              <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 max-h-96 overflow-y-auto">
-                {availableThemes.map((t) => (
-                  <li key={t}>
-                    <a 
-                      className={theme === t ? 'active' : ''} 
-                      onClick={() => changeTheme(t)}
-                    >
-                      {t.charAt(0).toUpperCase() + t.slice(1)}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
+            <button 
+              onClick={openSettingsModal}
+              className="btn btn-sm btn-ghost"
+              title="Paramètres"
+            >
+              <Settings size={16} />
+            </button>
             <button 
               onClick={handleSignOut}
               className="btn btn-sm btn-ghost"
             >
               <LogOut size={16} />
               <span className="hidden sm:inline ml-1">Déconnexion</span>
+            </button>
+            <button 
+              onClick={() => setDarkMode(!darkMode)}
+              className="btn btn-circle btn-sm btn-ghost"
+            >
+              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
           </div>
         </header>
@@ -300,15 +315,13 @@ const App = () => {
           </button>
         </div>
 
-        
-
         {/* Modal des objectifs */}
-        <dialog id="goals_modal" className="modal" ref={modalRef}>
+        <dialog id="goals_modal" className="modal" ref={goalsModalRef}>
           <div className="modal-box w-11/12 max-w-3xl">
             <h3 className="font-bold text-lg mb-4">Gestion des objectifs</h3>
             <div className="max-h-[70vh] overflow-auto">
               <StudyGoalApp 
-                theme={theme}
+                darkMode={darkMode} 
                 goals={goals} 
                 onGoalsUpdate={handleGoalsUpdate} 
               />
@@ -321,9 +334,16 @@ const App = () => {
           </div>
         </dialog>
 
+        {/* Composant de paramètres utilisateur */}
+        <UserSettings 
+          user={user} 
+          updateUserProfile={updateUserProfile} 
+          modalRef={settingsModalRef}
+        />
+
         {/* Timer App toujours affiché */}
         <TimerApp 
-          theme={theme}
+          darkMode={darkMode} 
           goals={goals} 
           studySessions={studySessions}
           onAddSession={handleAddStudySession}
@@ -335,28 +355,5 @@ const App = () => {
     </div>
   );
 };
-// Fonction pour changer de thème via un menu déroulant
-const changeTheme = (newTheme) => {
-  // Appliquer le thème directement à l'élément html
-  document.documentElement.setAttribute('data-theme', newTheme);
-  // Mettre à jour l'état
-  setTheme(newTheme);
-  // Sauvegarder dans localStorage
-  localStorage.setItem('theme', newTheme);
-};
-
-// Récupérer le thème du localStorage au chargement
-useEffect(() => {
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) {
-    // Appliquer directement le thème sauvegardé
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    setTheme(savedTheme);
-  } else {
-    // Si pas de thème sauvegardé, appliquer le thème par défaut
-    document.documentElement.setAttribute('data-theme', 'cupcake');
-    setTheme('cupcake');
-  }
-}, []);
 
 export default App;
