@@ -87,24 +87,25 @@ const TimerApp = ({
     setWeekSessions(weekSessions);
   }, [studySessions]);
 
-  // Gérer le timer
-  useEffect(() => {
-    if (isActive) {
-      intervalRef.current = setInterval(() => {
-        setTimer(prevTimer => {
-          // En mode pomodoro, on compte aussi le temps d'étude effectif
-          if (pomodoroMode && pomodoroState === 'focus') {
-            setEffectiveStudyTime(prev => prev + 1);
-          }
-          return prevTimer + 1;
-        });
-      }, 1000);
-    } else {
-      clearInterval(intervalRef.current);
-    }
 
-    return () => clearInterval(intervalRef.current);
-  }, [isActive, pomodoroMode, pomodoroState]);
+// Gérer le timer
+useEffect(() => {
+  if (isActive) {
+    intervalRef.current = setInterval(() => {
+      setTimer(prevTimer => prevTimer + 1);
+      
+      // N'incrémenter le temps effectif que pendant les phases de focus en mode pomodoro
+      // Ou tout le temps quand pomodoro est désactivé
+      if (!pomodoroMode || (pomodoroMode && pomodoroState === 'focus')) {
+        setEffectiveStudyTime(prev => prev + 1);
+      }
+    }, 1000);
+  } else {
+    clearInterval(intervalRef.current);
+  }
+
+  return () => clearInterval(intervalRef.current);
+}, [isActive, pomodoroMode, pomodoroState]);
 
   // Gestion du mode Pomodoro
   useEffect(() => {
@@ -384,12 +385,7 @@ const TimerApp = ({
           }`}>
             {formatTime(timer)}
           </div>
-          
-          {pomodoroMode && pomodoroState === 'focus' && (
-            <div className="text-xl mb-4">
-              Temps d'étude effectif: {formatTime(effectiveStudyTime)}
-            </div>
-          )}
+        
           
           <div className="flex justify-center space-x-4 mt-8">
             {isActive ? (
@@ -430,146 +426,146 @@ const TimerApp = ({
 
   // Affichage normal
   return (
-    <div className="w-full space-y-6">
-      {/* Sélection d'objectif et mode Pomodoro */}
-      <div className="bg-base-200 p-4 rounded-box shadow">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-medium">Choisir un objectif</h2>
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setShowAllGoals(!showAllGoals)}
-              className="btn btn-sm btn-outline"
-            >
-              {showAllGoals ? "Uniquement aujourd'hui" : "Tous les objectifs"}
-            </button>
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+{/* Sélection d'objectif et mode Pomodoro */}
+<div className="card bg-base-200 shadow-lg">
+  <div className="card-body">
+    <h2 className="card-title">Objectif actuel</h2>
+    
+    <select
+      value={selectedGoal || ''}
+      onChange={(e) => onSelectGoal(e.target.value ? Number(e.target.value) : null)}
+      className="select select-bordered w-full mb-4"
+      disabled={isActive}
+    >
+      <option value="">Sélectionnez un objectif</option>
+      {goals.map(goal => (
+        <option key={goal.id} value={goal.id}>
+          {goal.title} ({goal.minutes} min/jour)
+        </option>
+      ))}
+    </select>
+    
+    {selectedGoal && (
+      <div className="mt-2">
+        {remainingTime > 0 ? (
+          <div className="alert alert-info">
+            <Clock size={18} />
+            <span>
+              Temps restant aujourd'hui : <strong>{formatTime(remainingTime)}</strong>
+            </span>
           </div>
+        ) : (
+          <div className="alert alert-success">
+            <span>
+              {Object.values(goals.find(g => g.id === selectedGoal)?.days || {}).some(day => day) 
+                ? "Objectif atteint pour aujourd'hui !" 
+                : "Cet objectif n'est pas prévu pour aujourd'hui"}
+            </span>
+          </div>
+        )}
+      </div>
+    )}
+    
+    {/* Contrôles du timer ajoutés ici */}
+    {selectedGoal && (
+      <div className="border-t pt-4 mt-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Coffee size={18} />
+            <span className="text-sm">Mode Pomodoro</span>
+          </div>
+          <input 
+            type="checkbox" 
+            className="toggle toggle-primary" 
+            checked={pomodoroMode}
+            onChange={togglePomodoroMode}
+            disabled={isActive}
+          />
         </div>
         
-        {/* Affichage des cartes d'objectifs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-          {getGoalsToDisplay().map(goal => (
-            <GoalCard
-              key={goal.id}
-              goal={goal}
-              isSelected={selectedGoal === goal.id}
-              onSelect={onSelectGoal}
-              remainingTime={getRemainingTimeForGoal(goal.id)}
-            />
-          ))}
-          
-          {/* Carte pour ajouter un nouvel objectif */}
-          <div 
-            className="card bg-base-100 border-2 border-dashed border-base-300 cursor-pointer hover:border-primary transition-colors duration-200 flex items-center justify-center min-h-[140px]"
-            onClick={() => document.getElementById('goals_modal').showModal()}
-          >
-            <div className="text-center p-4">
-              <PlusCircle size={32} className="mx-auto mb-2 opacity-60" />
-              <p className="text-sm font-medium">Ajouter un objectif</p>
-            </div>
+        {pomodoroMode && (
+          <div className="text-xs mb-4 opacity-70">
+            25 min de travail, 5 min de pause. Les pauses ne sont pas comptées.
           </div>
-        </div>
-
-        {/* Switch pour le mode Pomodoro */}
-        <div className="form-control w-full mt-4">
-          <label className="label cursor-pointer justify-start gap-2">
-            <span className="label-text flex items-center">
-              <Coffee size={18} className="mr-2" />
-              Mode Pomodoro
-            </span>
-            <input 
-              type="checkbox" 
-              className="toggle toggle-primary ml-2" 
-              checked={pomodoroMode}
-              onChange={togglePomodoroMode}
-              disabled={isActive}
-            />
-          </label>
-          {pomodoroMode && (
-            <div className="text-xs mt-1 opacity-70 ml-8">
-              25 min de travail, 5 min de pause. Les pauses ne sont pas comptées.
+        )}
+        
+        <div className="text-center">
+          <div className={`text-3xl font-mono my-4 ${
+            isActive 
+              ? pomodoroState === 'focus' ? 'text-primary' : 'text-accent'
+              : ''
+          }`}>
+            {formatTime(timer)}
+          </div>
+          
+          {pomodoroMode && isActive && (
+            <div className="badge badge-sm mb-4">
+              {pomodoroState === 'focus' ? 'Focus' : 'Pause'}
+            </div>
+          )}
+          
+          <div className="flex justify-center space-x-4">
+            {!isActive ? (
+              <button
+                onClick={startTimer}
+                className="btn btn-primary"
+                disabled={!selectedGoal}
+                title="Démarrer"
+              >
+                <Play size={20} className="mr-2" />
+                Démarrer
+              </button>
+            ) : (
+              <button
+                onClick={pauseTimer}
+                className="btn btn-warning"
+                title="Pause"
+              >
+                <Pause size={20} className="mr-2" />
+                Pause
+              </button>
+            )}
+            
+            <button
+              onClick={stopTimer}
+              className="btn btn-error"
+              disabled={timer === 0}
+              title="Arrêter et enregistrer"
+            >
+              <StopCircle size={20} className="mr-2" />
+              Arrêter
+            </button>
+          </div>
+          
+          {timerStartTime && (
+            <div className="mt-4 text-sm opacity-75">
+              Démarré à {new Date(timerStartTime).toLocaleTimeString('fr-FR')}
             </div>
           )}
         </div>
+        
+        {isActive && (
+          <div className="mt-4 flex justify-end">
+            <button 
+              onClick={toggleFocusMode}
+              className="btn btn-sm btn-ghost"
+              title="Mode plein écran"
+            >
+              <Maximize size={18} className="mr-1" />
+              Plein écran
+            </button>
+          </div>
+        )}
       </div>
+    )}
+  </div>
+</div>
 
       {/* Timer et statistiques */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Timer */}
-        <div className="card bg-base-200 shadow-lg">
-          <div className="card-body">
-            <div className="flex justify-between items-center">
-              <h2 className="card-title">
-                Timer
-                {pomodoroMode && isActive && (
-                  <span className={`badge ${pomodoroState === 'focus' ? 'badge-primary' : 'badge-accent'}`}>
-                    {pomodoroState === 'focus' ? 'Focus' : 'Pause'}
-                  </span>
-                )}
-              </h2>
-              {timer > 0 && (
-                <button 
-                  onClick={toggleFocusMode}
-                  className="btn btn-sm btn-circle btn-ghost"
-                  title="Mode plein écran"
-                >
-                  <Maximize size={18} />
-                </button>
-              )}
-            </div>
-            
-            <div className="text-center my-4">
-              <div className={`text-4xl sm:text-5xl font-mono my-6 ${
-                isActive 
-                  ? pomodoroState === 'focus' ? 'text-primary' : 'text-accent'
-                  : ''
-              }`}>
-                {formatTime(timer)}
-              </div>
-              
-              {pomodoroMode && pomodoroState === 'focus' && isActive && (
-                <div className="text-sm mb-4">
-                  Temps d'étude effectif: {formatTime(effectiveStudyTime)}
-                </div>
-              )}
-              
-              <div className="flex justify-center space-x-4">
-                {!isActive ? (
-                  <button
-                    onClick={startTimer}
-                    className="btn btn-circle btn-primary"
-                    disabled={!selectedGoal}
-                    title="Démarrer"
-                  >
-                    <Play size={24} />
-                  </button>
-                ) : (
-                  <button
-                    onClick={pauseTimer}
-                    className="btn btn-circle btn-warning"
-                    title="Pause"
-                  >
-                    <Pause size={24} />
-                  </button>
-                )}
-                
-                <button
-                  onClick={stopTimer}
-                  className="btn btn-circle btn-error"
-                  disabled={timer === 0}
-                  title="Arrêter et enregistrer"
-                >
-                  <StopCircle size={24} />
-                </button>
-              </div>
-              
-              {timerStartTime && (
-                <div className="mt-4 text-sm opacity-75">
-                  Démarré à {new Date(timerStartTime).toLocaleTimeString('fr-FR')}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        
 
         {/* Statistiques */}
         <div className="card bg-base-200 shadow-lg">
