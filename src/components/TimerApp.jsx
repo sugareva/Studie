@@ -430,12 +430,13 @@ const TimerApp = ({
 
   // Affichage normal
   return (
-    <div className="w-full grid grid-cols- md:grid-cols-2 gap-4 sm:gap-6">
+    <div className="w-full grid grid-cols-1 md:grid-cols-6 gap-4 sm:gap-6">
       {/* Sélection d'objectif et mode Pomodoro */}
-      <div className="bg-base-200 p-4 rounded-box shadow">
+      <div className="bg-base-200 p-4 rounded-box shadow md:col-span-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-medium">Choisir un objectif</h2>
           <div className="flex items-center gap-2">
+            
             <button 
               onClick={() => setShowAllGoals(!showAllGoals)}
               className="btn btn-sm btn-outline"
@@ -564,11 +565,11 @@ const TimerApp = ({
       </div>
 
       {/* Timer et statistiques */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="card bg-base-200 shadow-lg md:col-span-2">
         {/* Timer */}
 
         {/* Statistiques */}
-        <div className="card bg-base-200 shadow-lg">
+        <div className="">
           <div className="card-body">
             <h2 className="card-title">Statistiques</h2>
             

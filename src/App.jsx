@@ -213,10 +213,10 @@ const App = () => {
 
   return (
     <div className="min-h-screen w-screen overflow-x-hidden bg-base-100 text-base-content">
-      <div className="w-full max-w-[85%] mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="w-full max-w-[80%] mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Header avec logo et contrôles utilisateur */}
-        <header className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-extrabold">Studie</h1>
+        <header className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-extrabold">Studie</h1>
           <div className="flex items-center space-x-4">
             <div className="flex items-center text-sm opacity-70">
               <User size={16} className="mr-1" />
@@ -239,15 +239,14 @@ const App = () => {
         </header>
 
         {/* Barre de navigation principale */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Suivi du temps</h2>
           <button
             onClick={openGoalsModal}
-            className="btn btn-sm btn-primary"
+            className="btn btn-circle btn-ghost"
             title="Gérer les objectifs"
           >
-            <Settings size={16} className="mr-1" />
-            Gérer les objectifs
+            <Settings size={20} />
           </button>
         </div>
 
@@ -270,7 +269,7 @@ const App = () => {
           </div>
         </dialog>
 
-        {/* Timer App toujours affiché avec disposition modifiée */}
+        {/* Timer App toujours affiché */}
         <TimerApp 
           darkMode={darkMode} 
           goals={goals} 
