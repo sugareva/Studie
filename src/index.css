@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, cupcake;
+}
+
+
+/* Reset pour forcer la largeur complète */
+html, body, #root {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Overrides pour les styles Tailwind */
+.w-full {
+  width: 100% !important;
+}
+
+.max-w-none {
+  max-width: none !important;
+}
+
+/* Garantir que les tableaux prennent toute la largeur disponible */
+table {
+  width: 100%;
+  table-layout: fixed;
+}
