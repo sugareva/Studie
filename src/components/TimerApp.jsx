@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, StopCircle, BarChart2, Clock, X, Maximize, Minimize, Trash2, Coffee } from 'lucide-react';
+import { Play, Pause, StopCircle, BarChart2, Clock, X, Maximize, Minimize, Trash2, Coffee, PlusCircle } from 'lucide-react';
+import GoalCard from './GoalCard';
 
 const TimerApp = ({ 
   darkMode, 
@@ -21,6 +22,7 @@ const TimerApp = ({
   const [pomodoroState, setPomodoroState] = useState('focus'); // 'focus' ou 'break'
   const [pomodoroCount, setPomodoroCount] = useState(0);
   const [effectiveStudyTime, setEffectiveStudyTime] = useState(0); // Temps d'étude effectif (sans pauses)
+  const [showAllGoals, setShowAllGoals] = useState(false);
   
   const intervalRef = useRef(null);
   const pomodoroTimerRef = useRef(null);
@@ -305,6 +307,40 @@ const TimerApp = ({
   // Calculer le temps total passé cette semaine
   const totalTimeWeek = weekSessions.reduce((total, session) => total + session.duration, 0);
 
+  // Obtenir les objectifs à afficher (tous ou seulement ceux du jour)
+  const getGoalsToDisplay = () => {
+    if (showAllGoals) return goals;
+    
+    const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+    const today = days[new Date().getDay()];
+    
+    return goals.filter(goal => goal.days[today]);
+  };
+
+  // Calculer le temps restant par objectif
+  const getRemainingTimeForGoal = (goalId) => {
+    const goal = goals.find(g => g.id === goalId);
+    if (!goal) return 0;
+    
+    const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+    const today = days[new Date().getDay()];
+    
+    if (!goal.days[today]) return 0;
+    
+    const todayStr = new Date().toDateString();
+    const todaySessionsForGoal = studySessions.filter(
+      session => session.goalId === goalId && new Date(session.date).toDateString() === todayStr
+    );
+    
+    const totalMinutesToday = todaySessionsForGoal.reduce(
+      (total, session) => total + session.duration, 0
+    ) / 60; // Convertir les secondes en minutes
+    
+    // Calculer le temps restant en secondes
+    const remainingMinutes = Math.max(0, goal.minutes - totalMinutesToday);
+    return Math.round(remainingMinutes * 60);
+  };
+
   // Si mode focus activé, afficher uniquement le timer en plein écran
   if (focusMode) {
     return (
@@ -394,207 +430,207 @@ const TimerApp = ({
 
   // Affichage normal
   return (
-    <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+    <div className="w-full space-y-6">
       {/* Sélection d'objectif et mode Pomodoro */}
-      <div className="card bg-base-200 shadow-lg">
-        <div className="card-body">
-          <h2 className="card-title">Objectif actuel</h2>
-          
-          <select
-            value={selectedGoal || ''}
-            onChange={(e) => onSelectGoal(e.target.value ? Number(e.target.value) : null)}
-            className="select select-bordered w-full mb-4"
-            disabled={isActive}
-          >
-            <option value="">Sélectionnez un objectif</option>
-            {goals.map(goal => (
-              <option key={goal.id} value={goal.id}>
-                {goal.title} ({goal.minutes} min/jour)
-              </option>
-            ))}
-          </select>
-          
-          {/* Switch pour le mode Pomodoro */}
-          <div className="form-control w-full mb-4">
-            <label className="label cursor-pointer">
-              <span className="label-text flex items-center">
-                <Coffee size={18} className="mr-2" />
-                Mode Pomodoro
-              </span>
-              <input 
-                type="checkbox" 
-                className="toggle toggle-primary" 
-                checked={pomodoroMode}
-                onChange={togglePomodoroMode}
-                disabled={isActive}
-              />
-            </label>
-            {pomodoroMode && (
-              <div className="text-xs mt-1 opacity-70">
-                25 min de travail, 5 min de pause. Les pauses ne sont pas comptées.
-              </div>
-            )}
+      <div className="bg-base-200 p-4 rounded-box shadow">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-medium">Choisir un objectif</h2>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setShowAllGoals(!showAllGoals)}
+              className="btn btn-sm btn-outline"
+            >
+              {showAllGoals ? "Uniquement aujourd'hui" : "Tous les objectifs"}
+            </button>
           </div>
+        </div>
+        
+        {/* Affichage des cartes d'objectifs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          {getGoalsToDisplay().map(goal => (
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              isSelected={selectedGoal === goal.id}
+              onSelect={onSelectGoal}
+              remainingTime={getRemainingTimeForGoal(goal.id)}
+            />
+          ))}
           
-          {selectedGoal && (
-            <div className="mt-2">
-              {remainingTime > 0 ? (
-                <div className="alert alert-info">
-                  <Clock size={18} />
-                  <span>
-                    Temps restant aujourd'hui : <strong>{formatTime(remainingTime)}</strong>
-                  </span>
-                </div>
-              ) : (
-                <div className="alert alert-success">
-                  <span>
-                    {Object.values(goals.find(g => g.id === selectedGoal)?.days || {}).some(day => day) 
-                      ? "Objectif atteint pour aujourd'hui !" 
-                      : "Cet objectif n'est pas prévu pour aujourd'hui"}
-                  </span>
-                </div>
-              )}
+          {/* Carte pour ajouter un nouvel objectif */}
+          <div 
+            className="card bg-base-100 border-2 border-dashed border-base-300 cursor-pointer hover:border-primary transition-colors duration-200 flex items-center justify-center min-h-[140px]"
+            onClick={() => document.getElementById('goals_modal').showModal()}
+          >
+            <div className="text-center p-4">
+              <PlusCircle size={32} className="mx-auto mb-2 opacity-60" />
+              <p className="text-sm font-medium">Ajouter un objectif</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Switch pour le mode Pomodoro */}
+        <div className="form-control w-full mt-4">
+          <label className="label cursor-pointer justify-start gap-2">
+            <span className="label-text flex items-center">
+              <Coffee size={18} className="mr-2" />
+              Mode Pomodoro
+            </span>
+            <input 
+              type="checkbox" 
+              className="toggle toggle-primary ml-2" 
+              checked={pomodoroMode}
+              onChange={togglePomodoroMode}
+              disabled={isActive}
+            />
+          </label>
+          {pomodoroMode && (
+            <div className="text-xs mt-1 opacity-70 ml-8">
+              25 min de travail, 5 min de pause. Les pauses ne sont pas comptées.
             </div>
           )}
         </div>
       </div>
 
-      {/* Timer */}
-      <div className="card bg-base-200 shadow-lg">
-        <div className="card-body">
-          <div className="flex justify-between items-center">
-            <h2 className="card-title">
-              Timer
-              {pomodoroMode && isActive && (
-                <span className={`badge ${pomodoroState === 'focus' ? 'badge-primary' : 'badge-accent'}`}>
-                  {pomodoroState === 'focus' ? 'Focus' : 'Pause'}
-                </span>
+      {/* Timer et statistiques */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Timer */}
+        <div className="card bg-base-200 shadow-lg">
+          <div className="card-body">
+            <div className="flex justify-between items-center">
+              <h2 className="card-title">
+                Timer
+                {pomodoroMode && isActive && (
+                  <span className={`badge ${pomodoroState === 'focus' ? 'badge-primary' : 'badge-accent'}`}>
+                    {pomodoroState === 'focus' ? 'Focus' : 'Pause'}
+                  </span>
+                )}
+              </h2>
+              {timer > 0 && (
+                <button 
+                  onClick={toggleFocusMode}
+                  className="btn btn-sm btn-circle btn-ghost"
+                  title="Mode plein écran"
+                >
+                  <Maximize size={18} />
+                </button>
               )}
-            </h2>
-            {timer > 0 && (
-              <button 
-                onClick={toggleFocusMode}
-                className="btn btn-sm btn-circle btn-ghost"
-                title="Mode plein écran"
-              >
-                <Maximize size={18} />
-              </button>
-            )}
-          </div>
-          
-          <div className="text-center my-4">
-            <div className={`text-4xl sm:text-5xl font-mono my-6 ${
-              isActive 
-                ? pomodoroState === 'focus' ? 'text-primary' : 'text-accent'
-                : ''
-            }`}>
-              {formatTime(timer)}
             </div>
             
-            {pomodoroMode && pomodoroState === 'focus' && isActive && (
-              <div className="text-sm mb-4">
-                Temps d'étude effectif: {formatTime(effectiveStudyTime)}
+            <div className="text-center my-4">
+              <div className={`text-4xl sm:text-5xl font-mono my-6 ${
+                isActive 
+                  ? pomodoroState === 'focus' ? 'text-primary' : 'text-accent'
+                  : ''
+              }`}>
+                {formatTime(timer)}
               </div>
-            )}
-            
-            <div className="flex justify-center space-x-4">
-              {!isActive ? (
-                <button
-                  onClick={startTimer}
-                  className="btn btn-circle btn-primary"
-                  disabled={!selectedGoal}
-                  title="Démarrer"
-                >
-                  <Play size={24} />
-                </button>
-              ) : (
-                <button
-                  onClick={pauseTimer}
-                  className="btn btn-circle btn-warning"
-                  title="Pause"
-                >
-                  <Pause size={24} />
-                </button>
+              
+              {pomodoroMode && pomodoroState === 'focus' && isActive && (
+                <div className="text-sm mb-4">
+                  Temps d'étude effectif: {formatTime(effectiveStudyTime)}
+                </div>
               )}
               
-              <button
-                onClick={stopTimer}
-                className="btn btn-circle btn-error"
-                disabled={timer === 0}
-                title="Arrêter et enregistrer"
-              >
-                <StopCircle size={24} />
-              </button>
-            </div>
-            
-            {timerStartTime && (
-              <div className="mt-4 text-sm opacity-75">
-                Démarré à {new Date(timerStartTime).toLocaleTimeString('fr-FR')}
+              <div className="flex justify-center space-x-4">
+                {!isActive ? (
+                  <button
+                    onClick={startTimer}
+                    className="btn btn-circle btn-primary"
+                    disabled={!selectedGoal}
+                    title="Démarrer"
+                  >
+                    <Play size={24} />
+                  </button>
+                ) : (
+                  <button
+                    onClick={pauseTimer}
+                    className="btn btn-circle btn-warning"
+                    title="Pause"
+                  >
+                    <Pause size={24} />
+                  </button>
+                )}
+                
+                <button
+                  onClick={stopTimer}
+                  className="btn btn-circle btn-error"
+                  disabled={timer === 0}
+                  title="Arrêter et enregistrer"
+                >
+                  <StopCircle size={24} />
+                </button>
               </div>
-            )}
+              
+              {timerStartTime && (
+                <div className="mt-4 text-sm opacity-75">
+                  Démarré à {new Date(timerStartTime).toLocaleTimeString('fr-FR')}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Statistiques */}
-      <div className="card bg-base-200 shadow-lg">
-        <div className="card-body">
-          <h2 className="card-title">Statistiques</h2>
-          
-          <div className="stats stats-vertical shadow my-4">
-            <div className="stat">
-              <div className="stat-title">Aujourd'hui</div>
-              <div className="stat-value">{formatTime(totalTimeToday)}</div>
-            </div>
+        {/* Statistiques */}
+        <div className="card bg-base-200 shadow-lg">
+          <div className="card-body">
+            <h2 className="card-title">Statistiques</h2>
             
-            <div className="stat">
-              <div className="stat-title">Cette semaine</div>
-              <div className="stat-value">{formatTime(totalTimeWeek)}</div>
-            </div>
-          </div>
-          
-          <div>
-            <div className="flex items-center mb-3">
-              <BarChart2 size={18} className="mr-2" />
-              <h3 className="font-medium">Sessions récentes</h3>
-            </div>
-            
-            {studySessions.length === 0 ? (
-              <div className="text-center py-3">
-                <p className="italic opacity-70">
-                  Aucune session d'étude enregistrée
-                </p>
+            <div className="stats stats-vertical shadow my-4">
+              <div className="stat">
+                <div className="stat-title">Aujourd'hui</div>
+                <div className="stat-value">{formatTime(totalTimeToday)}</div>
               </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="table table-xs">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Durée</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {studySessions.slice().reverse().slice(0, 3).map(session => (
-                      <tr key={session.id}>
-                        <td>{formatDate(session.date)}</td>
-                        <td className="font-mono">{formatTime(session.duration)}</td>
-                        <td>
-                          <button
-                            onClick={() => handleDeleteSession(session.id)}
-                            className="btn btn-xs btn-ghost btn-circle text-error"
-                            title="Supprimer cette session"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </td>
+              
+              <div className="stat">
+                <div className="stat-title">Cette semaine</div>
+                <div className="stat-value">{formatTime(totalTimeWeek)}</div>
+              </div>
+            </div>
+            
+            <div>
+              <div className="flex items-center mb-3">
+                <BarChart2 size={18} className="mr-2" />
+                <h3 className="font-medium">Sessions récentes</h3>
+              </div>
+              
+              {studySessions.length === 0 ? (
+                <div className="text-center py-3">
+                  <p className="italic opacity-70">
+                    Aucune session d'étude enregistrée
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="table table-xs">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Durée</th>
+                        <th>Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    </thead>
+                    <tbody>
+                      {studySessions.slice().reverse().slice(0, 3).map(session => (
+                        <tr key={session.id}>
+                          <td>{formatDate(session.date)}</td>
+                          <td className="font-mono">{formatTime(session.duration)}</td>
+                          <td>
+                            <button
+                              onClick={() => handleDeleteSession(session.id)}
+                              className="btn btn-xs btn-ghost btn-circle text-error"
+                              title="Supprimer cette session"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
