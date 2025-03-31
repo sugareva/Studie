@@ -441,13 +441,13 @@ const TimerApp = ({
               onClick={() => setShowAllGoals(!showAllGoals)}
               className="btn btn-sm btn-outline"
             >
-              {showAllGoals ? "Uniquement aujourd'hui" : "Tous les objectifs"}
+              {showAllGoals ? "aujourd'hui" : "Tous les objectifs"}
             </button>
           </div>
         </div>
         
         {/* Affichage des cartes d'objectifs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4 ">
           {getGoalsToDisplay().map(goal => (
             <GoalCard
               key={goal.id}
@@ -460,10 +460,10 @@ const TimerApp = ({
           
           {/* Carte pour ajouter un nouvel objectif */}
           <div 
-            className="card bg-base-100 border-2 border-dashed border-base-300 cursor-pointer hover:border-primary transition-colors duration-200 flex items-center justify-center min-h-[140px]"
+            className="card bg-base-100 border-2 border-dashed border-base-300 cursor-pointer hover:border-primary transition-colors duration-200 flex items-center justify-center"
             onClick={() => document.getElementById('goals_modal').showModal()}
           >
-            <div className="text-center p-4">
+            <div className="text-center p-2">
               <PlusCircle size={32} className="mx-auto mb-2 opacity-60" />
               <p className="text-sm font-medium">Ajouter un objectif</p>
             </div>
@@ -573,17 +573,17 @@ const TimerApp = ({
           <div className="card-body">
             <h2 className="card-title">Statistiques</h2>
             
-            <div className="stats stats-vertical shadow my-4">
-              <div className="stat">
-                <div className="stat-title">Aujourd'hui</div>
-                <div className="stat-value">{formatTime(totalTimeToday)}</div>
-              </div>
-              
-              <div className="stat">
-                <div className="stat-title">Cette semaine</div>
-                <div className="stat-value">{formatTime(totalTimeWeek)}</div>
-              </div>
+            <div className="stats shadow my-4 stats-horizontal">
+            <div className="stat">
+              <div className="stat-title text-xs">Aujourd'hui</div>
+              <div className="stat-value text-xl">{formatTime(totalTimeToday)}</div>
             </div>
+            
+            <div className="stat">
+              <div className="stat-title text-xs">Cette semaine</div>
+              <div className="stat-value text-xl">{formatTime(totalTimeWeek)}</div>
+            </div>
+          </div>
             
             <div>
               <div className="flex items-center mb-3">
