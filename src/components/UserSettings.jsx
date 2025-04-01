@@ -30,7 +30,7 @@ const UserSettings = ({ user, updateUserProfile, modalRef }) => {
           .select('nickname, avatar_url')
           .eq('user_id', user.id)
           .single();
-
+          
         if (error && error.code !== 'PGRST116') {
           throw error;
         }
@@ -43,7 +43,7 @@ const UserSettings = ({ user, updateUserProfile, modalRef }) => {
         console.error('Erreur lors du chargement du profil:', error);
       }
     };
-
+    
     if (user) {
       loadProfile();
     }
@@ -54,40 +54,89 @@ const UserSettings = ({ user, updateUserProfile, modalRef }) => {
       modalRef.current.close();
     }
   };
+    // Fonction pour mettre à jour l'avatar séparément
+    const updateAvatar = async (avatarUrl) => {
+        try {
+          // Utilisez upsert directement pour éviter les problèmes de duplication
+          const { error } = await supabase
+            .from('profiles')
+            .upsert({
+              user_id: user.id,
+              avatar_url: avatarUrl,
+              updated_at: new Date().toISOString()
+            });
+            
+          if (error) throw error;
+          return { success: true };
+        } catch (error) {
+          console.error('Erreur lors de la mise à jour du profil:', error);
+          throw new Error("Impossible de sauvegarder les modifications. Veuillez réessayer.");
+        }
+      };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setErrorMessage('');
-
-    try {
-      // Stocker les préférences dans la table profiles
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          user_id: user.id,
-          nickname: nickname.trim(),
-          avatar_url: selectedAvatar,
-          updated_at: new Date().toISOString(),
-        });
-
-      if (error) throw error;
-
-      // Mettre à jour l'état global via la fonction passée en props
-      updateUserProfile({
-        nickname: nickname.trim(),
-        avatar_url: selectedAvatar
-      });
-
-      // Fermer la modal
-      closeModal();
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du profil:', error);
-      setErrorMessage('Impossible de sauvegarder les modifications. Veuillez réessayer.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setErrorMessage('');
+        
+        try {
+          // Vérifier d'abord si un profil existe déjà
+          const { data: existingProfile, error: checkError } = await supabase
+            .from('profiles')
+            .select('id')  // Récupérer l'ID pour pouvoir faire une mise à jour
+            .eq('user_id', user.id)
+            .maybeSingle();
+            
+          if (checkError) {
+            console.error('Erreur lors de la vérification du profil:', checkError);
+            throw checkError;
+          }
+          
+          let profileError;
+          
+          if (existingProfile) {
+            // Mettre à jour le profil existant en utilisant l'ID existant
+            const { error } = await supabase
+              .from('profiles')
+              .update({
+                nickname: nickname.trim(),
+                avatar_url: selectedAvatar,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', existingProfile.id);  // Utiliser l'ID comme critère
+            
+            profileError = error;
+          } else {
+            // Créer un nouveau profil
+            const { error } = await supabase
+              .from('profiles')
+              .insert({
+                user_id: user.id,
+                nickname: nickname.trim(),
+                avatar_url: selectedAvatar
+                // Pas besoin de spécifier created_at et updated_at car ils ont des valeurs par défaut
+              });
+            
+            profileError = error;
+          }
+          
+          if (profileError) throw profileError;
+          
+          // Mettre à jour l'état global via la fonction passée en props
+          updateUserProfile({
+            nickname: nickname.trim(),
+            avatar_url: selectedAvatar
+          });
+          
+          // Fermer le modal après la mise à jour réussie
+          closeModal();
+        } catch (error) {
+          console.error('Erreur détaillée lors de la sauvegarde du profil:', error);
+          setErrorMessage("Impossible de sauvegarder les modifications. Veuillez réessayer.");
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
   return (
     <>
