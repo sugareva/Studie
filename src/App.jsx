@@ -214,28 +214,33 @@ const App = () => {
       console.error('Erreur lors de la mise à jour des objectifs:', error);
     }
   };
-
   const handleAddStudySession = async (session) => {
     try {
-      // Ajouter l'ID utilisateur
-      const sessionWithUserId = user ? {
-        ...session,
-        user_id: user.id, // Assurez-vous que c'est une chaîne
-      } : session;
+      // Transformation des noms de propriétés de camelCase vers snake_case
+      const sessionForDB = {
+        id: session.id,
+        goal_id: session.goalId,  // Changé de goalId à goal_id
+        duration: session.duration,
+        date: session.date,
+        goal_title: session.goalTitle,  // Changé de goalTitle à goal_title
+        user_id: user.id.toString()
+      };
       
-      // Mettre à jour l'état local
-      const newSessions = [...studySessions, sessionWithUserId];
+      console.log('Tentative d\'enregistrement avec session:', sessionForDB);
+      
+      // Mettre à jour l'état local avec la version originale
+      const newSessions = [...studySessions, session];
       setStudySessions(newSessions);
       
-      // Sauvegarder dans Supabase si l'utilisateur est connecté
+      // Sauvegarder dans Supabase avec la version formatée
       if (user) {
-        console.log('Enregistrement de la session dans Supabase:', sessionWithUserId);
         const { data, error } = await supabase
           .from('sessions')
-          .insert([sessionWithUserId]);
+          .insert([sessionForDB])
+          .select();
           
         if (error) {
-          console.error('Erreur détaillée Supabase:', error);
+          console.error('Erreur Supabase détaillée:', error);
           throw error;
         }
         
@@ -243,10 +248,11 @@ const App = () => {
       }
     } catch (error) {
       console.error('Erreur lors de l\'ajout d\'une session:', error);
+      alert('Erreur lors de l\'enregistrement de la session: ' + error.message);
     }
   };
-
-  const handleDeleteStudySession = async (sessionId) => {
+  
+const handleDeleteStudySession = async (sessionId) => {
     try {
       // Mettre à jour l'état local
       const updatedSessions = studySessions.filter(s => s.id !== sessionId);

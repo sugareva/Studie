@@ -434,14 +434,14 @@ const TimerApp = ({
       {/* Sélection d'objectif et mode Pomodoro */}
       <div className="bg-base-200 p-4 rounded-box shadow md:col-span-4">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-medium">Choisir un objectif</h2>
+          <h2 className="text-l font-medium">Choisir un objectif</h2>
           <div className="flex items-center gap-2">
             
             <button 
               onClick={() => setShowAllGoals(!showAllGoals)}
-              className="btn btn-sm btn-outline"
+              className="btn btn-xs btn-outline"
             >
-              {showAllGoals ? "aujourd'hui" : "Tous les objectifs"}
+              {showAllGoals ? "Aujourd'hui" : "Voir tout"}
             </button>
           </div>
         </div>
