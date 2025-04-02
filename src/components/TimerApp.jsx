@@ -11,6 +11,7 @@ const TimerApp = ({
   selectedGoal, 
   onSelectGoal 
 }) => {
+  const [filteredGoalId, setFilteredGoalId] = useState(null);
   const [timer, setTimer] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [timerStartTime, setTimerStartTime] = useState(null);
@@ -244,11 +245,11 @@ const TimerApp = ({
     if (timer > 0) {
       const session = {
         id: Date.now(),
-        goalId: selectedGoal,
+        goal_id: selectedGoal,
         // En mode Pomodoro, on n'enregistre que le temps d'étude effectif
         duration: pomodoroMode ? effectiveStudyTime : timer,
         date: new Date().toISOString(),
-        goalTitle: goals.find(g => g.id === selectedGoal)?.title || 'Inconnu'
+        goal_title: goals.find(g => g.id === selectedGoal)?.title || 'Inconnu'
       };
       
       onAddSession(session);
@@ -591,33 +592,54 @@ const TimerApp = ({
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="table table-xs">
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Durée</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {studySessions.slice().reverse().slice(0, 3).map(session => (
-                        <tr key={session.id}>
-                          <td>{formatDate(session.date)}</td>
-                          <td className="font-mono">{formatTime(session.duration)}</td>
-                          <td>
-                            <button
-                              onClick={() => handleDeleteSession(session.id)}
-                              className="btn btn-xs btn-ghost btn-circle text-error"
-                              title="Supprimer cette session"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+  {/* Filtre par objectif */}
+  <div className="mb-2">
+  <select 
+  className="select select-xs select-bordered w-full max-w-xs"
+  value={filteredGoalId || ""}
+  onChange={(e) => setFilteredGoalId(e.target.value ? Number(e.target.value) : null)}
+>
+  <option value="">Tous les objectifs</option>
+  {goals.map(goal => (
+    <option key={goal.id} value={goal.id}>{goal.title}</option>
+  ))}
+</select>
+  </div>
+
+  <table className="table table-xs">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Objectif</th>
+        <th>Durée</th>
+        <th></th> {/* En-tête vide au lieu de "Action" */}
+      </tr>
+    </thead>
+    <tbody>
+      {studySessions
+        .slice()
+        .reverse()
+        .slice(0, 3)
+        .filter(session => !filteredGoalId || session.goal_id === filteredGoalId)
+        .map(session => (
+          <tr key={session.id}>
+            <td>{formatDate(session.date)}</td>
+            <td>{session.goal_title || getGoalName(session.goal_id)}</td> {/* Nom de l'objectif */}
+            <td className="font-mono">{formatTime(session.duration)}</td>
+            <td>
+              <button
+                onClick={() => handleDeleteSession(session.id)}
+                className="btn btn-xs btn-ghost text-error px-1" // Taille réduite avec padding ajusté
+                title="Supprimer cette session"
+              >
+                <Trash2 size={12} /> {/* Taille d'icône réduite */}
+              </button>
+            </td>
+          </tr>
+        ))}
+    </tbody>
+  </table>
+</div>
               )}
             </div>
           </div>
