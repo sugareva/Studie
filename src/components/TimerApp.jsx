@@ -242,23 +242,36 @@ const TimerApp = ({
 
   // Arrêter le timer et enregistrer la session
   const stopTimer = () => {
+    // Éviter les appels multiples en vérifiant si le timer est déjà arrêté
+    if (!isActive && timer === 0) {
+      console.log('Timer déjà arrêté, ignoré');
+      return;
+    }
+    
+    console.log("stopTimer - selectedGoal:", selectedGoal, typeof selectedGoal);
+    
     if (timer > 0) {
+      // Trouver l'objectif avec conversion explicite des types pour éviter les erreurs
+      const targetGoal = goals.find(g => String(g.id) === String(selectedGoal));
+      console.log("Objectif trouvé pour la session:", targetGoal);
+      
       const session = {
         id: Date.now(),
-        goal_id: selectedGoal,
-        // En mode Pomodoro, on n'enregistre que le temps d'étude effectif
+        goalId: targetGoal ? targetGoal.id : null,
         duration: pomodoroMode ? effectiveStudyTime : timer,
         date: new Date().toISOString(),
-        goal_title: goals.find(g => g.id === selectedGoal)?.title || 'Inconnu'
+        goalTitle: targetGoal ? targetGoal.title : 'Inconnu'
       };
       
+      console.log("Session créée:", session);
       onAddSession(session);
     }
+    
     
     setIsActive(false);
     setTimer(0);
     setTimerStartTime(null);
-    setFocusMode(false); // Désactiver le mode focus
+    setFocusMode(false);
     setEffectiveStudyTime(0);
     
     // Réinitialiser le mode Pomodoro si actif
@@ -285,10 +298,15 @@ const TimerApp = ({
     }
   };
 
+  // Filtrer les sessions en fonction de l'objectif sélectionné
+const filteredSessions = filteredGoalId 
+? studySessions.filter(session => session.goalId === filteredGoalId || session.goal_id === filteredGoalId)
+: studySessions;
+
   // Obtenir le nom de l'objectif
   const getGoalName = (goalId) => {
     const goal = goals.find(g => g.id === goalId);
-    return goal ? goal.title : 'Objectif inconnu';
+    return goal ? goal_title : 'Objectif inconnu';
   };
 
   // Formater la date
@@ -594,14 +612,16 @@ const TimerApp = ({
                 <div className="overflow-x-auto">
   {/* Filtre par objectif */}
   <div className="mb-2">
-  <select 
+  <select
   className="select select-xs select-bordered w-full max-w-xs"
   value={filteredGoalId || ""}
   onChange={(e) => setFilteredGoalId(e.target.value ? Number(e.target.value) : null)}
 >
   <option value="">Tous les objectifs</option>
   {goals.map(goal => (
-    <option key={goal.id} value={goal.id}>{goal.title}</option>
+    <option key={goal.id} value={goal.id}>
+      {goal.title}
+    </option>
   ))}
 </select>
   </div>
@@ -612,16 +632,10 @@ const TimerApp = ({
         <th>Date</th>
         <th>Objectif</th>
         <th>Durée</th>
-        <th></th> {/* En-tête vide au lieu de "Action" */}
       </tr>
     </thead>
     <tbody>
-      {studySessions
-        .slice()
-        .reverse()
-        .slice(0, 3)
-        .filter(session => !filteredGoalId || session.goal_id === filteredGoalId)
-        .map(session => (
+      {studySessions.slice().reverse().slice(0, 3).filter(session => !filteredGoalId || Number(session.goal_id) === filteredGoalId).map(session => (
           <tr key={session.id}>
             <td>{formatDate(session.date)}</td>
             <td>{session.goal_title || getGoalName(session.goal_id)}</td> {/* Nom de l'objectif */}
@@ -630,8 +644,7 @@ const TimerApp = ({
               <button
                 onClick={() => handleDeleteSession(session.id)}
                 className="btn btn-xs btn-ghost text-error px-1" // Taille réduite avec padding ajusté
-                title="Supprimer cette session"
-              >
+                title="Supprimer cette session">
                 <Trash2 size={12} /> {/* Taille d'icône réduite */}
               </button>
             </td>

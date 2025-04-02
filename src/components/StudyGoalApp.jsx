@@ -4,6 +4,7 @@ import { Clock, Plus, Trash, ChevronUp, ChevronDown } from 'lucide-react';
 const StudyGoalApp = ({ darkMode, goals = [], onGoalsUpdate }) => {
   const [newGoal, setNewGoal] = useState({
     title: '',
+    user_id: user.id.toString(),
     minutes: 30,
     days: {
       lundi: false,
@@ -37,6 +38,7 @@ const StudyGoalApp = ({ darkMode, goals = [], onGoalsUpdate }) => {
       alert('Veuillez sélectionner au moins un jour de la semaine');
       return;
     }
+    
 
     // Convertir les heures en minutes si nécessaire
     const minutes = timeUnit === 'heures' ? Math.round(newGoal.minutes * 60) : newGoal.minutes;

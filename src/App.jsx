@@ -216,13 +216,19 @@ const App = () => {
   };
   const handleAddStudySession = async (session) => {
     try {
+      // Vérifier si une session avec cet ID existe déjà
+      if (studySessions.some(s => s.id === session.id)) {
+        console.warn('Session déjà existante, ignorée:', session.id);
+        return;
+      }
+      
       // Transformation des noms de propriétés de camelCase vers snake_case
       const sessionForDB = {
         id: session.id,
-        goal_id: session.goalId,  // Changé de goalId à goal_id
+        goal_id: session.goalId ? session.goalId.toString() : null,
         duration: session.duration,
         date: session.date,
-        goal_title: session.goalTitle,  // Changé de goalTitle à goal_title
+        goal_title: session.goalTitle,
         user_id: user.id.toString()
       };
       
