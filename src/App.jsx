@@ -9,6 +9,7 @@ import UserSettings from './components/UserSettings';
 
 const App = () => {
   const [darkMode, setDarkMode] = useState(false);
+  
   const [goals, setGoals] = useState([]);
   const [studySessions, setStudySessions] = useState([]);
   const [selectedGoal, setSelectedGoal] = useState(null);
@@ -16,21 +17,45 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [isEmailConfirmation, setIsEmailConfirmation] = useState(false);
-  
+
+
   // Référence pour les modals
   const goalsModalRef = useRef(null);
   const settingsModalRef = useRef(null);
 
-    // Référence pour suivre si la redirection a déjà eu lieu
-    const redirected = useRef(false);
+  // Référence pour suivre si la redirection a déjà eu lieu
+  const redirected = useRef(false);
+
   
   // Vérifier s'il s'agit d'une confirmation d'email
+  
   useEffect(() => {
     const hash = window.location.hash;
     if (hash && hash.includes('type=signup')) {
       setIsEmailConfirmation(true);
     }
   }, []);
+
+  useEffect(() => {
+    // Utiliser bumblebee comme thème par défaut au lieu de cupcake
+    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (prefersDarkMode) {
+      setDarkMode(true);
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      setDarkMode(false);
+      document.documentElement.setAttribute('data-theme', 'bumblebee');
+    }
+  }, []);
+
+  const handleDarkModeToggle = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    document.documentElement.setAttribute('data-theme', newDarkMode ? 'dark' : 'bumblebee');
+  };
+  
+
 
   // Vérifier si l'utilisateur est connecté au chargement
   useEffect(() => {
@@ -140,7 +165,7 @@ const App = () => {
     loadData();
     
     // Ne plus détecter la préférence du système pour utiliser le thème cupcake par défaut
-    setDarkMode(false);
+    
   }, [user]);
 
   const handleGoalsUpdate = async (updatedGoals) => {
@@ -193,7 +218,10 @@ const App = () => {
   const handleAddStudySession = async (session) => {
     try {
       // Ajouter l'ID utilisateur
-      const sessionWithUserId = user ? { ...session, user_id: user.id.toString() } : session;
+      const sessionWithUserId = user ? {
+        ...session,
+        user_id: user.id, // Assurez-vous que c'est une chaîne
+      } : session;
       
       // Mettre à jour l'état local
       const newSessions = [...studySessions, sessionWithUserId];
@@ -201,11 +229,17 @@ const App = () => {
       
       // Sauvegarder dans Supabase si l'utilisateur est connecté
       if (user) {
-        const { error } = await supabase
+        console.log('Enregistrement de la session dans Supabase:', sessionWithUserId);
+        const { data, error } = await supabase
           .from('sessions')
-          .insert(sessionWithUserId);
+          .insert([sessionWithUserId]);
           
-        if (error) throw error;
+        if (error) {
+          console.error('Erreur détaillée Supabase:', error);
+          throw error;
+        }
+        
+        console.log('Session enregistrée avec succès:', data);
       }
     } catch (error) {
       console.error('Erreur lors de l\'ajout d\'une session:', error);
@@ -301,13 +335,15 @@ const App = () => {
               <span className="hidden sm:inline ml-1">Déconnexion</span>
             </button>
             <button 
-              onClick={() => setDarkMode(!darkMode)}
-              className="btn btn-circle btn-sm btn-ghost"
-            >
-              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
+  onClick={handleDarkModeToggle}
+  className="btn btn-circle btn-sm btn-ghost"
+>
+  {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+</button>
           </div>
         </header>
+
+        
 
         {/* Barre de navigation principale */}
         <div className="flex justify-between items-center mb-6">

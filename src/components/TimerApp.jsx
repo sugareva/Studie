@@ -530,15 +530,7 @@ const TimerApp = ({
               </button>
             )}
             
-            <button
-              onClick={stopTimer}
-              className="btn btn-error"
-              disabled={timer === 0}
-              title="Arrêter et enregistrer"
-            >
-              <StopCircle size={20} className="mr-2" />
-              Arrêter
-            </button>
+
           </div>
           
           {timerStartTime && (
