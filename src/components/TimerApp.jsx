@@ -473,7 +473,7 @@ const TimerApp = ({
         {/* Switch pour le mode Pomodoro */}
         {selectedGoal && (
       <div className="border-t pt-4 mt-2">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2 mb-4">
           <div className="flex items-center gap-2">
             <Coffee size={18} />
             <span className="text-sm">Mode Pomodoro</span>

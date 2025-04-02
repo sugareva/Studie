@@ -3,7 +3,8 @@ import { Sun, Moon, Settings, User, LogOut } from 'lucide-react';
 import StudyGoalApp from './components/StudyGoalApp';
 import TimerApp from './components/TimerApp';
 import { supabase } from './supabase';
-import AuthComponent from './components/Auth';
+import AuthPage from './components/AuthPage'; // Importez votre nouveau composant
+import EmailConfirmation from './components/EmailConfirmation'; // Importez le composant de confirmation d'email
 import UserSettings from './components/UserSettings';
 
 const App = () => {
@@ -14,13 +15,22 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
+  const [isEmailConfirmation, setIsEmailConfirmation] = useState(false);
   
   // Référence pour les modals
   const goalsModalRef = useRef(null);
   const settingsModalRef = useRef(null);
+
+    // Référence pour suivre si la redirection a déjà eu lieu
+    const redirected = useRef(false);
   
-  // Référence pour suivre si la redirection a déjà eu lieu
-  const redirected = useRef(false);
+  // Vérifier s'il s'agit d'une confirmation d'email
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.includes('type=signup')) {
+      setIsEmailConfirmation(true);
+    }
+  }, []);
 
   // Vérifier si l'utilisateur est connecté au chargement
   useEffect(() => {
@@ -37,33 +47,34 @@ const App = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Chargement du profil utilisateur
-  useEffect(() => {
-    const loadUserProfile = async () => {
-      if (!user) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('nickname, avatar_url')
-          .eq('user_id', user.id)
-          .single();
-
-        if (error && error.code !== 'PGRST116') {
+    // Chargement du profil utilisateur
+    useEffect(() => {
+      const loadUserProfile = async () => {
+        if (!user) return;
+  
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('nickname, avatar_url')
+            .eq('user_id', user.id)
+            .single();
+  
+          if (error && error.code !== 'PGRST116') {
+            console.error('Erreur lors du chargement du profil:', error);
+            return;
+          }
+  
+          setUserProfile(data || null);
+        } catch (error) {
           console.error('Erreur lors du chargement du profil:', error);
-          return;
         }
-
-        setUserProfile(data || null);
-      } catch (error) {
-        console.error('Erreur lors du chargement du profil:', error);
+      };
+  
+      if (user) {
+        loadUserProfile();
       }
-    };
-
-    if (user) {
-      loadUserProfile();
-    }
-  }, [user]);
+    }, [user]);
+  
 
   // Ouvrir le modal des objectifs
   const openGoalsModal = () => {
@@ -75,15 +86,15 @@ const App = () => {
   // Ouvrir le modal des paramètres
   const openSettingsModal = () => {
     if (settingsModalRef.current) {
-      settingsModalRef.current.showModal();
-    }
+      settingsModalRef.current.showModal();}
   };
 
-  // Mettre à jour le profil utilisateur
-  const updateUserProfile = (profileData) => {
-    setUserProfile(profileData);
-  };
-
+    // Mettre à jour le profil utilisateur
+    const updateUserProfile = (profileData) => {
+      setUserProfile(profileData);
+    };
+  
+  
   // Chargement des données après connexion
   useEffect(() => {
     if (!user) {
@@ -222,20 +233,20 @@ const App = () => {
     }
   };
 
+
   // Fonction de déconnexion
   const handleSignOut = async () => {
     await supabase.auth.signOut();
   };
 
-  // Fonction pour formater l'email de l'utilisateur ou afficher le pseudo
-  const getUserDisplayName = () => {
-    if (userProfile?.nickname) {
-      return userProfile.nickname;
-    }
-    
-    const email = user?.email;
+    // Fonction pour formater l'email de l'utilisateur ou afficher le pseudo
+    const getUserDisplayName = () => {
+      if (userProfile?.nickname) {
+        return userProfile.nickname;
+      }
+      
+      const email = user?.email;
     if (!email) return "";
-    
     const atIndex = email.indexOf('@');
     if (atIndex > 10) {
       return email.substring(0, 10) + '...' + email.substring(atIndex);
@@ -251,13 +262,14 @@ const App = () => {
     );
   }
 
+  // S'il s'agit d'une confirmation d'email
+  if (isEmailConfirmation) {
+    return <EmailConfirmation />;
+  }
+
   // Si l'utilisateur n'est pas connecté, afficher le composant d'authentification
   if (!user) {
-    return (
-      <div className="min-h-screen w-screen flex items-center justify-center bg-base-100">
-        <AuthComponent />
-      </div>
-    );
+    return <AuthPage />;
   }
 
   return (
@@ -267,10 +279,11 @@ const App = () => {
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-extrabold">Studie</h1>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center">
+          <div className="flex items-center"><button onClick={openSettingsModal}
+              className="btn btn-sm btn-ghost">
               {userProfile?.avatar_url && (
                 <div className="avatar mr-2">
-                  <div className="w-8 h-8 rounded-full">
+                  <div className="w-6 h-6 rounded-full">
                     <img src={userProfile.avatar_url} alt="Avatar" />
                   </div>
                 </div>
@@ -278,15 +291,8 @@ const App = () => {
               <span className="text-sm opacity-70">
                 {userProfile?.avatar_url ? "" : <User size={16} className="mr-1 inline-block" />}
                 {getUserDisplayName()}
-              </span>
+              </span></button>
             </div>
-            <button 
-              onClick={openSettingsModal}
-              className="btn btn-sm btn-ghost"
-              title="Paramètres"
-            >
-              <Settings size={16} />
-            </button>
             <button 
               onClick={handleSignOut}
               className="btn btn-sm btn-ghost"
@@ -306,13 +312,7 @@ const App = () => {
         {/* Barre de navigation principale */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Suivi du temps</h2>
-          <button
-            onClick={openGoalsModal}
-            className="btn btn-circle btn-ghost"
-            title="Gérer les objectifs"
-          >
-            <Settings size={20} />
-          </button>
+          
         </div>
 
         {/* Modal des objectifs */}
@@ -333,13 +333,15 @@ const App = () => {
             </div>
           </div>
         </dialog>
-
+          
         {/* Composant de paramètres utilisateur */}
         <UserSettings 
           user={user} 
           updateUserProfile={updateUserProfile} 
           modalRef={settingsModalRef}
         />
+
+
 
         {/* Timer App toujours affiché */}
         <TimerApp 
