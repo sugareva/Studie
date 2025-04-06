@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Darumadrop+One&display=swap');
+@plugin "daisyui" {
+  themes: bumblebee --default, dim --prefersdark, bumblebee;
+}
+
+
+/* Vos autres styles CSS... */
+
+.app-title {
+  font-family: "Darumadrop One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+.hide-scrollbar {
+  /* Pour Firefox */
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  /* Pour Chrome, Safari et Opera */
+  display: none;
+}

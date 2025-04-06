@@ -1,0 +1,221 @@
+// src/components/Navbar.jsx
+import { useState, useEffect } from 'react';
+import { User, Grid, BarChart2, Sun, Moon, Menu, X } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
+
+function Navbar({ onOpenUserModal, userSettings: propUserSettings }) {
+  const { user } = useAuth();
+  const location = useLocation();
+  const [userSettings, setUserSettings] = useState(null);
+  const [theme, setTheme] = useState(() => {
+    // Récupérer le thème du localStorage ou utiliser le thème par défaut
+    return localStorage.getItem('theme') || 'bumblebee';
+  });
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Appliquer le thème au chargement et lors des changements
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+  
+  // Utiliser les paramètres fournis en props s'ils existent
+  useEffect(() => {
+    if (propUserSettings) {
+      setUserSettings(propUserSettings);
+    }
+  }, [propUserSettings]);
+  
+  // Charger les paramètres de l'utilisateur au chargement
+  useEffect(() => {
+    let isMounted = true;
+    
+    async function fetchUserSettings() {
+      if (!user || propUserSettings) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('user_settings')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error fetching user settings:', error);
+          return;
+        }
+        
+        if (data && isMounted) {
+          setUserSettings(data);
+        }
+      } catch (error) {
+        console.error('Error in fetchUserSettings:', error);
+      }
+    }
+    
+    fetchUserSettings();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [user, propUserSettings]);
+
+  // Fonction qui gère l'ouverture de la modale
+  const handleOpenModal = () => {
+    if (onOpenUserModal && typeof onOpenUserModal === 'function') {
+      onOpenUserModal();
+      setIsMenuOpen(false); // Fermer le menu après avoir ouvert la modale
+    } else {
+      console.error("onOpenUserModal n'est pas une fonction valide");
+    }
+  };
+
+  // Basculer entre les thèmes clair et sombre
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'bumblebee' ? 'dim' : 'bumblebee');
+  };
+
+  // Toggle le menu mobile
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  return (
+    <div className="w-full flex justify-center">
+      <div className="navbar bg-base-100 rounded-box mb-4 max-w-[90%] sm:max-w-[80%] w-full">
+        <div className="flex flex-1">
+          <a className="px-4 text-2xl app-title">Studie</a>
+          
+          {/* Navigation links - visible sur desktop, caché sur mobile */}
+          <div className="hidden sm:flex gap-2">
+            <Link 
+              to="/" 
+              className={`tab ${location.pathname === '/' ? 'tab-active' : ''}`}
+            >
+              <Grid size={16} className="mr-1" />
+              Dashboard
+            </Link>
+            <Link 
+              to="/activity" 
+              className={`tab ${location.pathname === '/activity' ? 'tab-active' : ''}`}
+            >
+              <BarChart2 size={16} className="mr-1" />
+              Activité
+            </Link>
+          </div>
+        </div>
+        
+        {/* Actions Desktop - visible sur desktop, caché sur mobile */}
+        <div className="flex-none hidden sm:flex items-center gap-3">
+          {/* Bouton pour basculer entre les thèmes */}
+          <button 
+            className="btn btn-ghost btn-circle" 
+            onClick={toggleTheme}
+            aria-label={theme === 'bumblebee' ? 'Activer le mode sombre' : 'Activer le mode clair'}
+          >
+            {theme === 'bumblebee' ? (
+              <Moon size={20} /> // Icône de lune pour le mode sombre
+            ) : (
+              <Sun size={20} /> // Icône de soleil pour le mode clair
+            )}
+          </button>
+          
+          {/* Bouton du profil utilisateur */}
+          <button 
+            className="btn btn-ghost" 
+            onClick={handleOpenModal}
+          >
+            <div className="flex items-center gap-2">
+              {userSettings?.avatar ? (
+                <div className="avatar">
+                  <div className="w-8 h-8 rounded-full">
+                    <img src={userSettings.avatar} alt="Avatar" />
+                  </div>
+                </div>
+              ) : (
+                <div className="avatar placeholder">
+                  <div className="bg-neutral-focus text-neutral-content rounded-full w-8">
+                    <User size={16} />
+                  </div>
+                </div>
+              )}
+              <span>{userSettings?.nickname || user?.email}</span>
+            </div>
+          </button>
+        </div>
+        
+        {/* Bouton de menu burger - visible uniquement sur mobile */}
+        <div className="flex-none sm:hidden">
+          <button className="btn btn-ghost btn-circle" onClick={toggleMenu}>
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+      </div>
+      
+      {/* Menu mobile - s'affiche lorsque le menu est ouvert */}
+      {isMenuOpen && (
+        <div className="fixed top-16 left-0 w-full flex justify-center z-50 sm:hidden">
+          <div className="max-w-[80%] w-full mx-auto bg-base-100 shadow-lg rounded-box p-4 flex flex-col gap-4">
+            <Link 
+              to="/" 
+              className={`btn justify-start ${location.pathname === '/' ? 'btn-soft btn-secondary' : 'btn-ghost'}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Grid size={16} className="mr-2" />
+              Dashboard
+            </Link>
+            <Link 
+              to="/activity" 
+              className={`btn justify-start ${location.pathname === '/activity' ? 'btn-soft btn-secondary' : 'btn-ghost'}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <BarChart2 size={16} className="mr-2" />
+              Activité
+            </Link>
+            
+            <div className="divider"></div>
+            
+            {/* Bouton pour basculer entre les thèmes */}
+            <button 
+              className="btn btn-ghost justify-start" 
+              onClick={toggleTheme}
+            >
+              {theme === 'bumblebee' ? (
+                <><Moon size={20} className="mr-2" /> Mode sombre</>
+              ) : (
+                <><Sun size={20} className="mr-2" /> Mode clair</>
+              )}
+            </button>
+            
+            {/* Bouton du profil utilisateur */}
+            <button 
+              className="btn btn-ghost justify-start" 
+              onClick={handleOpenModal}
+            >
+              <div className="flex items-center gap-2">
+                {userSettings?.avatar ? (
+                  <div className="avatar">
+                    <div className="w-8 h-8 rounded-full">
+                      <img src={userSettings.avatar} alt="Avatar" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="avatar placeholder">
+                    <div className="bg-neutral-focus text-neutral-content rounded-full w-8">
+                      <User size={16} />
+                    </div>
+                  </div>
+                )}
+                <span>{userSettings?.nickname || user?.email}</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default Navbar;
