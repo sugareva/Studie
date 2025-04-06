@@ -1,12 +1,20 @@
-# React + Vite
+# Let's Studie !
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Introduction
 
-Currently, two official plugins are available:
+Studie est une application web conçue pour aider à optimiser les temps d'apprentissage et de travail. Développée initialement pour mon usage personnel, l'application offre des outils complets pour la gestion des objectifs, le suivi des sessions d'étude et l'organisation des tâches.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Fonctionnalités principales
 
-## Expanding the ESLint configuration
+- **Gestion des objectifs** : Définissez et suivez vos objectifs d'apprentissage
+- **Timer d'étude** : Enregistrez précisément vos sessions de travail
+- **Visualisation des données** : Analysez votre progression avec des graphiques
+- **Gestion des tâches** : Organisez vos activités par jour de la semaine
+- **Personnalisation** : Personnalisez votre profil et expérience
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Technologies utilisées
+
+- **Frontend** : React (Vite)
+- **Backend** : Supabase
+- **Styling** : TailwindCSS, DaisyUI
+- **Visualisation** : Recharts
