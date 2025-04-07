@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Play, Coffee, Pause, RotateCcw, Clock, StopCircle, Maximize, Minimize, Volume2, VolumeX } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const TIMER_STORAGE_KEY = 'STUDY_APP_TIMER_STATE';
 const DAILY_PROGRESS_KEY = 'DAILY_PROGRESS';
@@ -12,6 +13,7 @@ const DEFAULT_LOFI_URL = 'https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1';
 const LOFI_THUMBNAIL = 'https://i.ytimg.com/vi/jfKfPfyJRdk/maxresdefault.jpg';
 
 const Timer = ({ selectedGoal, onTimerStop }) => {
+  const { t } = useTranslation();
   const [displayTime, setDisplayTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [isPomodoroMode, setIsPomodoroMode] = useState(false);
@@ -39,7 +41,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
         return JSON.parse(storedState);
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération de l\'état du timer:', error);
+      console.error(t('timer.errorRetrievingState'), error);
     }
     return null;
   };
@@ -49,7 +51,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
     try {
       localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify(state));
     } catch (error) {
-      console.error('Erreur lors de l\'enregistrement de l\'état du timer:', error);
+      console.error(t('timer.errorSavingState'), error);
     }
   };
   
@@ -119,9 +121,9 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
               setPomodoroSession('break');
               try {
                 const notification = new Audio('/notification.mp3');
-                notification.play().catch(e => console.log('Audio play failed:', e));
+                notification.play().catch(e => console.log(t('timer.audioPlayFailed'), e));
               } catch (e) {
-                console.log('Audio play failed:', e);
+                console.log(t('timer.audioPlayFailed'), e);
               }
               
               // Mettre à jour l'état stocké
@@ -136,9 +138,9 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
               setPomodoroSession('focus');
               try {
                 const notification = new Audio('/notification.mp3');
-                notification.play().catch(e => console.log('Audio play failed:', e));
+                notification.play().catch(e => console.log(t('timer.audioPlayFailed'), e));
               } catch (e) {
-                console.log('Audio play failed:', e);
+                console.log(t('timer.audioPlayFailed'), e);
               }
               
               // Mettre à jour l'état stocké
@@ -159,7 +161,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
         clearInterval(intervalId);
       }
     };
-  }, [isRunning, isPomodoroMode, pomodoroSession, selectedGoal]);
+  }, [isRunning, isPomodoroMode, pomodoroSession, selectedGoal, t]);
   
   // Vérifier si nous devons mettre à jour l'état quand la page devient visible
   useEffect(() => {
@@ -189,7 +191,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
   // Fonctions de contrôle du timer
   const startTimer = () => {
     if (!selectedGoal) {
-      alert("Veuillez sélectionner un objectif avant de démarrer le timer.");
+      alert(t('timer.selectGoalBeforeStarting'));
       return;
     }
     
@@ -298,7 +300,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
           onTimerStop(selectedGoal.id, finalTime, data[0]);
         }
       } catch (error) {
-        console.error('Erreur lors de l\'enregistrement de la session d\'étude:', error);
+        console.error(t('timer.errorSavingStudySession'), error);
       }
     }
     
@@ -370,7 +372,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
         todayCompletedSeconds = parseInt(storedProgress, 10);
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération de la progression quotidienne:', error);
+      console.error(t('timer.errorRetrievingDailyProgress'), error);
     }
     
     const totalSeconds = selectedGoal.duration || 0;
@@ -394,7 +396,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
         todayProgress = parseInt(storedProgress, 10);
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération de la progression quotidienne:', error);
+      console.error(t('timer.errorRetrievingDailyProgress'), error);
     }
     
     const totalDuration = selectedGoal.duration || 0;
@@ -440,7 +442,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
             <h2 className="text-xl md:text-2xl font-bold mb-2">{selectedGoal.name}</h2>
             <div className="flex items-center justify-center gap-2 mb-4">
               <Clock size={16} />
-              <span className="text-sm md:text-base">Temps restant: {calculateRemainingTime()}</span>
+              <span className="text-sm md:text-base">{t('timer.timeRemaining')}: {calculateRemainingTime()}</span>
             </div>
             <div className="w-48 md:w-64 mx-auto">
               <progress
@@ -460,8 +462,8 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
           {isPomodoroMode && (
             <div className="text-lg md:text-xl mb-6">
               {pomodoroSession === 'focus' 
-                ? `${calculatePomodoroRemaining()} restants avant pause`
-                : `${calculatePomodoroRemaining()} restants avant reprise`}
+                ? t('timer.remainingBeforeBreak', { time: calculatePomodoroRemaining() })
+                : t('timer.remainingBeforeResume', { time: calculatePomodoroRemaining() })}
             </div>
           )}
           
@@ -469,7 +471,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
             {!isRunning ? (
               <button 
                 className="btn btn-success btn-lg btn-circle tooltip" 
-                data-tip="Démarrer"
+                data-tip={t('timer.start')}
                 onClick={startTimer}
                 disabled={!selectedGoal}
               >
@@ -478,7 +480,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
             ) : (
               <button 
                 className="btn btn-warning btn-lg btn-circle tooltip" 
-                data-tip="Pause"
+                data-tip={t('timer.pause')}
                 onClick={pauseTimer}
               >
                 <Pause size={28} />
@@ -487,7 +489,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
             
             <button 
               className="btn btn-error btn-lg btn-circle tooltip" 
-              data-tip="Arrêter et enregistrer"
+              data-tip={t('timer.stopAndSave')}
               onClick={stopTimer}
               disabled={displayTime === 0}
             >
@@ -496,7 +498,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
             
             <button 
               className="btn btn-neutral btn-lg btn-circle tooltip" 
-              data-tip="Réinitialiser"
+              data-tip={t('timer.reset')}
               onClick={resetTimer}
               disabled={displayTime === 0}
             >
@@ -518,7 +520,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
                     <iframe 
                       className="w-full h-full"
                       src={getYouTubeUrl()}
-                      title="Lofi Music pour étudier"
+                      title={t('timer.lofiMusicTitle')}
                       allow="autoplay; encrypted-media"
                       allowFullScreen
                     ></iframe>
@@ -526,11 +528,11 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
                 </div>
               </figure>
               <div className="card-body p-2 md:p-3">
-                <h3 className="card-title text-xs md:text-sm truncate">lofi hip hop radio - beats to relax/study to</h3>
+                <h3 className="card-title text-xs md:text-sm truncate">{t('timer.lofiChannelTitle')}</h3>
                 <div className="card-actions justify-end mt-1">
                   <button 
                     className="btn btn-xs btn-circle btn-ghost tooltip"
-                    data-tip={isMuted ? "Activer le son" : "Couper le son"}
+                    data-tip={isMuted ? t('timer.unmute') : t('timer.mute')}
                     onClick={toggleMute}
                   >
                     {isMuted ? <VolumeX size={12} /> : <Volume2 size={12} />}
@@ -538,7 +540,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
                   
                   <button 
                     className="btn btn-xs btn-circle btn-ghost tooltip"
-                    data-tip="Masquer YouTube"
+                    data-tip={t('timer.hideYouTube')}
                     onClick={toggleYouTube}
                   >
                     <StopCircle size={12} />
@@ -556,7 +558,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
             onClick={toggleYouTube}
           >
             <Volume2 size={14} />
-            <span className="hidden md:inline">Lofi Music</span>
+            <span className="hidden md:inline">{t('timer.lofiMusic')}</span>
           </button>
         )}
       </div>
@@ -568,10 +570,10 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body h-full flex flex-col">
         <h2 className="card-title text-lg flex justify-between items-center">
-          <span>Minuteur</span>
+          <span>{t('timer.title')}</span>
           <div className="form-control">
             <label className="label cursor-pointer gap-2">
-            <Coffee size={14} /><span className="label-text text-xs"> Pomodoro</span>
+            <Coffee size={14} /><span className="label-text text-xs"> {t('timer.pomodoro')}</span>
               <input
                 type="checkbox"
                 className="toggle toggle-secondary toggle-sm"
@@ -594,7 +596,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
             </div>
             <div className="flex items-center gap-2 mt-1.5">
               <Clock size={14} />
-              <span className="text-xs">Temps restant: {calculateRemainingTime()}</span>
+              <span className="text-xs">{t('timer.timeRemaining')}: {calculateRemainingTime()}</span>
             </div>
             <progress
               className="progress progress-info w-full mt-1.5 h-1.5"
@@ -604,7 +606,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
           </div>
         ) : (
           <div className="alert py-2 text-sm flex-shrink-0 mb-3">
-            <span>Sélectionnez un objectif pour commencer</span>
+            <span>{t('timer.selectGoalToStart')}</span>
           </div>
         )}
 
@@ -613,7 +615,9 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
           <div className="stats shadow">
             <div className="stat p-4">
               <div className="stat-title text-sm">
-                {isPomodoroMode ? `${pomodoroSession === 'focus' ? 'Focus' : 'Pause'}` : 'Temps écoulé'}
+                {isPomodoroMode 
+                  ? (pomodoroSession === 'focus' ? t('timer.focus') : t('timer.break'))
+                  : t('timer.elapsedTime')}
               </div>
               <div className={`stat-value text-3xl ${!selectedGoal ? 'text-gray-400' : ''}`}>
                 {formatTime(displayTime)}
@@ -621,8 +625,8 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
               {isPomodoroMode && (
                 <div className="stat-desc text-xs">
                   {pomodoroSession === 'focus' 
-                    ? `${calculatePomodoroRemaining()} restants avant pause`
-                    : `${calculatePomodoroRemaining()} restants avant reprise`}
+                    ? t('timer.remainingBeforeBreak', { time: calculatePomodoroRemaining() })
+                    : t('timer.remainingBeforeResume', { time: calculatePomodoroRemaining() })}
                 </div>
               )}
             </div>
@@ -634,7 +638,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
           {!isRunning ? (
             <button 
               className="btn btn-success btn-circle btn-md tooltip" 
-              data-tip="Démarrer"
+              data-tip={t('timer.start')}
               onClick={startTimer}
               disabled={!selectedGoal}
             >
@@ -643,7 +647,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
           ) : (
             <button 
               className="btn btn-warning btn-circle btn-md tooltip" 
-              data-tip="Pause"
+              data-tip={t('timer.pause')}
               onClick={pauseTimer}
             >
               <Pause size={20} />
@@ -652,7 +656,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
           
           <button 
             className="btn btn-error btn-circle btn-md tooltip" 
-            data-tip="Arrêter et enregistrer"
+            data-tip={t('timer.stopAndSave')}
             onClick={stopTimer}
             disabled={displayTime === 0}
           >
@@ -661,7 +665,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
           
           <button 
             className="btn btn-neutral btn-circle btn-md tooltip" 
-            data-tip="Réinitialiser"
+            data-tip={t('timer.reset')}
             onClick={resetTimer}
             disabled={displayTime === 0}
           >
@@ -672,12 +676,12 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
           
           <button 
             className="btn btn-outline btn-sm gap-2 tooltip" 
-            data-tip="Mode focus avec Lofi Music"
+            data-tip={t('timer.focusModeTooltip')}
             onClick={toggleFullscreen}
             disabled={!isRunning}
           >
             <Maximize size={16} />
-            <span>Mode focus</span>
+            <span>{t('timer.focusMode')}</span>
           </button>
         </div>
       </div>

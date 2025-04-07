@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Dashboard from './pages/Dashboard';
 import Activity from './pages/Activity';
 import Login from './pages/Login';
+import './i18n';
+
 
 // Composant pour protéger les routes privées
 function PrivateRoute({ children }) {

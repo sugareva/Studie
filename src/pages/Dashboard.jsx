@@ -9,8 +9,13 @@ import UserOptionsModal from '../components/UserOptionsModal';
 import Navbar from '../components/Navbar';
 import OnboardingModal from '../components/OnboardingModal';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { fr, enGB } from 'date-fns/locale';
+import { convertToStoredFormat } from '../utils/dayMapping';
 
 function Dashboard() {
+  const { t, i18n } = useTranslation();
   const { user, signOut } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState(null);
@@ -55,7 +60,7 @@ const updateDailyProgress = (goalId, duration) => {
     
     return newProgress;
   } catch (error) {
-    console.error('Erreur lors de la mise à jour de la progression quotidienne:', error);
+    console.error(t('dashboard.errorUpdatingProgress'), error);
     return 0;
   }
 };
@@ -93,7 +98,7 @@ const updateDailyProgress = (goalId, duration) => {
           .maybeSingle();
         
         if (error && error.code !== 'PGRST116') {
-          console.error('Error checking onboarding status:', error);
+          console.error(t('dashboard.errorCheckingOnboarding'), error);
           return;
         }
         
@@ -102,12 +107,12 @@ const updateDailyProgress = (goalId, duration) => {
           setShowOnboarding(true);
         }
       } catch (error) {
-        console.error('Error in checkOnboardingStatus:', error);
+        console.error(t('dashboard.errorInOnboardingCheck'), error);
       }
     }
     
     checkOnboardingStatus();
-  }, [user]);
+  }, [user, t]);
   
   // Gérer la complétion de l'onboarding
   const handleOnboardingComplete = (updatedSettings) => {
@@ -132,7 +137,7 @@ const updateDailyProgress = (goalId, duration) => {
           .single();
         
         if (error && error.code !== 'PGRST116') { // PGRST116 = pas de données trouvées
-          console.error('Error fetching user settings:', error);
+          console.error(t('dashboard.errorFetchingSettings'), error);
           return;
         }
         
@@ -141,12 +146,12 @@ const updateDailyProgress = (goalId, duration) => {
           setShowTodoList(data.show_todo_list !== false); // Default to true if not set
         }
       } catch (error) {
-        console.error('Error in fetchUserSettings:', error);
+        console.error(t('dashboard.errorInFetchSettings'), error);
       }
     }
     
     fetchUserSettings();
-  }, [user]);
+  }, [user, t]);
 
   // Gestionnaire de mise à jour des paramètres utilisateur
   const handleUpdateSettings = (updatedSettings) => {
@@ -154,23 +159,10 @@ const updateDailyProgress = (goalId, duration) => {
     setShowTodoList(updatedSettings.show_todo_list !== false);
   };
 
-  
-  // Fonction pour obtenir le nom du jour en français
-  const getDayName = (date) => {
-    const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-    return days[date.getDay()];
-  };
-  
-  // Fonction pour obtenir le nom du mois en français
-  const getMonthName = (date) => {
-    const months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 
-                   'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-    return months[date.getMonth()];
-  };
-  
-  // Formater la date actuelle
+  // Formater la date actuelle en utilisant date-fns pour la traduction
   const formatCurrentDate = () => {
-    return `${getDayName(currentDate)} ${currentDate.getDate()} ${getMonthName(currentDate)}`;
+    const locale = i18n.language === 'fr' ? fr : enGB;
+    return format(currentDate, 'EEEE d MMMM', { locale });
   };
   
   // Naviguer au jour précédent
@@ -194,6 +186,21 @@ const updateDailyProgress = (goalId, duration) => {
     setIgnoreDate(!ignoreDate);
   };
 
+  // Obtenir le nom du jour pour les composants qui en ont besoin
+  const getCurrentDayName = () => {
+    const locale = i18n.language === 'fr' ? fr : enGB;
+    const day = format(currentDate, 'EEEE', { locale });
+    // Capitaliser la première lettre
+    const formattedDay = day.charAt(0).toUpperCase() + day.slice(1);
+    
+    // Si on est en anglais, convertir au format stocké (français)
+    if (i18n.language !== 'fr') {
+      return convertToStoredFormat(formattedDay, i18n.language);
+    }
+    
+    return formattedDay;
+  };
+
   return (
     <div className="min-h-screen bg-base-200 flex flex-col pt-4">
       {/* Utiliser le composant Navbar partagé */}
@@ -210,6 +217,7 @@ const updateDailyProgress = (goalId, duration) => {
             <button
               className="btn btn-xs btn-outline btn-secondary btn-circle"
               onClick={goToPreviousDay}
+              aria-label={t('dashboard.previousDay')}
             >
               <ChevronLeft size={18} />
             </button>
@@ -217,28 +225,30 @@ const updateDailyProgress = (goalId, duration) => {
             <button
               className="btn btn-xs btn-outline btn-secondary btn-circle"
               onClick={goToNextDay}
+              aria-label={t('dashboard.nextDay')}
             >
               <ChevronRight size={18} />
             </button>
           </div>
           <div className="flex items-center gap-2">
-  <span className="text-sm">Voir tout</span>
-  <input 
-    type="checkbox" 
-    className="toggle toggle-secondary" 
-    checked={ignoreDate} 
-    onChange={toggleIgnoreDate}
-  />
-</div>
+            <span className="text-sm">{t('dashboard.viewAll')}</span>
+            <input 
+              type="checkbox" 
+              className="toggle toggle-secondary" 
+              checked={ignoreDate} 
+              onChange={toggleIgnoreDate}
+              aria-label={t('dashboard.toggleDateFilter')}
+            />
+          </div>
         </div>
         
-        {/* Removed fixed height, using flex-1 instead */}
+        {/* Grille des composants principaux */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="md:col-span-1">
             <GoalSetting
               onGoalSelect={handleGoalSelect}
               refreshTrigger={refreshTrigger}
-              currentDay={getDayName(currentDate)}
+              currentDay={getCurrentDayName()}
               ignoreDate={ignoreDate}
             />
           </div>
@@ -251,7 +261,7 @@ const updateDailyProgress = (goalId, duration) => {
           {showTodoList && (
             <div className="md:col-span-1">
               <TodoList
-                currentDay={getDayName(currentDate)}
+                currentDay={getCurrentDayName()}
                 ignoreDate={ignoreDate}
               />
             </div>
