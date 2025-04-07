@@ -1,0 +1,593 @@
+{
+  "auth": {
+    "login": "Login",
+    "signup": "Sign up",
+    "email": "Email address",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "signOut": "Sign out"
+  },
+  "login": {
+    "welcome": "Welcome!",
+    "optimizeStudyTime": "Optimize your study time",
+    "optimizeStudyProductivity": "Optimize your study time and productivity",
+    "features": "Features",
+    "trackStudyTime": "Track your study time",
+    "trackStudyTimeDesc": "Record your study sessions with our intuitive timer.",
+    "setGoals": "Set goals",
+    "setGoalsDesc": "Create and track your study goals effectively.",
+    "organizeDays": "Organize your days",
+    "organizeDaysDesc": "Plan your week with our task list.",
+    "getStarted": "Get started",
+    "allRightsReserved": "All rights reserved."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "goals": "Goals",
+    "addGoal": "Add goal",
+    "editGoal": "Edit goal",
+    "deleteGoal": "Delete goal",
+    "study": "Study",
+    "todos": "To-do list",
+    "addTodo": "Add task",
+    "editTodo": "Edit task",
+    "deleteTodo": "Delete task",
+    "startTimer": "Start timer",
+    "pauseTimer": "Pause timer",
+    "resetTimer": "Reset timer",
+    "saveSession": "Save session",
+    "viewAll": "View all",
+    "previousDay": "Previous day",
+    "nextDay": "Next day",
+    "toggleDateFilter": "Show all days",
+    "errorUpdatingProgress": "Error updating daily progress:",
+    "errorCheckingOnboarding": "Error checking onboarding status:",
+    "errorInOnboardingCheck": "Error in checkOnboardingStatus:",
+    "errorFetchingSettings": "Error fetching user settings:",
+    "errorInFetchSettings": "Error in fetchUserSettings:"
+  },
+  "goals": {
+    "name": "Goal name",
+    "targetTime": "Target time",
+    "weekDays": "Week days",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "hoursPerWeek": "Hours per week",
+    "minutesPerDay": "Minutes per day",
+    "progress": "Progress"
+  },
+  "todos": {
+    "task": "Task",
+    "day": "Day",
+    "status": "Status",
+    "completed": "Completed",
+    "pending": "Pending",
+    "allDays": "All days",
+    "today": "Today",
+    "filter": "Filter by day",
+    "nothingTodo": "Nothing to do"
+  },
+  "activity": {
+    "title": "Activity",
+    "weeklyChart": "Weekly study time",
+    "dailyChart": "Daily study time",
+    "sessions": "Study sessions",
+    "date": "Date",
+    "duration": "Duration",
+    "goal": "Goal",
+    "noSessions": "No study sessions recorded yet",
+    "hoursStudied": "Hours studied",
+    "minutesStudied": "Minutes studied",
+    "timeByGoal": "Time by goal",
+    "weeklyProgress": "Weekly progress",
+    "exportData": "Export data"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "avatar": "Avatar",
+    "username": "Username",
+    "preferences": "Preferences",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "language": "Language",
+    "notifications": "Notifications",
+    "saveChanges": "Save changes",
+    "cancel": "Cancel"
+  },
+  "onboarding": {
+    "welcome": "Welcome to StudyTracker!",
+    "intro": "Let's get you started with tracking your study time",
+    "step1": "Set your study goals",
+    "step2": "Track your study sessions with the timer",
+    "step3": "Manage your tasks with the to-do list",
+    "step4": "Analyze your progress in the Activity page",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Finish",
+    "skip": "Skip"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "minutes": "minutes",
+    "hours": "hours",
+    "days": "days",
+    "weeks": "weeks",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This week",
+    "lastWeek": "Last week",
+    "thisMonth": "This month",
+    "total": "Total",
+    "name": "Name",
+    "description": "Description",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort"
+  },
+  "time": {
+    "hour": "hour",
+    "hours": "hours",
+    "minute": "minute",
+    "minutes": "minutes",
+    "second": "second",
+    "seconds": "seconds"
+  },
+  "timer": {
+    "title": "Timer",
+    "pomodoro": "Pomodoro",
+    "focus": "Focus",
+    "break": "Break",
+    "elapsedTime": "Elapsed time",
+    "timeRemaining": "Time remaining",
+    "remainingBeforeBreak": "{{time}} remaining before break",
+    "remainingBeforeResume": "{{time}} remaining before resuming",
+    "start": "Start",
+    "pause": "Pause",
+    "stopAndSave": "Stop and save",
+    "reset": "Reset",
+    "focusMode": "Focus mode",
+    "focusModeTooltip": "Focus mode with Lofi Music",
+    "selectGoalToStart": "Select a goal to start",
+    "selectGoalBeforeStarting": "Please select a goal before starting the timer.",
+    "lofiMusic": "Lofi Music",
+    "lofiMusicTitle": "Lofi Music for studying",
+    "lofiChannelTitle": "lofi hip hop radio - beats to relax/study to",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "hideYouTube": "Hide YouTube",
+    "errorRetrievingState": "Error retrieving timer state:",
+    "errorSavingState": "Error saving timer state:",
+    "errorRetrievingDailyProgress": "Error retrieving daily progress:",
+    "errorSavingStudySession": "Error saving study session:",
+    "audioPlayFailed": "Audio play failed:"
+  },
+  "headings": {
+    "myGoals": "My Goals"
+  },
+  "buttons": {
+    "changeGoal": "Change Goal",
+    "add": "Add",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save",
+    "editAriaLabel": "Edit",
+    "deleteAriaLabel": "Delete"
+  },
+  "tooltips": {
+    "goalsLimitReached": "Goal limit of {{limit}} reached"
+  },
+  "emptyStates": {
+    "noGoalsDefined": "No goals defined. Create one to get started.",
+    "noGoalsForDay": "No goals for {{day}}. Add one or modify the days of an existing goal."
+  },
+  "status": {
+    "completed": "Completed",
+    "percentCompleted": "{{percent}}% completed"
+  },
+  "time": {
+    "minutes": "Minutes",
+    "hours": "Hours",
+    "minuteFormat": "{{count}} minute(s)",
+    "hourFormat": "{{count}} hour(s)",
+    "hoursMinutesRemaining": "{{hours}}h {{minutes}}m remaining",
+    "minutesSecondsRemaining": "{{minutes}}m {{seconds}}s remaining"
+  },
+  "days": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "mondayShort": "M",
+    "tuesdayShort": "T",
+    "wednesdayShort": "W",
+    "thursdayShort": "T",
+    "fridayShort": "F",
+    "saturdayShort": "S",
+    "sundayShort": "S",
+    "everyday": "Everyday",
+    "weekdays": "Weekdays",
+    "weekend": "Weekend"
+  },
+  "modals": {
+    "createGoal": {
+      "title": "Create a New Goal",
+      "goalName": "Goal Name",
+      "goalNamePlaceholder": "Ex: Learn JavaScript",
+      "dailyTime": "Daily Time",
+      "daysOfWeek": "Days of the Week",
+      "chooseDaysHelp": "Choose when to apply this goal",
+      "color": "Color"
+    },
+    "editGoal": {
+      "title": "Edit Goal",
+      "goalName": "Goal Name",
+      "dailyTime": "Daily Time",
+      "daysOfWeek": "Days of the Week",
+      "chooseDaysHelp": "Choose when to apply this goal",
+      "color": "Color"
+    }
+  },
+  "colors": {
+    "coralRed": "Coral Red",
+    "peach": "Peach",
+    "paleYellow": "Pale Yellow",
+    "turquoise": "Turquoise",
+    "oceanBlue": "Ocean Blue"
+  },
+  "confirmations": {
+    "deleteGoal": "Are you sure you want to delete this goal?"
+  },
+  "errors": {
+    "dailyProgressRetrievalError": "Error retrieving daily progress:",
+    "goalsLimitCheckError": "Error checking goals limit:",
+    "goalsRetrievalError": "Error retrieving goals:",
+    "goalCreationError": "Error creating goal:",
+    "goalUpdateError": "Error updating goal:",
+    "goalDeletionError": "Error deleting goal:",
+    "unableToLoadGoals": "Unable to load your goals. Please try again.",
+    "unableToCreateGoal": "Unable to create goal. Please try again.",
+    "unableToUpdateGoal": "Unable to update goal. Please try again.",
+    "unableToDeleteGoal": "Unable to delete goal. Please try again.",
+    "goalsLimitReached": "You have reached the limit of {{limit}} goals"
+  },
+  
+    "todoList": {
+      "headings": {
+        "taskList": "Task List",
+        "addTask": "Add a Todo",
+        "advancedOptions": "Advanced Options"
+      },
+      "buttons": {
+        "add": "Add",
+        "cancel": "Cancel",
+        "deleteAriaLabel": "Delete this task"
+      },
+      "labels": {
+        "recurringTask": "Recurring Task",
+        "daysOfWeek": "Days of the Week",
+        "optionalTag": "Tag (optional)"
+      },
+      "placeholders": {
+        "newTask": "New task..."
+      },
+      "help": {
+        "chooseTodoDays": "Choose when to display this todo"
+      },
+      "days": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun",
+        "monShort": "M",
+        "tueShort": "T",
+        "wedShort": "W",
+        "thuShort": "T",
+        "friShort": "F",
+        "satShort": "S",
+        "sunShort": "S"
+      },
+      "tags": {
+        "normal": "Normal",
+        "important": "Important",
+        "optional": "Optional"
+      },
+      "emptyStates": {
+        "noTasks": "No tasks at the moment",
+        "noTasksForDay": "No tasks for {{day}}"
+      },
+      "errors": {
+        "tasksFetchError": "Error retrieving tasks:",
+        "taskAddError": "Error adding task:",
+        "taskUpdateError": "Error updating task:",
+        "taskDeleteError": "Error deleting task:"
+      }
+    },
+    "auth": {
+      "headings": {
+        "login": "Login",
+        "createAccount": "Create an Account"
+      },
+      "descriptions": {
+        "loginDescription": "Enter your credentials to access your account",
+        "signupDescription": "Fill out the form to create your account"
+      },
+      "labels": {
+        "email": "Email",
+        "password": "Password",
+        "passwordWithRequirement": "Password (8 characters min.)"
+      },
+      "placeholders": {
+        "email": "youremail@example.com",
+        "existingPassword": "Your password",
+        "newPassword": "Create a password"
+      },
+      "buttons": {
+        "login": "Login",
+        "signup": "Sign up",
+        "loading": "Loading..."
+      },
+      "toggleButtons": {
+        "toSignup": "Don't have an account? Create one",
+        "toLogin": "Already have an account? Log in"
+      },
+      "messages": {
+        "checkEmailConfirmation": "Please check your email to confirm your registration."
+      },
+      "errors": {
+        "authError": "Authentication error:",
+        "genericAuthError": "Authentication error"
+      },
+      "disclaimers": {
+        "privacyInfo": "This information is used only for your login and to save your actions on Studie. No data is shared or sold."
+      },
+      "debugMessages": {
+        "authResult": "Auth result:"
+      }
+    },
+    "onboarding": {
+    "headings": {
+      "welcome": "Welcome to Studie!",
+      "firstGoal": "Let's create your first goal",
+      "useTimer": "Using the timer",
+      "todoList": "The to-do list"
+    },
+    "buttons": {
+      "previous": "Previous",
+      "next": "Next",
+      "finish": "Finish",
+      "skip": "Skip",
+      "loading": "Loading...",
+      "previousAvatar": "Previous avatar",
+      "nextAvatar": "Next avatar",
+      "selectAvatarNum": "Select avatar {{number}}"
+    },
+    "confirmations": {
+      "skipTutorial": "Are you sure you want to skip the tutorial?"
+    },
+    "steps": {
+      "profile": {
+        "title": "Customize your profile",
+        "description": "To start, choose a nickname and an avatar. This will help you feel more at home!",
+        "nicknamePlaceholder": "Your nickname",
+        "chooseAvatar": "Choose an avatar",
+        "selectedAvatarAlt": "Selected avatar"
+      },
+      "goal": {
+        "title": "Study goal",
+        "description": "Your goal will appear in your dashboard according to the days you've defined and you'll be able to track the time spent on it.",
+        "name": "Name",
+        "namePlaceholder": "Ex: Mathematics, English, etc.",
+        "color": "Goal color",
+        "days": "Days",
+        "customDays": "Custom",
+        "timeObjective": "Time objective"
+      },
+      "timer": {
+        "title": "How does it work?",
+        "step1Title": "Select a goal",
+        "step1Description": "Click on a goal you've created in the list to select it.",
+        "step2Title": "Start the timer",
+        "step2Description": "Click the Play button to start timing your session. You can activate Pomodoro mode or switch to \"Focus mode\" to avoid distractions.",
+        "step3Title": "Progress",
+        "step3Description": "When you stop the timer, the remaining time to complete your goal is updated!",
+        "step4Title": "Statistics",
+        "step4Description": "The \"Activity\" tab allows you to track the time spent on your different goals, and to delete times entered by mistake."
+      },
+      "todo": {
+        "title": "Add your first task",
+        "description": "The to-do list allows you to add a small task, in parallel or in addition to your goals.",
+        "taskTitle": "Task title",
+        "taskPlaceholder": "Ex: Solve the exercises in chapter 3",
+        "chooseDays": "Choose which day to display the task"
+      }
+    },
+    "errors": {
+      "nicknameRequired": "Please choose a nickname",
+      "goalNameRequired": "Please give your goal a name",
+      "daySelectionRequired": "Please select at least one day of the week",
+      "profileCreationError": "Error while creating profile:",
+      "skipError": "Error while skipping onboarding:",
+      "skipErrorMessage": "An error occurred while skipping the onboarding.",
+      "genericError": "An error occurred. Please try again."
+    }
+  },
+  
+    "userOptions": {
+      "title": "User Settings",
+      "labels": {
+        "chooseAvatar": "Choose an avatar",
+        "showTodoList": "Show to-do list",
+        "todoToggleHint": "Enabling or disabling the task list doesn't delete your existing todos."
+      },
+      "placeholders": {
+        "nickname": "Your nickname"
+      },
+      "buttons": {
+        "save": "Save",
+        "saving": "Saving...",
+        "signOut": "Sign Out",
+        "closeAriaLabel": "Close",
+        "previousAvatar": "Previous avatar",
+        "nextAvatar": "Next avatar",
+        "selectAvatarNum": "Select avatar {{number}}"
+      },
+      "messages": {
+        "settingsSaved": "Settings saved successfully"
+      },
+      "errors": {
+        "fetchSettingsLogError": "Error fetching user settings:",
+        "fetchSettingsTryCatchError": "Error in fetchUserSettings:",
+        "loadSettingsError": "Error loading settings",
+        "saveSettingsError": "Error saving user settings:",
+        "saveSettingsErrorMessage": "Error saving settings"
+      },
+      "altTexts": {
+        "selectedAvatar": "Selected avatar"
+      }
+    },
+    "navbar": {
+    "links": {
+      "dashboard": "Dashboard",
+      "activity": "Activity",
+      "language": "Switch language"
+    },
+    "buttons": {
+      "darkMode": "Dark mode",
+      "lightMode": "Light mode",
+      "enableDarkModeAriaLabel": "Enable dark mode",
+      "enableLightModeAriaLabel": "Enable light mode",
+      "openMenuAriaLabel": "Open menu",
+      "closeMenuAriaLabel": "Close menu"
+    },
+    "images": {
+      "avatarAlt": "Avatar"
+    },
+    "errors": {
+      "fetchSettingsError": "Error fetching user settings:",
+      "fetchSettingsCatchError": "Error in fetchUserSettings:",
+      "invalidOpenModalFunction": "onOpenUserModal is not a valid function"
+    }
+  },
+  
+    "activity": {
+      "headings": {
+        "goalTracking": "Goal Tracking",
+        "studyTimePerDay": "Study Time per Day",
+        "sessionHistory": "Session History"
+      },
+      "labels": {
+        "goalTarget": "Goal: {{duration}} per practice day",
+        "scheduled": "To do",
+        "notScheduled": "Not planned",
+        "deletedGoal": "Deleted goal"
+      },
+      "legend": {
+        "goalAchieved": "Goal achieved",
+        "goalNotAchieved": "Goal not achieved",
+        "dayNotScheduled": "Day not scheduled"
+      },
+      "messages": {
+        "selectGoalToViewTracking": "Please select a goal to view its tracking.",
+        "loadingSessions": "Loading sessions...",
+        "noStudySessionsRecorded": "No study sessions recorded."
+      },
+      "table": {
+        "date": "Date",
+        "goal": "Goal",
+        "duration": "Duration",
+        "actions": "Actions"
+      },
+      "time": {
+        "zeroSeconds": "0 sec",
+        "zeroMinutes": "0 min",
+        "secondsOnly": "{{seconds}} sec",
+        "minutesOnly": "{{minutes}} min",
+        "minutesAndSeconds": "{{minutes}} min {{seconds}} sec",
+        "hoursFormat": "{{hours}}h {{minutes}}",
+        "minutesFormat": "{{minutes}}min",
+        "secondsFormat": "{{seconds}}sec",
+        "minutesAppend": "{{minutes}}min"
+      },
+      "units": {
+        "minutes": " min"
+      },
+      "tooltips": {
+        "studyTime": "Study time"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "delete": "Delete"
+      },
+      "ariaLabels": {
+        "previousWeek": "Previous week",
+        "nextWeek": "Next week",
+        "deleteSession": "Delete this session"
+      },
+      "modals": {
+        "deleteConfirmation": {
+          "title": "Delete Confirmation",
+          "confirmationQuestion": "Are you sure you want to delete this session?",
+          "goal": "Goal",
+          "duration": "Duration",
+          "date": "Date",
+          "note": "Note: The duration will also be subtracted from the associated goal.",
+          "todayProgressNote": "Today's progress will also be updated."
+        }
+      },
+      "errors": {
+        "dailyProgressError": "Error retrieving daily progress:",
+        "dataLoadError": "Error loading data:",
+        "unableToLoadData": "Unable to load your data",
+        "goalCompletionDataError": "Error preparing goal completion data:",
+        "goalNotFound": "Goal not found for id:",
+        "sessionDeletionError": "Error deleting session:",
+        "unableToDeleteSession": "Unable to delete session"
+      },
+      "debug": {
+        "sessionsLoaded": "Sessions loaded:",
+        "goalsLoaded": "Goals loaded:",
+        "availableGoals": "Available goals:",
+        "settingDefaultGoal": "Setting default goal:",
+        "noGoalsFound": "No goals found",
+        "preparingChartData": "Preparing chart data for goal:",
+        "invalidDaysFormat": "Invalid days format, using empty array",
+        "errorParsingDays": "Error parsing days:",
+        "daysValue": "days value:",
+        "dayDebugInfo": "Day {{day}} ({{dayShort}}): Total seconds={{totalSeconds}}, isScheduled={{isScheduled}}",
+        "noGoalSelected": "No goal selected, resetting goal completion data",
+        "goalSelected": "Goal selected:",
+        "searchingForGoal": "Searching for goal with ID:",
+        "or": "or",
+        "foundGoal": "Found goal:",
+        "fallingBackToFirstGoal": "Falling back to first available goal:"
+      }
+    }
+  
+  
+  
+}

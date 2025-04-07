@@ -1,0 +1,596 @@
+{
+  "auth": {
+    "login": "Connexion",
+    "signup": "Inscription",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?",
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter"
+  },
+  "login": {
+    "welcome": "Bienvenue !",
+    "optimizeStudyTime": "Optimisez votre temps d'étude",
+    "optimizeStudyProductivity": "Optimisez votre temps d'étude et votre productivité",
+    "features": "Fonctionnalités",
+    "trackStudyTime": "Suivez votre temps d'étude",
+    "trackStudyTimeDesc": "Enregistrez vos sessions d'étude avec notre timer intuitif.",
+    "setGoals": "Fixez des objectifs",
+    "setGoalsDesc": "Créez et suivez vos objectifs d'étude efficacement.",
+    "organizeDays": "Organisez vos journées",
+    "organizeDaysDesc": "Planifiez votre semaine avec notre liste de tâches.",
+    "getStarted": "Commencer",
+    "allRightsReserved": "Tous droits réservés."
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "welcome": "Bon retour",
+    "goals": "Objectifs",
+    "addGoal": "Ajouter un objectif",
+    "editGoal": "Modifier l'objectif",
+    "deleteGoal": "Supprimer l'objectif",
+    "study": "Étudier",
+    "todos": "Liste de tâches",
+    "addTodo": "Ajouter une tâche",
+    "editTodo": "Modifier la tâche",
+    "deleteTodo": "Supprimer la tâche",
+    "startTimer": "Démarrer le timer",
+    "pauseTimer": "Mettre en pause",
+    "resetTimer": "Réinitialiser",
+    "saveSession": "Enregistrer la session",
+    "viewAll": "Voir tout",
+    "previousDay": "Jour précédent",
+    "nextDay": "Jour suivant",
+    "toggleDateFilter": "Afficher tous les jours",
+    "errorUpdatingProgress": "Erreur lors de la mise à jour de la progression quotidienne:",
+    "errorCheckingOnboarding": "Erreur lors de la vérification du statut d'onboarding:",
+    "errorInOnboardingCheck": "Erreur dans checkOnboardingStatus:",
+    "errorFetchingSettings": "Erreur lors de la récupération des paramètres utilisateur:",
+    "errorInFetchSettings": "Erreur dans fetchUserSettings:"
+  },
+  "goals": {
+    "name": "Nom de l'objectif",
+    "targetTime": "Temps cible",
+    "weekDays": "Jours de la semaine",
+    "monday": "Lundi",
+    "tuesday": "Mardi",
+    "wednesday": "Mercredi",
+    "thursday": "Jeudi",
+    "friday": "Vendredi",
+    "saturday": "Samedi",
+    "sunday": "Dimanche",
+    "hoursPerWeek": "Heures par semaine",
+    "minutesPerDay": "Minutes par jour",
+    "progress": "Progression"
+  },
+  "todos": {
+    "task": "Tâche",
+    "day": "Jour",
+    "status": "Statut",
+    "completed": "Terminée",
+    "pending": "En attente",
+    "allDays": "Tous les jours",
+    "today": "Aujourd'hui",
+    "filter": "Filtrer par jour",
+    "nothingTodo": "Rien à faire"
+  },
+  "activity": {
+    "title": "Activité",
+    "weeklyChart": "Temps d'étude hebdomadaire",
+    "dailyChart": "Temps d'étude quotidien",
+    "sessions": "Sessions d'étude",
+    "date": "Date",
+    "duration": "Durée",
+    "goal": "Objectif",
+    "noSessions": "Aucune session d'étude enregistrée",
+    "hoursStudied": "Heures étudiées",
+    "minutesStudied": "Minutes étudiées",
+    "timeByGoal": "Temps par objectif",
+    "weeklyProgress": "Progression hebdomadaire",
+    "exportData": "Exporter les données"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "profile": "Profil",
+    "avatar": "Avatar",
+    "username": "Nom d'utilisateur",
+    "preferences": "Préférences",
+    "theme": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "language": "Langue",
+    "notifications": "Notifications",
+    "saveChanges": "Enregistrer les modifications",
+    "cancel": "Annuler"
+  },
+  "onboarding": {
+    "welcome": "Bienvenue sur StudyTracker !",
+    "intro": "Commençons à suivre votre temps d'étude",
+    "step1": "Définissez vos objectifs d'étude",
+    "step2": "Suivez vos sessions d'étude avec le timer",
+    "step3": "Gérez vos tâches avec la liste à faire",
+    "step4": "Analysez vos progrès dans la page Activité",
+    "next": "Suivant",
+    "back": "Précédent",
+    "finish": "Terminer",
+    "skip": "Passer"
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "confirm": "Confirmer",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "success": "Succès",
+    "minutes": "minutes",
+    "hours": "heures",
+    "days": "jours",
+    "weeks": "semaines",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "thisWeek": "Cette semaine",
+    "lastWeek": "Semaine dernière",
+    "thisMonth": "Ce mois-ci",
+    "total": "Total",
+    "name": "Nom",
+    "description": "Description",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier"
+  },
+  "time": {
+    "hour": "heure",
+    "hours": "heures",
+    "minute": "minute",
+    "minutes": "minutes",
+    "second": "seconde",
+    "seconds": "secondes"
+  },
+  "timer": {
+    "title": "Minuteur",
+    "pomodoro": "Pomodoro",
+    "focus": "Focus",
+    "break": "Pause",
+    "elapsedTime": "Temps écoulé",
+    "timeRemaining": "Temps restant",
+    "remainingBeforeBreak": "{{time}} restants avant pause",
+    "remainingBeforeResume": "{{time}} restants avant reprise",
+    "start": "Démarrer",
+    "pause": "Pause",
+    "stopAndSave": "Arrêter et enregistrer",
+    "reset": "Réinitialiser",
+    "focusMode": "Mode focus",
+    "focusModeTooltip": "Mode focus avec Lofi Music",
+    "selectGoalToStart": "Sélectionnez un objectif pour commencer",
+    "selectGoalBeforeStarting": "Veuillez sélectionner un objectif avant de démarrer le timer.",
+    "lofiMusic": "Lofi Music",
+    "lofiMusicTitle": "Lofi Music pour étudier",
+    "lofiChannelTitle": "lofi hip hop radio - beats to relax/study to",
+    "mute": "Couper le son",
+    "unmute": "Activer le son",
+    "hideYouTube": "Masquer YouTube",
+    "errorRetrievingState": "Erreur lors de la récupération de l'état du timer:",
+    "errorSavingState": "Erreur lors de l'enregistrement de l'état du timer:",
+    "errorRetrievingDailyProgress": "Erreur lors de la récupération de la progression quotidienne:",
+    "errorSavingStudySession": "Erreur lors de l'enregistrement de la session d'étude:",
+    "audioPlayFailed": "Audio play failed:"
+  },
+  "headings": {
+    "myGoals": "Mes objectifs"
+  },
+  "buttons": {
+    "changeGoal": "Changer d'objectif",
+    "add": "Ajouter",
+    "cancel": "Annuler",
+    "create": "Créer",
+    "save": "Enregistrer",
+    "editAriaLabel": "Modifier",
+    "deleteAriaLabel": "Supprimer"
+  },
+  "tooltips": {
+    "goalsLimitReached": "Limite de {{limit}} objectifs atteinte"
+  },
+  "emptyStates": {
+    "noGoalsDefined": "Aucun objectif défini. Créez-en un pour commencer.",
+    "noGoalsForDay": "Aucun objectif pour {{day}}. Ajoutez-en un ou modifiez les jours d'un objectif existant."
+  },
+  "status": {
+    "completed": "Terminé",
+    "percentCompleted": "{{percent}}% accompli"
+  },
+  "time": {
+    "minutes": "Minutes",
+    "hours": "Heures",
+    "minuteFormat": "{{count}} minute(s)",
+    "hourFormat": "{{count}} heure(s)",
+    "hoursMinutesRemaining": "{{hours}}h {{minutes}}m restante(s)",
+    "minutesSecondsRemaining": "{{minutes}}m {{seconds}}s restante(s)"
+  },
+  "days": {
+    "monday": "Lundi",
+    "tuesday": "Mardi",
+    "wednesday": "Mercredi",
+    "thursday": "Jeudi",
+    "friday": "Vendredi",
+    "saturday": "Samedi",
+    "sunday": "Dimanche",
+    "mondayShort": "L",
+    "tuesdayShort": "M",
+    "wednesdayShort": "M",
+    "thursdayShort": "J",
+    "fridayShort": "V",
+    "saturdayShort": "S",
+    "sundayShort": "D",
+    "everyday": "Tous les jours",
+    "weekdays": "Jours ouvrés",
+    "weekend": "Week-end"
+  },
+  "modals": {
+    "createGoal": {
+      "title": "Créer un nouvel objectif",
+      "goalName": "Nom de l'objectif",
+      "goalNamePlaceholder": "Ex: Apprendre JavaScript",
+      "dailyTime": "Temps quotidien",
+      "daysOfWeek": "Jours de la semaine",
+      "chooseDaysHelp": "Choisissez quand appliquer cet objectif",
+      "color": "Couleur"
+    },
+    "editGoal": {
+      "title": "Modifier l'objectif",
+      "goalName": "Nom de l'objectif",
+      "dailyTime": "Temps quotidien",
+      "daysOfWeek": "Jours de la semaine",
+      "chooseDaysHelp": "Choisissez quand appliquer cet objectif",
+      "color": "Couleur"
+    }
+  },
+  "colors": {
+    "coralRed": "Rouge corail",
+    "peach": "Pêche",
+    "paleYellow": "Jaune pâle",
+    "turquoise": "Turquoise",
+    "oceanBlue": "Bleu océan"
+  },
+  "confirmations": {
+    "deleteGoal": "Êtes-vous sûr de vouloir supprimer cet objectif ?"
+  },
+  "errors": {
+    "dailyProgressRetrievalError": "Erreur lors de la récupération de la progression quotidienne:",
+    "goalsLimitCheckError": "Erreur lors de la vérification de la limite d'objectifs:",
+    "goalsRetrievalError": "Erreur lors de la récupération des objectifs:",
+    "goalCreationError": "Erreur lors de la création de l'objectif:",
+    "goalUpdateError": "Erreur lors de la mise à jour de l'objectif:",
+    "goalDeletionError": "Erreur lors de la suppression de l'objectif:",
+    "unableToLoadGoals": "Impossible de charger vos objectifs. Veuillez réessayer.",
+    "unableToCreateGoal": "Impossible de créer l'objectif. Veuillez réessayer.",
+    "unableToUpdateGoal": "Impossible de mettre à jour l'objectif. Veuillez réessayer.",
+    "unableToDeleteGoal": "Impossible de supprimer l'objectif. Veuillez réessayer.",
+    "goalsLimitReached": "Vous avez atteint la limite de {{limit}} objectifs"
+  },
+  "todoList": {
+    "headings": {
+      "taskList": "Liste de tâches",
+      "addTask": "Ajout d'une Todo",
+      "advancedOptions": "Options avancées"
+    },
+    "buttons": {
+      "add": "Ajouter",
+      "cancel": "Annuler",
+      "deleteAriaLabel": "Supprimer cette tâche"
+    },
+    "labels": {
+      "recurringTask": "Tâche récurrente",
+      "daysOfWeek": "Jours de la semaine",
+      "optionalTag": "Tag (facultatif)"
+    },
+    "placeholders": {
+      "newTask": "Nouvelle tâche..."
+    },
+    "help": {
+      "chooseTodoDays": "Choisissez quand afficher cette todo"
+    },
+    "days": {
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mer",
+      "thu": "Jeu",
+      "fri": "Ven",
+      "sat": "Sam",
+      "sun": "Dim",
+      "monShort": "L",
+      "tueShort": "M",
+      "wedShort": "M",
+      "thuShort": "J",
+      "friShort": "V",
+      "satShort": "S",
+      "sunShort": "D"
+    },
+    "tags": {
+      "normal": "Normal",
+      "important": "Important",
+      "optional": "Facultatif"
+    },
+    "emptyStates": {
+      "noTasks": "Aucune tâche pour le moment",
+      "noTasksForDay": "Aucune tâche pour {{day}}"
+    },
+    "errors": {
+      "tasksFetchError": "Erreur lors de la récupération des tâches :",
+      "taskAddError": "Erreur lors de l'ajout de la tâche :",
+      "taskUpdateError": "Erreur lors de la mise à jour de la tâche :",
+      "taskDeleteError": "Erreur lors de la suppression de la tâche :"
+    }
+  }
+,
+"auth": {
+    "headings": {
+      "login": "Connexion",
+      "createAccount": "Créer un compte"
+    },
+    "descriptions": {
+      "loginDescription": "Entrez vos identifiants pour accéder à votre compte",
+      "signupDescription": "Remplissez le formulaire pour créer votre compte"
+    },
+    "labels": {
+      "email": "Email",
+      "password": "Mot de passe",
+      "passwordWithRequirement": "Mot de passe (8 caractères min.)"
+    },
+    "placeholders": {
+      "email": "votreemail@exemple.com",
+      "existingPassword": "Votre mot de passe",
+      "newPassword": "Créez un mot de passe"
+    },
+    "buttons": {
+      "login": "Se connecter",
+      "signup": "S'inscrire",
+      "loading": "Chargement..."
+    },
+    "toggleButtons": {
+      "toSignup": "Pas encore de compte ? Créer un compte",
+      "toLogin": "Déjà un compte ? Se connecter"
+    },
+    "messages": {
+      "checkEmailConfirmation": "Veuillez vérifier votre email pour confirmer votre inscription."
+    },
+    "errors": {
+      "authError": "Erreur d'authentification:",
+      "genericAuthError": "Erreur d'authentification"
+    },
+    "disclaimers": {
+      "privacyInfo": "Ces informations servent uniquement à votre connexion et à la sauvegarde de vos actions sur Studie. Aucune donnée n'est partagée ou vendue."
+    },
+    "debugMessages": {
+      "authResult": "Résultat auth:"
+    }
+  },
+  
+    "onboarding": {
+      "headings": {
+        "welcome": "Bienvenue sur Studie!",
+        "firstGoal": "Créons votre premier objectif",
+        "useTimer": "Utiliser le timer",
+        "todoList": "La to-do list"
+      },
+      "buttons": {
+        "previous": "Précédent",
+        "next": "Suivant",
+        "finish": "Terminer",
+        "skip": "Ignorer",
+        "loading": "Chargement...",
+        "previousAvatar": "Avatar précédent",
+        "nextAvatar": "Avatar suivant",
+        "selectAvatarNum": "Sélectionner avatar {{number}}"
+      },
+      "confirmations": {
+        "skipTutorial": "Êtes-vous sûr de vouloir passer les explications ?"
+      },
+      "steps": {
+        "profile": {
+          "title": "Personnalisez votre profil",
+          "description": "Pour commencer, choisissez un pseudo et un avatar. Cela vous permettra de vous sentir un peu plus chez vous !",
+          "nicknamePlaceholder": "Votre pseudo",
+          "chooseAvatar": "Choisir un avatar",
+          "selectedAvatarAlt": "Avatar sélectionné"
+        },
+        "goal": {
+          "title": "Objectif d'étude",
+          "description": "Votre objectif apparaitra dans votre tableau de bord selon les jours que vous aurez définis et vous pourrez suivre le temps passé dessus.",
+          "name": "Nom",
+          "namePlaceholder": "Ex: Mathématiques, Anglais, etc.",
+          "color": "Couleur de l'objectif",
+          "days": "Jours concernés",
+          "customDays": "Personnalisé",
+          "timeObjective": "Objectif de temps"
+        },
+        "timer": {
+          "title": "Comment ça marche ?",
+          "step1Title": "Sélectionnez un objectif",
+          "step1Description": "Cliquez sur un objectif que vous avez créé dans la liste pour le sélectionner.",
+          "step2Title": "Démarrez le timer",
+          "step2Description": "Cliquez sur le bouton Play pour commencer à chronométrer votre session. Vous pouvez activer le mode Pomodoro ou passer en \"Focus mode\" pour éviter les distractions.",
+          "step3Title": "Progression",
+          "step3Description": "Lorsque vous arrêtez le timer, le temps restant pour compléter votre objectif est mis à jour !",
+          "step4Title": "Statistiques",
+          "step4Description": "L'onglet \"Activité\" vous permet de suivre le temps passé sur vos différents objectifs, et de supprimer les temps rentrés par erreur."
+        },
+        "todo": {
+          "title": "Ajoutez votre première tâche",
+          "description": "La todo list vous permet de renseigner une petite tâche, en parallèle ou en supplément de vos objectifs.",
+          "taskTitle": "Titre de la tâche",
+          "taskPlaceholder": "Ex: Résoudre les exercices du chapitre 3",
+          "chooseDays": "Choisissez quel jour afficher la tâche"
+        }
+      },
+      "errors": {
+        "nicknameRequired": "Veuillez choisir un pseudo",
+        "goalNameRequired": "Veuillez donner un nom à votre objectif",
+        "daySelectionRequired": "Veuillez sélectionner au moins un jour de la semaine",
+        "profileCreationError": "Erreur lors de la création du profil:",
+        "skipError": "Erreur lors de l'ignore de l'onboarding:",
+        "skipErrorMessage": "Une erreur est survenue lors de l'ignoration de l'onboarding.",
+        "genericError": "Une erreur est survenue. Veuillez réessayer."
+      }
+    },
+    
+      "userOptions": {
+        "title": "Paramètres utilisateur",
+        "labels": {
+          "chooseAvatar": "Choisir un avatar",
+          "showTodoList": "Afficher la to-do list",
+          "todoToggleHint": "Activer ou désactiver la todo n'efface pas les todos renseignées."
+        },
+        "placeholders": {
+          "nickname": "Votre pseudo"
+        },
+        "buttons": {
+          "save": "Enregistrer",
+          "saving": "Enregistrement...",
+          "signOut": "Déconnexion",
+          "closeAriaLabel": "Fermer",
+          "previousAvatar": "Avatar précédent",
+          "nextAvatar": "Avatar suivant",
+          "selectAvatarNum": "Sélectionner avatar {{number}}"
+        },
+        "messages": {
+          "settingsSaved": "Paramètres enregistrés avec succès"
+        },
+        "errors": {
+          "fetchSettingsLogError": "Erreur lors de la récupération des paramètres utilisateur:",
+          "fetchSettingsTryCatchError": "Erreur dans fetchUserSettings:",
+          "loadSettingsError": "Erreur lors du chargement des paramètres",
+          "saveSettingsError": "Erreur lors de l'enregistrement des paramètres utilisateur:",
+          "saveSettingsErrorMessage": "Erreur lors de l'enregistrement des paramètres"
+        },
+        "altTexts": {
+          "selectedAvatar": "Avatar sélectionné"
+        }
+      },
+      "navbar": {
+    "links": {
+      "dashboard": "Dashboard",
+      "activity": "Activité",
+      "language": "Changer de langue"
+    },
+    "buttons": {
+      "darkMode": "Mode sombre",
+      "lightMode": "Mode clair",
+      "enableDarkModeAriaLabel": "Activer le mode sombre",
+      "enableLightModeAriaLabel": "Activer le mode clair",
+      "openMenuAriaLabel": "Ouvrir le menu",
+      "closeMenuAriaLabel": "Fermer le menu"
+    },
+    "images": {
+      "avatarAlt": "Avatar"
+    },
+    "errors": {
+      "fetchSettingsError": "Erreur lors de la récupération des paramètres utilisateur:",
+      "fetchSettingsCatchError": "Erreur dans fetchUserSettings:",
+      "invalidOpenModalFunction": "onOpenUserModal n'est pas une fonction valide"
+    }
+  },
+  
+    "activity": {
+      "headings": {
+        "goalTracking": "Suivi de l'objectif",
+        "studyTimePerDay": "Temps d'étude par jour",
+        "sessionHistory": "Historique des sessions"
+      },
+      "labels": {
+        "goalTarget": "Objectif : {{duration}} par jour de pratique",
+        "scheduled": "Prévu",
+        "notScheduled": "Non planifié",
+        "deletedGoal": "Objectif supprimé"
+      },
+      "legend": {
+        "goalAchieved": "Objectif atteint",
+        "goalNotAchieved": "Objectif non atteint",
+        "dayNotScheduled": "Jour non planifié"
+      },
+      "messages": {
+        "selectGoalToViewTracking": "Veuillez sélectionner un objectif pour voir son suivi.",
+        "loadingSessions": "Chargement des sessions...",
+        "noStudySessionsRecorded": "Aucune session d'étude enregistrée."
+      },
+      "table": {
+        "date": "Date",
+        "goal": "Objectif",
+        "duration": "Durée",
+        "actions": "Actions"
+      },
+      "time": {
+        "zeroSeconds": "0 sec",
+        "zeroMinutes": "0 min",
+        "secondsOnly": "{{seconds}} sec",
+        "minutesOnly": "{{minutes}} min",
+        "minutesAndSeconds": "{{minutes}} min {{seconds}} sec",
+        "hoursFormat": "{{hours}}h {{minutes}}",
+        "minutesFormat": "{{minutes}}min",
+        "secondsFormat": "{{seconds}}sec",
+        "minutesAppend": "{{minutes}}min"
+      },
+      "units": {
+        "minutes": " min"
+      },
+      "tooltips": {
+        "studyTime": "Temps d'étude"
+      },
+      "buttons": {
+        "cancel": "Annuler",
+        "delete": "Supprimer"
+      },
+      "ariaLabels": {
+        "previousWeek": "Semaine précédente",
+        "nextWeek": "Semaine suivante",
+        "deleteSession": "Supprimer cette session"
+      },
+      "modals": {
+        "deleteConfirmation": {
+          "title": "Confirmation de suppression",
+          "confirmationQuestion": "Êtes-vous sûr de vouloir supprimer cette session ?",
+          "goal": "Objectif",
+          "duration": "Durée",
+          "date": "Date",
+          "note": "Note : La durée sera également soustraite de l'objectif associé.",
+          "todayProgressNote": "La progression d'aujourd'hui sera également mise à jour."
+        }
+      },
+      "errors": {
+        "dailyProgressError": "Erreur lors de la récupération de la progression quotidienne:",
+        "dataLoadError": "Erreur lors du chargement des données:",
+        "unableToLoadData": "Impossible de charger vos données",
+        "goalCompletionDataError": "Erreur lors de la préparation des données de complétion d'objectif:",
+        "goalNotFound": "Objectif non trouvé pour id:",
+        "sessionDeletionError": "Erreur lors de la suppression de la session:",
+        "unableToDeleteSession": "Impossible de supprimer la session"
+      },
+      "debug": {
+        "sessionsLoaded": "Sessions chargées:",
+        "goalsLoaded": "Objectifs chargés:",
+        "availableGoals": "Objectifs disponibles:",
+        "settingDefaultGoal": "Définition de l'objectif par défaut:",
+        "noGoalsFound": "Aucun objectif trouvé",
+        "preparingChartData": "Préparation des données pour l'objectif:",
+        "invalidDaysFormat": "Format de jours invalide, utilisation d'un tableau vide",
+        "errorParsingDays": "Erreur lors de l'analyse des jours:",
+        "daysValue": "valeur des jours:",
+        "dayDebugInfo": "Jour {{day}} ({{dayShort}}): Total secondes={{totalSeconds}}, est prévu={{isScheduled}}",
+        "noGoalSelected": "Aucun objectif sélectionné, réinitialisation des données de complétion d'objectif",
+        "goalSelected": "Objectif sélectionné:",
+        "searchingForGoal": "Recherche d'un objectif avec l'ID:",
+        "or": "ou",
+        "foundGoal": "Objectif trouvé:",
+        "fallingBackToFirstGoal": "Repli sur le premier objectif disponible:"
+      }
+    }
+  
+    
+  
+
+  
+}

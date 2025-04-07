@@ -3,8 +3,10 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { Trash2, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 function TodoList({ currentDay = null, ignoreDate = false }) {
+  const { t } = useTranslation();
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -15,11 +17,15 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
   const { user } = useAuth();
   const [todayDate, setTodayDate] = useState('');
 
-  const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+  // Clés pour les jours au lieu des valeurs directes
+  const WEEKDAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+  // Les valeurs traduites sont obtenues à partir des clés
+  const weekDays = WEEKDAY_KEYS.map(day => t(`todoList.days.${day}`));
+  
   const tagOptions = [
-    { value: 'normal', label: 'Normal', color: 'info' },
-    { value: 'important', label: 'Important', color: 'error' },
-    { value: 'optional', label: 'Facultatif', color: 'warning' }
+    { value: 'normal', labelKey: 'todoList.tags.normal', color: 'info' },
+    { value: 'important', labelKey: 'todoList.tags.important', color: 'error' },
+    { value: 'optional', labelKey: 'todoList.tags.optional', color: 'warning' }
   ];
 
   // Déterminer le jour actuel au chargement du composant
@@ -28,7 +34,7 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
     const dayIndex = date.getDay() - 1; // 0 pour lundi, -1 pour dimanche (qui devient 6)
     const adjustedIndex = dayIndex < 0 ? 6 : dayIndex;
     setTodayDate(weekDays[adjustedIndex]);
-  }, []);
+  }, [weekDays]);
 
   useEffect(() => {
     if (user) {
@@ -66,7 +72,7 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
       const sortedTasks = sortTasksByCompletion(adjustedTasks || []);
       setTasks(sortedTasks);
     } catch (error) {
-      console.error('Erreur lors de la récupération des tâches :', error);
+      console.error(t('todoList.errors.tasksFetchError'), error);
     } finally {
       setIsLoading(false);
     }
@@ -140,7 +146,7 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
       resetForm();
       fetchTasks();
     } catch (error) {
-      console.error('Erreur lors de l\'ajout de la tâche :', error);
+      console.error(t('todoList.errors.taskAddError'), error);
     } finally {
       setIsLoading(false);
     }
@@ -178,7 +184,7 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
         setTasks(sortTasksByCompletion(updatedTasks));
       }
     } catch (error) {
-      console.error('Erreur lors de la mise à jour de la tâche :', error);
+      console.error(t('todoList.errors.taskUpdateError'), error);
     }
   };
 
@@ -198,7 +204,7 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
       
       setTasks(tasks.filter(task => task.id !== id));
     } catch (error) {
-      console.error('Erreur lors de la suppression de la tâche :', error);
+      console.error(t('todoList.errors.taskDeleteError'), error);
     }
   };
 
@@ -219,14 +225,14 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
     <div className="card w-full bg-base-100 shadow-xl flex flex-col max-h-screen">
       <div className="card-body flex flex-col h-full p-4 overflow-hidden">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="card-title text-lg">Liste de tâches</h2>
+          <h2 className="card-title text-lg">{t('todoList.headings.taskList')}</h2>
           {!isAddingTask && (
             <button 
               className="btn btn-sm btn-soft btn-secondary"
               onClick={() => setIsAddingTask(true)}
             >
               <Plus size={16} />
-              Ajouter
+              {t('todoList.buttons.add')}
             </button>
           )}
         </div>
@@ -235,14 +241,14 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
         <div className="flex flex-col overflow-hidden flex-grow">
           {isAddingTask && (
             <div className="rounded-lg p-4 mb-4 overflow-y-auto">
-              <h3 className="font-medium text-base mb-3">Ajout d'une Todo</h3>
+              <h3 className="font-medium text-base mb-3">{t('todoList.headings.addTask')}</h3>
               <form onSubmit={addTask} className="space-y-4">
                 <input
                   type="text"
                   className="input input-bordered w-full"
                   value={newTask}
                   onChange={(e) => setNewTask(e.target.value)}
-                  placeholder="Nouvelle tâche..."
+                  placeholder={t('todoList.placeholders.newTask')}
                   autoFocus
                 />
                 
@@ -250,14 +256,14 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
                 <div className="collapse collapse-arrow border border-base-300 bg-base-100 rounded-lg">
                   <input type="checkbox" className="peer" /> 
                   <div className="collapse-title text-sm font-medium">
-                    Options avancées
+                    {t('todoList.headings.advancedOptions')}
                   </div>
                   <div className="collapse-content">
                     <div className="space-y-4 pt-2">
                       {/* Type de tâche */}
                       <div className="form-control">
                         <label className="cursor-pointer label">
-                          <span className="label-text">Tâche récurrente</span>
+                          <span className="label-text">{t('todoList.labels.recurringTask')}</span>
                           <input 
                             type="checkbox" 
                             className="toggle toggle-primary toggle-sm" 
@@ -270,66 +276,47 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
                       {/* Jours de la semaine pour tâches récurrentes */}
                       {taskType === 'recurring' && (
                         <fieldset className="fieldset bg-base-200 rounded-lg p-2 border border-base-300">
-                          <legend className="fieldset-legend">Jours de la semaine</legend>
+                          <legend className="fieldset-legend">{t('todoList.labels.daysOfWeek')}</legend>
                           <div className="flex flex-wrap gap-1 justify-center">
-                            {weekDays.map(day => (
+                            {WEEKDAY_KEYS.map((dayKey, index) => (
                               <button
-                                key={day}
+                                key={dayKey}
                                 type="button"
                                 className={`btn btn-xs ${
-                                  selectedDays.includes(day) 
+                                  selectedDays.includes(weekDays[index]) 
                                     ? 'btn-success' 
                                     : 'bg-base-300 text-base-content opacity-60'
                                 }`}
-                                onClick={() => toggleDaySelection(day)}
+                                onClick={() => toggleDaySelection(weekDays[index])}
                               >
-                                {day.substring(0, 1)}
+                                {t(`todoList.days.${dayKey}Short`)}
                               </button>
                             ))}
                           </div>
-                          <p className="fieldset-label">Choisissez quand afficher cette todo</p>
+                          <p className="fieldset-label">{t('todoList.help.chooseTodoDays')}</p>
                         </fieldset>
                       )}
                       
                       {/* Tags */}
                       <div className="form-control">
                         <label className="label">
-                          <span className="label-text">Tag (facultatif)</span>
+                          <span className="label-text">{t('todoList.labels.optionalTag')}</span>
                         </label>
                         <div className="grid grid-cols-3 gap-2">
-                          <button
-                            type="button"
-                            className={`btn btn-sm ${
-                              selectedTag === 'normal' 
-                                ? 'btn-info' 
-                                : 'btn-outline btn-info'
-                            }`}
-                            onClick={() => toggleTag('normal')}
-                          >
-                            Normal
-                          </button>
-                          <button
-                            type="button"
-                            className={`btn btn-sm ${
-                              selectedTag === 'important' 
-                                ? 'btn-error' 
-                                : 'btn-outline btn-error'
-                            }`}
-                            onClick={() => toggleTag('important')}
-                          >
-                            Important
-                          </button>
-                          <button
-                            type="button"
-                            className={`btn btn-sm ${
-                              selectedTag === 'optional' 
-                                ? 'btn-warning' 
-                                : 'btn-outline btn-warning'
-                            }`}
-                            onClick={() => toggleTag('optional')}
-                          >
-                            Facultatif
-                          </button>
+                          {tagOptions.map(tag => (
+                            <button
+                              key={tag.value}
+                              type="button"
+                              className={`btn btn-sm ${
+                                selectedTag === tag.value 
+                                  ? `btn-${tag.color}` 
+                                  : `btn-outline btn-${tag.color}`
+                              }`}
+                              onClick={() => toggleTag(tag.value)}
+                            >
+                              {t(tag.labelKey)}
+                            </button>
+                          ))}
                         </div>
                       </div>
                     </div>
@@ -343,14 +330,14 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
                     className="btn btn-sm btn-ghost"
                     onClick={resetForm}
                   >
-                    Annuler
+                    {t('todoList.buttons.cancel')}
                   </button>
                   <button
                     type="submit"
                     className="btn btn-sm btn-primary"
                     disabled={isLoading || !newTask.trim()}
                   >
-                    Ajouter
+                    {t('todoList.buttons.add')}
                   </button>
                 </div>
               </form>
@@ -368,10 +355,10 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
           <div className="overflow-y-auto flex-grow">
             <ul className="space-y-2 pr-1">
               {tasks.length === 0 ? (
-                <li className="text-center text-gray-500 py-4">Aucune tâche pour le moment</li>
+                <li className="text-center text-gray-500 py-4">{t('todoList.emptyStates.noTasks')}</li>
               ) : getFilteredTasks().length === 0 ? (
                 <li className="text-center text-gray-500 py-4">
-                  Aucune tâche pour {currentDay}
+                  {t('todoList.emptyStates.noTasksForDay', { day: currentDay })}
                 </li>
               ) : (
                 getFilteredTasks().map(task => (
@@ -403,11 +390,7 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
                                     ? 'bg-warning text-warning-content' 
                                     : 'bg-info text-info-content'
                               }`}>
-                                {task.tag === 'important' 
-                                  ? 'Important' 
-                                  : task.tag === 'optional' 
-                                    ? 'Facultatif' 
-                                    : 'Normal'}
+                                {t(`todoList.tags.${task.tag}`)}
                               </span>
                             )}
                           </div>
@@ -415,24 +398,27 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
                           {/* Jours récurrents */}
                           {task.type === 'recurring' && (
                             <div className="flex gap-1 mt-1">
-                              {weekDays.map(day => (
-                                <span 
-                                  key={day} 
-                                  className={`text-xs ${
-                                    task.recurring_days.includes(day) 
-                                      ? task.tag === 'important'
-                                        ? 'text-error font-bold'
-                                        : task.tag === 'optional'
-                                          ? 'text-warning font-bold'
-                                          : task.tag === 'normal'
-                                            ? 'text-info font-bold'
-                                            : 'text-primary font-bold'
-                                      : 'opacity-30'
-                                  }`}
-                                >
-                                  {day.substring(0, 1)}
-                                </span>
-                              ))}
+                              {WEEKDAY_KEYS.map((dayKey, index) => {
+                                const dayValue = weekDays[index];
+                                return (
+                                  <span 
+                                    key={dayKey} 
+                                    className={`text-xs ${
+                                      task.recurring_days.includes(dayValue) 
+                                        ? task.tag === 'important'
+                                          ? 'text-error font-bold'
+                                          : task.tag === 'optional'
+                                            ? 'text-warning font-bold'
+                                            : task.tag === 'normal'
+                                              ? 'text-info font-bold'
+                                              : 'text-primary font-bold'
+                                        : 'opacity-30'
+                                    }`}
+                                  >
+                                    {t(`todoList.days.${dayKey}Short`)}
+                                  </span>
+                                );
+                              })}
                             </div>
                           )}
                         </div>
@@ -440,6 +426,7 @@ function TodoList({ currentDay = null, ignoreDate = false }) {
                       <button 
                         className="group"
                         onClick={() => deleteTask(task.id)}
+                        aria-label={t('todoList.buttons.deleteAriaLabel')}
                       >
                         <Trash2 size={14} className="text-base-content group-hover:text-error transition-colors" />
                       </button>

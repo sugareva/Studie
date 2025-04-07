@@ -31,11 +31,13 @@ import {
 } from 'recharts';
 import { format, parseISO, startOfWeek, endOfWeek, eachDayOfInterval, addWeeks, subWeeks, isSameDay, isToday } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 
 // Constante pour la clé de progression journalière (doit être la même que dans les autres composants)
 const DAILY_PROGRESS_KEY = 'DAILY_PROGRESS';
 
 function Activity() {
+  const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const [sessions, setSessions] = useState([]);
   const [goals, setGoals] = useState([]);
@@ -112,7 +114,7 @@ function Activity() {
         return parseInt(storedProgress, 10);
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération de la progression quotidienne:', error);
+      console.error(t('activity.errors.dailyProgressError'), error);
     }
     
     return 0;
@@ -158,9 +160,9 @@ function Activity() {
           throw sessionsError;
         }
         
-        console.log("Sessions loaded:", sessionsData?.length);
-        console.log("Goals loaded:", goalsData?.length);
-        console.log("Available goals:", goalsData?.map(g => ({ id: g.id, type: typeof g.id, name: g.name })));
+        console.log(t('activity.debug.sessionsLoaded'), sessionsData?.length);
+        console.log(t('activity.debug.goalsLoaded'), goalsData?.length);
+        console.log(t('activity.debug.availableGoals'), goalsData?.map(g => ({ id: g.id, type: typeof g.id, name: g.name })));
         
         // Pour chaque objectif, vérifier si nous avons une entrée pour aujourd'hui
         const today = getTodayDate();
@@ -178,26 +180,26 @@ function Activity() {
         // Définir l'objectif sélectionné par défaut (le premier)
         if (goalsData && goalsData.length > 0) {
           const firstGoal = goalsData[0];
-          console.log("Setting default goal:", firstGoal.name, firstGoal.id, typeof firstGoal.id);
+          console.log(t('activity.debug.settingDefaultGoal'), firstGoal.name, firstGoal.id, typeof firstGoal.id);
           setSelectedGoal(firstGoal);
           
           // Préparer les données pour les graphiques
           prepareChartData(sessionsData || [], firstGoal);
         } else {
-          console.log("No goals found");
+          console.log(t('activity.debug.noGoalsFound'));
           prepareChartData(sessionsData || [], null);
         }
         
       } catch (err) {
-        console.error('Erreur lors du chargement des données:', err);
-        setError('Impossible de charger vos données');
+        console.error(t('activity.errors.dataLoadError'), err);
+        setError(t('activity.errors.unableToLoadData'));
       } finally {
         setLoading(false);
       }
     }
     
     fetchData();
-  }, [user]);
+  }, [user, t]);
 
   // Mettre à jour les données du graphique quand la semaine change
   useEffect(() => {
@@ -208,17 +210,17 @@ function Activity() {
 
   // Fonction d'aide pour formater le temps en "Xmin Ysec"
   const formatTimeForTooltip = (seconds) => {
-    if (seconds === 0) return '0 sec';
+    if (seconds === 0) return t('activity.time.zeroSeconds');
     
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.round(seconds % 60);
     
     if (minutes === 0) {
-      return `${remainingSeconds} sec`;
+      return t('activity.time.secondsOnly', { seconds: remainingSeconds });
     } else if (remainingSeconds === 0) {
-      return `${minutes} min`;
+      return t('activity.time.minutesOnly', { minutes });
     } else {
-      return `${minutes} min ${remainingSeconds} sec`;
+      return t('activity.time.minutesAndSeconds', { minutes, seconds: remainingSeconds });
     }
   };
   
@@ -257,7 +259,7 @@ function Activity() {
     
     // Données de complétion d'objectif pour la visualisation hebdomadaire
     if (goal) {
-      console.log("Preparing chart data for goal:", goal.name, goal.id);
+      console.log(t('activity.debug.preparingChartData'), goal.name, goal.id);
       
       try {
         // Assurer que days est un tableau valide
@@ -265,11 +267,11 @@ function Activity() {
         try {
           goalDays = goal.days_of_week || [];
           if (!Array.isArray(goalDays)) {
-            console.warn("Invalid days format, using empty array", goal.days_of_week);
+            console.warn(t('activity.debug.invalidDaysFormat'), goal.days_of_week);
             goalDays = [];
           }
         } catch (e) {
-          console.error("Error parsing days:", e, "days value:", goal.days_of_week);
+          console.error(t('activity.debug.errorParsingDays'), e, t('activity.debug.daysValue'), goal.days_of_week);
           goalDays = [];
         }
         
@@ -305,7 +307,7 @@ function Activity() {
           }
           // Pour les jours futurs, totalSeconds reste à 0
           
-          console.log(`Day ${dayStr} (${dayShort}): Total seconds=${totalSeconds}, isScheduled=${isScheduled}`);
+          console.log(t('activity.debug.dayDebugInfo', { day: dayStr, dayShort, totalSeconds, isScheduled }));
           
           // Déterminer si l'objectif a été atteint pour ce jour
           const isCompleted = totalSeconds >= goalDuration;
@@ -326,11 +328,11 @@ function Activity() {
         
         setGoalCompletionData(goalCompletionStats);
       } catch (error) {
-        console.error("Error preparing goal completion data:", error);
+        console.error(t('activity.errors.goalCompletionDataError'), error);
         setGoalCompletionData([]);
       }
     } else {
-      console.log("No goal selected, resetting goal completion data");
+      console.log(t('activity.debug.noGoalSelected'));
       setGoalCompletionData([]);
     }
   };
@@ -338,7 +340,7 @@ function Activity() {
   // Gérer le changement d'objectif sélectionné
   const handleGoalChange = (event) => {
     const goalId = event.target.value;
-    console.log("Goal selected:", goalId, typeof goalId);
+    console.log(t('activity.debug.goalSelected'), goalId, typeof goalId);
     
     // Convertir l'ID en nombre si nécessaire (les valeurs de select sont souvent des chaînes)
     // Certaines bases de données utilisent des IDs numériques
@@ -354,20 +356,20 @@ function Activity() {
     }
     
     // Log détaillé pour comprendre le problème
-    console.log("Searching for goal with ID:", searchId, "or", searchIdNumber);
-    console.log("Available goals:", goals.map(g => ({ id: g.id, type: typeof g.id, name: g.name })));
-    console.log("Found goal:", goal);
+    console.log(t('activity.debug.searchingForGoal'), searchId, t('activity.debug.or'), searchIdNumber);
+    console.log(t('activity.debug.availableGoals'), goals.map(g => ({ id: g.id, type: typeof g.id, name: g.name })));
+    console.log(t('activity.debug.foundGoal'), goal);
     
     if (goal) {
       setSelectedGoal(goal);
       // Recalculer les données avec le nouvel objectif sélectionné
       prepareChartData(sessions, goal);
     } else {
-      console.error("Goal not found for id:", goalId);
+      console.error(t('activity.errors.goalNotFound'), goalId);
       
       // Solution de repli : s'il y a des objectifs disponibles, sélectionner le premier
       if (goals.length > 0) {
-        console.log("Falling back to first available goal:", goals[0]);
+        console.log(t('activity.debug.fallingBackToFirstGoal'), goals[0]);
         setSelectedGoal(goals[0]);
         prepareChartData(sessions, goals[0]);
       }
@@ -388,18 +390,18 @@ function Activity() {
   
   // Formater la durée (de secondes à heures et minutes)
   const formatDuration = (seconds) => {
-    if (!seconds) return '0 min';
+    if (!seconds) return t('activity.time.zeroMinutes');
     
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
     
     if (hours > 0) {
-      return `${hours}h ${minutes > 0 ? `${minutes}min` : ''}`;
+      return t('activity.time.hoursFormat', { hours, minutes: minutes > 0 ? t('activity.time.minutesAppend', { minutes }) : '' });
     } else if (minutes > 0) {
-      return `${minutes}min`;
+      return t('activity.time.minutesFormat', { minutes });
     } else {
-      return `${secs}sec`;
+      return t('activity.time.secondsFormat', { seconds: secs });
     }
   };
   
@@ -500,8 +502,8 @@ function Activity() {
       setSessionToDelete(null);
       
     } catch (err) {
-      console.error('Erreur lors de la suppression de la session:', err);
-      setError('Impossible de supprimer la session');
+      console.error(t('activity.errors.sessionDeletionError'), err);
+      setError(t('activity.errors.unableToDeleteSession'));
     } finally {
       setLoading(false);
     }
@@ -528,6 +530,7 @@ function Activity() {
             <button 
               className="btn btn-sm btn-ghost btn-circle" 
               onClick={goToPreviousWeek}
+              aria-label={t('activity.ariaLabels.previousWeek')}
             >
               <ChevronLeft size={18} />
             </button>
@@ -538,6 +541,7 @@ function Activity() {
             <button 
               className="btn btn-sm btn-ghost btn-circle" 
               onClick={goToNextWeek}
+              aria-label={t('activity.ariaLabels.nextWeek')}
             >
               <ChevronRight size={18} />
             </button>
@@ -550,7 +554,7 @@ function Activity() {
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
       <h2 className="card-title flex items-center gap-2">
         <Target size={20} className="text-primary" />
-        Suivi de l'objectif
+        {t('activity.headings.goalTracking')}
       </h2>
 
       {goals.length > 0 && (
@@ -573,7 +577,7 @@ function Activity() {
 
     {!selectedGoal && (
       <div className="alert">
-        <span>Veuillez sélectionner un objectif pour voir son suivi.</span>
+        <span>{t('activity.messages.selectGoalToViewTracking')}</span>
       </div>
     )}
 
@@ -581,7 +585,7 @@ function Activity() {
       <>
         <div className="alert alert-soft alert-info mb-4 py-2">
           <Info size={16} />
-          <span>Objectif : {formatDuration(selectedGoal.duration)} par jour de pratique</span>
+          <span>{t('activity.labels.goalTarget', { duration: formatDuration(selectedGoal.duration) })}</span>
         </div>
         
         {/* Conteneur avec scroll horizontal sur petit écran */}
@@ -646,13 +650,13 @@ function Activity() {
           {day.isScheduled ? (
             <>
               <div className="text-xs text-center text-base-content text-opacity-50 mb-1">
-                Prévu
+                {t('activity.labels.scheduled')}
               </div>
               <div className="text-xl font-bold">0%</div>
             </>
           ) : (
             <div className="text-xs text-center text-base-content text-opacity-50">
-              Non planifié
+              {t('activity.labels.notScheduled')}
             </div>
           )}
         </div>
@@ -667,15 +671,15 @@ function Activity() {
         <div className="flex flex-wrap gap-4 justify-center mt-4 text-xs">
           <div className="flex items-center gap-1">
             <CheckCircle2 size={16} className="text-success" />
-            <span>Objectif atteint</span>
+            <span>{t('activity.legend.goalAchieved')}</span>
           </div>
           <div className="flex items-center gap-1">
             <XCircle size={16} className="text-error" />
-            <span>Objectif non atteint</span>
+            <span>{t('activity.legend.goalNotAchieved')}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-base-200 rounded-full border border-base-300"></div>
-            <span>Jour non planifié</span>
+            <span>{t('activity.legend.dayNotScheduled')}</span>
           </div>
         </div>
       </>
@@ -687,7 +691,7 @@ function Activity() {
               <div className="card-body">
                 <h2 className="card-title flex items-center gap-2">
                   <Calendar size={20} className="text-primary" />
-                  Temps d'étude par jour
+                  {t('activity.headings.studyTimePerDay')}
                 </h2>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -697,18 +701,18 @@ function Activity() {
                     >
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="jour" />
-                      <YAxis unit=" min" />
+                      <YAxis unit={t('activity.units.minutes')} />
                       <Tooltip
                         formatter={(value, name, props) => {
                           if (props.payload && props.payload.secondes !== undefined) {
-                            return [formatTimeForTooltip(props.payload.secondes), 'Temps d\'étude'];
+                            return [formatTimeForTooltip(props.payload.secondes), t('activity.tooltips.studyTime')];
                           }
-                          return [`${value} min`, 'Temps d\'étude'];
+                          return [`${value} ${t('activity.units.minutes')}`, t('activity.tooltips.studyTime')];
                         }}
                       />
                       <Bar 
                         dataKey="minutes" 
-                        name="Temps d'étude"
+                        name={t('activity.tooltips.studyTime')}
                       >
                         {dailyData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill="#fdca11" />
@@ -727,10 +731,10 @@ function Activity() {
           <div className="card-body">
             <h2 className="card-title flex items-center gap-2">
               <Clock size={20} className="text-primary" />
-              Historique des sessions
+              {t('activity.headings.sessionHistory')}
             </h2>
             
-            {loading && <div className="alert">Chargement des sessions...</div>}
+            {loading && <div className="alert">{t('activity.messages.loadingSessions')}</div>}
             
             {error && (
               <div className="alert alert-error">
@@ -741,7 +745,7 @@ function Activity() {
             
             {!loading && sessions.length === 0 && (
               <div className="alert">
-                <span>Aucune session d'étude enregistrée.</span>
+                <span>{t('activity.messages.noStudySessionsRecorded')}</span>
               </div>
             )}
             
@@ -750,10 +754,10 @@ function Activity() {
                 <table className="table table-zebra w-full">
                   <thead>
                     <tr>
-                      <th>Date</th>
-                      <th>Objectif</th>
-                      <th>Durée</th>
-                      <th>Actions</th>
+                      <th>{t('activity.table.date')}</th>
+                      <th>{t('activity.table.goal')}</th>
+                      <th>{t('activity.table.duration')}</th>
+                      <th>{t('activity.table.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -771,7 +775,7 @@ function Activity() {
                                 <span>{session.goals.name}</span>
                               </>
                             )}
-                            {!session.goals && <span className="text-opacity-50">Objectif supprimé</span>}
+                            {!session.goals && <span className="text-opacity-50">{t('activity.labels.deletedGoal')}</span>}
                           </div>
                         </td>
                         <td>{formatDuration(session.duration)}</td>
@@ -779,6 +783,7 @@ function Activity() {
                           <button 
                             className="btn btn-sm btn-ghost text-error" 
                             onClick={() => prepareDeleteSession(session)}
+                            aria-label={t('activity.ariaLabels.deleteSession')}
                           >
                             <Trash2 size={16} />
                           </button>
@@ -799,26 +804,26 @@ function Activity() {
           <div className="modal-box">
             <h3 className="font-bold text-lg flex items-center gap-2">
               <AlertTriangle className="text-warning" size={20} />
-              Confirmation de suppression
+              {t('activity.modals.deleteConfirmation.title')}
             </h3>
             <p className="py-4">
-              Êtes-vous sûr de vouloir supprimer cette session ?
+              {t('activity.modals.deleteConfirmation.confirmationQuestion')}
               <br />
-              <span className="font-medium">Objectif :</span> {sessionToDelete.goals ? sessionToDelete.goals.name : 'Objectif supprimé'}
+              <span className="font-medium">{t('activity.modals.deleteConfirmation.goal')}:</span> {sessionToDelete.goals ? sessionToDelete.goals.name : t('activity.labels.deletedGoal')}
               <br />
-              <span className="font-medium">Durée :</span> {formatDuration(sessionToDelete.duration)}
+              <span className="font-medium">{t('activity.modals.deleteConfirmation.duration')}:</span> {formatDuration(sessionToDelete.duration)}
               <br />
-              <span className="font-medium">Date :</span> {formatDateTime(sessionToDelete.created_at)}
+              <span className="font-medium">{t('activity.modals.deleteConfirmation.date')}:</span> {formatDateTime(sessionToDelete.created_at)}
             </p>
             <p className="text-warning text-sm">
-              Note : La durée sera également soustraite de l'objectif associé.
+              {t('activity.modals.deleteConfirmation.note')}
               {isToday(new Date(sessionToDelete.created_at)) && (
-                <> La progression d'aujourd'hui sera également mise à jour.</>
+                <> {t('activity.modals.deleteConfirmation.todayProgressNote')}</>
               )}
             </p>
             <div className="modal-action">
-              <button className="btn" onClick={cancelDelete}>Annuler</button>
-              <button className="btn btn-error" onClick={confirmDelete}>Supprimer</button>
+              <button className="btn" onClick={cancelDelete}>{t('activity.buttons.cancel')}</button>
+              <button className="btn btn-error" onClick={confirmDelete}>{t('activity.buttons.delete')}</button>
             </div>
           </div>
         </div>

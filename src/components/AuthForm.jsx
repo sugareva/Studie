@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Loader, LogIn, UserPlus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 function AuthForm({ setIsLoading: setParentLoading }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
@@ -32,7 +34,7 @@ function AuthForm({ setIsLoading: setParentLoading }) {
         result = await signUp(email, password);
       }
       
-      console.log("Résultat auth:", result); // Log pour déboguer
+      console.log(t('auth.debugMessages.authResult'), result); // Log pour déboguer
       
       if (result.error) {
         setError(result.error.message);
@@ -41,11 +43,11 @@ function AuthForm({ setIsLoading: setParentLoading }) {
         navigate('/dashboard');
       } else if (!isLogin) {
         // Pour l'inscription, afficher un message de confirmation par email si nécessaire
-        setError("Veuillez vérifier votre email pour confirmer votre inscription.");
+        setError(t('auth.messages.checkEmailConfirmation'));
       }
     } catch (error) {
-      console.error("Erreur d'authentification:", error); // Log détaillé
-      setError(error.message || "Erreur d'authentification");
+      console.error(t('auth.errors.authError'), error); // Log détaillé
+      setError(error.message || t('auth.errors.genericAuthError'));
     } finally {
       setIsLoading(false);
     }
@@ -55,12 +57,12 @@ function AuthForm({ setIsLoading: setParentLoading }) {
     <div className="w-full">
       <div className="mb-4">
         <h2 className="text-xl font-bold text-gray-800 mb-1">
-          {isLogin ? 'Connexion' : 'Créer un compte'}
+          {isLogin ? t('auth.headings.login') : t('auth.headings.createAccount')}
         </h2>
         <p className="text-xs text-gray-600">
           {isLogin 
-            ? 'Entrez vos identifiants pour accéder à votre compte' 
-            : 'Remplissez le formulaire pour créer votre compte'
+            ? t('auth.descriptions.loginDescription') 
+            : t('auth.descriptions.signupDescription')
           }
         </p>
       </div>
@@ -75,7 +77,7 @@ function AuthForm({ setIsLoading: setParentLoading }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="form-control">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email
+            {t('auth.labels.email')}
           </label>
           <div className="relative rounded-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -84,7 +86,7 @@ function AuthForm({ setIsLoading: setParentLoading }) {
             <input
               type="email"
               className="input input-bordered w-full pl-10"
-              placeholder="votreemail@exemple.com"
+              placeholder={t('auth.placeholders.email')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -94,7 +96,7 @@ function AuthForm({ setIsLoading: setParentLoading }) {
 
         <div className="form-control">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {isLogin ? "Mot de passe" : "Mot de passe (8 caractères min.)"}
+            {isLogin ? t('auth.labels.password') : t('auth.labels.passwordWithRequirement')}
           </label>
           <div className="relative rounded-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -103,7 +105,7 @@ function AuthForm({ setIsLoading: setParentLoading }) {
             <input
               type="password"
               className="input input-bordered w-full pl-10"
-              placeholder={isLogin ? "Votre mot de passe" : "Créez un mot de passe"}
+              placeholder={isLogin ? t('auth.placeholders.existingPassword') : t('auth.placeholders.newPassword')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -121,17 +123,17 @@ function AuthForm({ setIsLoading: setParentLoading }) {
             {isLoading ? (
               <>
                 <Loader className="animate-spin h-4 w-4" />
-                Chargement...
+                {t('auth.buttons.loading')}
               </>
             ) : isLogin ? (
               <>
                 <LogIn className="h-4 w-4" />
-                Se connecter
+                {t('auth.buttons.login')}
               </>
             ) : (
               <>
                 <UserPlus className="h-4 w-4" />
-                S'inscrire
+                {t('auth.buttons.signup')}
               </>
             )}
           </button>
@@ -143,13 +145,13 @@ function AuthForm({ setIsLoading: setParentLoading }) {
           className="btn btn-link text-primary hover:text-primary-focus p-0 h-auto min-h-0"
           onClick={() => setIsLogin(!isLogin)}
         >
-          {isLogin ? "Pas encore de compte ? Créer un compte" : "Déjà un compte ? Se connecter"}
+          {isLogin ? t('auth.toggleButtons.toSignup') : t('auth.toggleButtons.toLogin')}
         </button>
       </div>
 
       {!isLogin && (
         <div className="mt-4 text-center text-xs text-gray-500">
-          Ces informations servent uniquement à votre connexion et à la sauvegarde de vos actions sur Studie. Aucune donnée n'est partagée ou vendue. {" "}
+          {t('auth.disclaimers.privacyInfo')}
         </div>
       )}
     </div>

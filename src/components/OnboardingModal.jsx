@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { X, ArrowLeft, ArrowRight, Check, User, Target, Clock, ListTodo, Mail } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from 'react-i18next';
 
 // Liste des avatars prédéfinis (même liste que dans UserOptionsModal)
 const avatars = [
@@ -17,29 +18,36 @@ const avatars = [
 
 // Couleurs disponibles pour les objectifs (identiques à GoalSetting)
 const COLORS = [
-  { name: 'Rouge corail', hex: '#f07167' },
-  { name: 'Pêche', hex: '#fed9b7' },
-  { name: 'Jaune pâle', hex: '#fdfcdc' },
-  { name: 'Turquoise', hex: '#00afb9' },
-  { name: 'Bleu océan', hex: '#0081a7' }
+  { nameKey: 'colors.coralRed', hex: '#f07167' },
+  { nameKey: 'colors.peach', hex: '#fed9b7' },
+  { nameKey: 'colors.paleYellow', hex: '#fdfcdc' },
+  { nameKey: 'colors.turquoise', hex: '#00afb9' },
+  { nameKey: 'colors.oceanBlue', hex: '#0081a7' }
 ];
 
-// Constantes pour les jours
-const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-const WEEKDAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
-const WEEKEND = ['Samedi', 'Dimanche'];
-const DAYS_SHORT = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+// Les clés pour les jours au lieu des valeurs directes
+const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+const WEEKDAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+const WEEKEND_KEYS = ['saturday', 'sunday'];
+const DAY_SHORT_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 // Constantes pour les tags de tâches
 const tagOptions = [
-  { value: 'normal', label: 'Normal', color: 'secondary' },
-  { value: 'important', label: 'Important', color: 'accent' },
-  { value: 'optional', label: 'Facultatif', color: 'primary' }
+  { value: 'normal', labelKey: 'todoList.tags.normal', color: 'secondary' },
+  { value: 'important', labelKey: 'todoList.tags.important', color: 'accent' },
+  { value: 'optional', labelKey: 'todoList.tags.optional', color: 'primary' }
 ];
 
 function OnboardingModal({ isOpen, onClose, user, onComplete }) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [totalSteps] = useState(4);
+  
+  // Transformer les clés de jours en noms de jours traduits
+  const DAYS = DAY_KEYS.map(day => t(`days.${day}`));
+  const WEEKDAYS = WEEKDAY_KEYS.map(day => t(`days.${day}`));
+  const WEEKEND = WEEKEND_KEYS.map(day => t(`days.${day}`));
+  const DAYS_SHORT = DAY_SHORT_KEYS.map(day => t(`todoList.days.${day}`));
   
   // Étape 1: Profil utilisateur
   const [nickname, setNickname] = useState('');
@@ -91,7 +99,7 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
   // Valider l'étape 1 (profil utilisateur)
   const validateStep1 = () => {
     if (!nickname.trim()) {
-      setError('Veuillez choisir un pseudo');
+      setError(t('onboarding.errors.nicknameRequired'));
       return false;
     }
     return true;
@@ -100,11 +108,11 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
   // Valider l'étape 2 (création d'objectif)
   const validateStep2 = () => {
     if (!goalName.trim()) {
-      setError('Veuillez donner un nom à votre objectif');
+      setError(t('onboarding.errors.goalNameRequired'));
       return false;
     }
     if (selectedDays.length === 0) {
-      setError('Veuillez sélectionner au moins un jour de la semaine');
+      setError(t('onboarding.errors.daySelectionRequired'));
       return false;
     }
     return true;
@@ -249,16 +257,15 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
       onClose();
       
     } catch (err) {
-      console.error('Erreur lors de la création du profil:', err);
-      setError('Une erreur est survenue. Veuillez réessayer.');
+      console.error(t('onboarding.errors.profileCreationError'), err);
+      setError(t('onboarding.errors.genericError'));
     } finally {
       setLoading(false);
     }
   };
   
   // Ignorer l'onboarding
-// Ignorer l'onboarding - Version corrigée
-const skipOnboarding = async () => {
+  const skipOnboarding = async () => {
     if (!user) return;
     
     try {
@@ -302,8 +309,8 @@ const skipOnboarding = async () => {
       onClose();
       
     } catch (err) {
-      console.error('Erreur lors de l\'ignore de l\'onboarding:', err);
-      setError('Une erreur est survenue lors de l\'ignoration de l\'onboarding.');
+      console.error(t('onboarding.errors.skipError'), err);
+      setError(t('onboarding.errors.skipErrorMessage'));
     } finally {
       setLoading(false);
     }
@@ -317,15 +324,15 @@ const skipOnboarding = async () => {
         {/* En-tête */}
         <div className="flex justify-between items-center mb-6">
           <h3 className="font-bold text-xl">
-              {step === 1 && 'Bienvenue sur Studie!'}
-              {step === 2 && 'Créons votre premier objectif'}
-              {step === 3 && 'Utiliser le timer'}
-              {step === 4 && 'La to-do list'}
+              {step === 1 && t('onboarding.headings.welcome')}
+              {step === 2 && t('onboarding.headings.firstGoal')}
+              {step === 3 && t('onboarding.headings.useTimer')}
+              {step === 4 && t('onboarding.headings.todoList')}
           </h3>
           <button 
             className="btn btn-sm btn-ghost" 
             onClick={() => {
-              if (window.confirm('Êtes-vous sûr de vouloir passer les explications ?')) {
+              if (window.confirm(t('onboarding.confirmations.skipTutorial'))) {
                 skipOnboarding();
               }
             }}
@@ -349,11 +356,11 @@ const skipOnboarding = async () => {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <User size={20} />
-                <h4 className="font-semibold">Personnalisez votre profil</h4>
+                <h4 className="font-semibold">{t('onboarding.steps.profile.title')}</h4>
               </div>
               
               <p className="text-base-content text-opacity-70 mb-6">
-                Pour commencer, choisissez un pseudo et un avatar. Cela vous permettra de vous sentir un peu plus chez vous ! 
+                {t('onboarding.steps.profile.description')}
               </p>
               
               <div className="form-control mb-4">
@@ -363,14 +370,14 @@ const skipOnboarding = async () => {
                     type="text" 
                     value={nickname} 
                     onChange={(e) => setNickname(e.target.value)} 
-                    placeholder="Votre pseudo"
+                    placeholder={t('onboarding.steps.profile.nicknamePlaceholder')}
                   />
                 </label>
               </div>
               
               <div className="form-control mb-4">
                 <label className="label">
-                  <span className="label-text">Choisir un avatar</span>
+                  <span className="label-text">{t('onboarding.steps.profile.chooseAvatar')}</span>
                 </label>
                 
                 {/* Navigation avec flèches et prévisualisation */}
@@ -382,6 +389,7 @@ const skipOnboarding = async () => {
                       const prevIndex = currentIndex <= 0 ? avatars.length - 1 : currentIndex - 1;
                       handleAvatarSelect(avatars[prevIndex]);
                     }}
+                    aria-label={t('onboarding.buttons.previousAvatar')}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
@@ -390,7 +398,7 @@ const skipOnboarding = async () => {
                   
                   <div className="avatar">
                     <div className="w-20 h-20 rounded-full">
-                      <img src={avatar || avatars[0]} alt="Avatar sélectionné" />
+                      <img src={avatar || avatars[0]} alt={t('onboarding.steps.profile.selectedAvatarAlt')} />
                     </div>
                   </div>
                   
@@ -401,6 +409,7 @@ const skipOnboarding = async () => {
                       const nextIndex = currentIndex >= avatars.length - 1 ? 0 : currentIndex + 1;
                       handleAvatarSelect(avatars[nextIndex]);
                     }}
+                    aria-label={t('onboarding.buttons.nextAvatar')}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
@@ -415,7 +424,7 @@ const skipOnboarding = async () => {
                       key={index}
                       className={`w-2 h-2 rounded-full ${avatar === avatarUrl ? 'bg-secondary' : 'bg-base-300'}`}
                       onClick={() => handleAvatarSelect(avatarUrl)}
-                      aria-label={`Sélectionner avatar ${index + 1}`}
+                      aria-label={t('onboarding.buttons.selectAvatarNum', { number: index + 1 })}
                     />
                   ))}
                 </div>
@@ -428,28 +437,28 @@ const skipOnboarding = async () => {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Target size={20} />
-                <h4 className="font-semibold">Objectif d'étude</h4>
+                <h4 className="font-semibold">{t('onboarding.steps.goal.title')}</h4>
               </div>
               
               <p className="text-sm text-opacity-70 mb-6">
-                Votre objectif apparaitra dans votre tableau de bord selon les jours que vous aurez définis et vous pourrez suivre le temps passé dessus.
+                {t('onboarding.steps.goal.description')}
               </p>
               
               <div className="form-control mb-4">
                 <label className="input w-full">
-                  <span className="opacity-50">Nom</span>
+                  <span className="opacity-50">{t('onboarding.steps.goal.name')}</span>
                   <input 
                     type="text" 
                     value={goalName} 
                     onChange={(e) => setGoalName(e.target.value)} 
-                    placeholder="Ex: Mathématiques, Anglais, etc."
+                    placeholder={t('onboarding.steps.goal.namePlaceholder')}
                   />
                 </label>
               </div>
               
               <div className="form-control mb-4">
                 <label className="label">
-                  <span className="label-text">Couleur de l'objectif</span>
+                  <span className="label-text">{t('onboarding.steps.goal.color')}</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {COLORS.map((color) => (
@@ -458,7 +467,7 @@ const skipOnboarding = async () => {
                       type="button"
                       className={`w-8 h-8 rounded-full cursor-pointer border-2 ${goalColor === color.hex ? 'border-secondary' : 'border-transparent'}`}
                       style={{ backgroundColor: color.hex }}
-                      title={color.name}
+                      title={t(color.nameKey)}
                       onClick={() => setGoalColor(color.hex)}
                     />
                   ))}
@@ -467,7 +476,7 @@ const skipOnboarding = async () => {
               
               <div className="form-control mb-4">
                 <label className="label">
-                  <span className="label-text">Jours concernés</span>
+                  <span className="label-text">{t('onboarding.steps.goal.days')}</span>
                 </label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   <button
@@ -475,41 +484,41 @@ const skipOnboarding = async () => {
                     className={`btn btn-sm ${daysSelectionMode === 'all' ? 'btn-info' : 'btn-outline'}`}
                     onClick={() => handleDaySelection([...DAYS], 'all')}
                   >
-                    Tous les jours
+                    {t('days.everyday')}
                   </button>
                   <button
                     type="button"
                     className={`btn btn-sm ${daysSelectionMode === 'weekdays' ? 'btn-info' : 'btn-outline'}`}
                     onClick={() => handleDaySelection([...WEEKDAYS], 'weekdays')}
                   >
-                    Jours ouvrés
+                    {t('days.weekdays')}
                   </button>
                   <button
                     type="button"
                     className={`btn btn-sm ${daysSelectionMode === 'weekend' ? 'btn-info' : 'btn-outline'}`}
                     onClick={() => handleDaySelection([...WEEKEND], 'weekend')}
                   >
-                    Week-end
+                    {t('days.weekend')}
                   </button>
                   <button
                     type="button"
                     className={`btn btn-sm ${daysSelectionMode === 'custom' ? 'btn-info' : 'btn-outline'}`}
                     onClick={() => setDaysSelectionMode('custom')}
                   >
-                    Personnalisé
+                    {t('onboarding.steps.goal.customDays')}
                   </button>
                 </div>
                 
                 {daysSelectionMode === 'custom' && (
                   <div className="grid grid-cols-7 gap-1">
-                    {DAYS.map((day) => (
+                    {DAY_KEYS.map((dayKey, index) => (
                       <button
-                        key={day}
+                        key={dayKey}
                         type="button"
-                        className={`btn btn-xs ${selectedDays.includes(day) ? 'btn-info' : 'btn-outline'}`}
-                        onClick={() => toggleDay(day)}
+                        className={`btn btn-xs ${selectedDays.includes(DAYS[index]) ? 'btn-info' : 'btn-outline'}`}
+                        onClick={() => toggleDay(DAYS[index])}
                       >
-                        {day.substring(0, 2)}
+                        {t(`days.${dayKey}Short`)}
                       </button>
                     ))}
                   </div>
@@ -518,7 +527,7 @@ const skipOnboarding = async () => {
               
               <div className="form-control mb-4">
                 <label className="label">
-                  <span className="label-text">Objectif de temps</span>
+                  <span className="label-text">{t('onboarding.steps.goal.timeObjective')}</span>
                 </label>
                 <div className="join w-full">
                   <div className="grow">
@@ -539,8 +548,8 @@ const skipOnboarding = async () => {
                     value={timeUnit}
                     onChange={(e) => setTimeUnit(e.target.value)}
                   >
-                    <option value="minutes">Minutes</option>
-                    <option value="heures">Heures</option>
+                    <option value="minutes">{t('time.minutes')}</option>
+                    <option value="heures">{t('time.hours')}</option>
                   </select>
                 </div>
               </div>
@@ -552,7 +561,7 @@ const skipOnboarding = async () => {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Clock size={20} />
-                <h4 className="font-semibold">Comment ça marche ?</h4>
+                <h4 className="font-semibold">{t('onboarding.steps.timer.title')}</h4>
               </div>
               
               <div className="flex flex-col gap-4">
@@ -561,9 +570,9 @@ const skipOnboarding = async () => {
                     <span className="text-primary font-bold">1</span>
                   </div>
                   <div>
-                    <p className="font-medium">Sélectionnez un objectif</p>
+                    <p className="font-medium">{t('onboarding.steps.timer.step1Title')}</p>
                     <p className="text-sm text-base-content text-opacity-70">
-                      Cliquez sur un objectif que vous avez créé dans la liste pour le sélectionner.
+                      {t('onboarding.steps.timer.step1Description')}
                     </p>
                   </div>
                 </div>
@@ -573,9 +582,9 @@ const skipOnboarding = async () => {
                     <span className="text-primary font-bold">2</span>
                   </div>
                   <div>
-                    <p className="font-medium">Démarrez le timer</p>
+                    <p className="font-medium">{t('onboarding.steps.timer.step2Title')}</p>
                     <p className="text-sm text-base-content text-opacity-70">
-                      Cliquez sur le bouton Play pour commencer à chronométrer votre session. Vous pouvez activer le mode Pomodoro ou passer en "Focus mode" pour éviter les distractions.
+                      {t('onboarding.steps.timer.step2Description')}
                     </p>
                   </div>
                 </div>
@@ -585,9 +594,9 @@ const skipOnboarding = async () => {
                     <span className="text-primary font-bold">3</span>
                   </div>
                   <div>
-                    <p className="font-medium">Progression</p>
+                    <p className="font-medium">{t('onboarding.steps.timer.step3Title')}</p>
                     <p className="text-sm text-base-content text-opacity-70">
-                     Lorsque vous arrêtez le timer, le temps restant pour compléter votre objectif est mis à jour ! 
+                      {t('onboarding.steps.timer.step3Description')}
                     </p>
                   </div>
                 </div>
@@ -597,10 +606,9 @@ const skipOnboarding = async () => {
                     <span className="text-primary font-bold">4</span>
                   </div>
                   <div>
-                    <p className="font-medium">Statistiques</p>
+                    <p className="font-medium">{t('onboarding.steps.timer.step4Title')}</p>
                     <p className="text-sm text-base-content text-opacity-70">
-                    L'onglet "Activité" vous permet de suivre le temps passé sur vos différents objectifs, et de supprimer les temps rentrés par erreur.
-
+                      {t('onboarding.steps.timer.step4Description')}
                     </p>
                   </div>
                 </div>
@@ -613,28 +621,28 @@ const skipOnboarding = async () => {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <ListTodo size={20} />
-                <h4 className="font-semibold">Ajoutez votre première tâche</h4>
+                <h4 className="font-semibold">{t('onboarding.steps.todo.title')}</h4>
               </div>
               
               <p className="text-base-content text-opacity-70 mb-6">
-                La todo list vous permet de renseigner une petite tâche, en parallèle ou en supplément de vos objectifs.
+                {t('onboarding.steps.todo.description')}
               </p>
               
               <div className="form-control mb-4">
-                <span className="opacity-50">Titre de la tâche</span>
+                <span className="opacity-50">{t('onboarding.steps.todo.taskTitle')}</span>
                 <label className="input w-full">
                   <input 
                     type="text" 
                     value={todoText} 
                     onChange={(e) => setTodoText(e.target.value)} 
-                    placeholder="Ex: Résoudre les exercices du chapitre 3"
+                    placeholder={t('onboarding.steps.todo.taskPlaceholder')}
                   />
                 </label>
               </div>
               
               <div className="form-control mb-4">
                 <label className="cursor-pointer label">
-                  <span className="label-text">Tâche récurrente</span>
+                  <span className="label-text">{t('todoList.labels.recurringTask')}</span>
                   <input 
                     type="checkbox" 
                     className="toggle toggle-primary toggle-sm" 
@@ -647,30 +655,28 @@ const skipOnboarding = async () => {
               {todoType === 'recurring' && (
                 <div className="form-control mb-4">
                   <label className="label">
-                    <span className="label-text">Choisissez quel jour afficher la tâche</span>
+                    <span className="label-text">{t('onboarding.steps.todo.chooseDays')}</span>
                   </label>
                   <div className="bg-base-200 rounded-lg p-2 border border-base-300 mb-2">
                     <div className="flex flex-wrap gap-1 justify-center">
-                      {DAYS_SHORT.map(day => (
+                      {DAY_SHORT_KEYS.map((dayKey, index) => (
                         <button
-                          key={day}
+                          key={dayKey}
                           type="button"
                           className={`btn btn-xs ${
-                            todoDays.includes(day) 
+                            todoDays.includes(DAYS_SHORT[index]) 
                               ? 'btn-info' 
                               : 'bg-base-300 text-base-content opacity-60'
                           }`}
-                          onClick={() => toggleTodoDay(day)}
+                          onClick={() => toggleTodoDay(DAYS_SHORT[index])}
                         >
-                          {day.substring(0, 1)}
+                          {t(`todoList.days.${dayKey}Short`)}
                         </button>
                       ))}
                     </div>
                   </div>
                 </div>
               )}
-              
-
             </div>
           )}
         </div>
@@ -688,27 +694,27 @@ const skipOnboarding = async () => {
                 disabled={loading}
               >
                 <ArrowLeft size={16} />
-                Précédent
+                {t('onboarding.buttons.previous')}
               </button>
             ) : (
               <button 
                 className="btn btn-ghost"
                 onClick={() => {
-                  if (window.confirm('Êtes-vous sûr de vouloir passer les explications ?')) {
+                  if (window.confirm(t('onboarding.confirmations.skipTutorial'))) {
                     skipOnboarding();
                   }
                 }}
                 disabled={loading}
               >
-                Ignorer
+                {t('onboarding.buttons.skip')}
               </button>
             )}
             <div className="w-56 bg-base-200 h-2 rounded-full">
-            <div 
-              className="bg-primary h-2 rounded-full transition-all" 
-              style={{ width: `${(step / totalSteps) * 100}%` }}
-            ></div>
-          </div>
+              <div 
+                className="bg-primary h-2 rounded-full transition-all" 
+                style={{ width: `${(step / totalSteps) * 100}%` }}
+              ></div>
+            </div>
             <button 
               className="btn btn-neutral flex items-center gap-2"
               onClick={nextStep}
@@ -717,25 +723,25 @@ const skipOnboarding = async () => {
               {loading ? (
                 <>
                   <span className="loading loading-spinner loading-xs"></span>
-                  Chargement...
+                  {t('onboarding.buttons.loading')}
                 </>
               ) : step === totalSteps ? (
-              <>
-                Terminer
-                <Check size={16} />
-              </>
-            ) : (
-              <>
-                Suivant
-                <ArrowRight size={16} />
-              </>
-            )}
-          </button>
+                <>
+                  {t('onboarding.buttons.finish')}
+                  <Check size={16} />
+                </>
+              ) : (
+                <>
+                  {t('onboarding.buttons.next')}
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }
 
-export default OnboardingModal;
+export default OnboardingModal
