@@ -27,8 +27,8 @@ const LanguageSwitcher = ({ minimal = false }) => {
   if (minimal) {
     return (
       <div className="dropdown dropdown-end">
-        <label tabIndex={0} className="btn btn-ghost btn-sm btn-circle">
-          <Globe className="h-5 w-5" />
+        <label tabIndex={0} className="btn btn-sm btn-circle">
+          <Globe className="h-5 w-5 text-secondary" />
         </label>
         <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-auto">
           <li>

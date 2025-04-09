@@ -549,7 +549,7 @@ const filteredGoals = useMemo(() => {
               filteredGoals.map((goal) => (
                 <div
                   key={goal.id}
-                  className="border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-base-200 transition-all shadow-sm"
+                  className="border border-base-200 rounded-lg p-4 cursor-pointer hover:bg-base-200 transition-all shadow-sm"
                   onClick={() => handleSelectGoal(goal)}
                 >
                   <div className="flex justify-between items-start mb-3">
