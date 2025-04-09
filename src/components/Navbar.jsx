@@ -77,7 +77,7 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings }) {
 
   // Basculer entre les thèmes clair et sombre
   const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'bumblebee' ? 'dim' : 'bumblebee');
+    setTheme(prevTheme => prevTheme === 'bumblebee' ? 'dark' : 'bumblebee');
   };
 
   // Toggle le menu mobile
@@ -94,7 +94,7 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings }) {
           {/* Navigation links - visible sur desktop, caché sur mobile */}
           <div className="hidden sm:flex gap-2">
             <Link 
-              to="/" 
+              to="/dashboard" 
               className={`tab ${location.pathname === '/' ? 'tab-active' : ''}`}
             >
               <Grid size={16} className="mr-1" />

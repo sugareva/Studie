@@ -56,10 +56,10 @@ function AuthForm({ setIsLoading: setParentLoading }) {
   return (
     <div className="w-full">
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-gray-800 mb-1">
+        <h2 className="text-xl font-bold text-base mb-1">
           {isLogin ? t('auth.headings.login') : t('auth.headings.createAccount')}
         </h2>
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-base-content/70">
           {isLogin 
             ? t('auth.descriptions.loginDescription') 
             : t('auth.descriptions.signupDescription')
@@ -76,7 +76,7 @@ function AuthForm({ setIsLoading: setParentLoading }) {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="form-control">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-base-content/50 mb-1">
             {t('auth.labels.email')}
           </label>
           <div className="relative rounded-md">
@@ -95,7 +95,7 @@ function AuthForm({ setIsLoading: setParentLoading }) {
         </div>
 
         <div className="form-control">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-base-content/50 mb-1">
             {isLogin ? t('auth.labels.password') : t('auth.labels.passwordWithRequirement')}
           </label>
           <div className="relative rounded-md">

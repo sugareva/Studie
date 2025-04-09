@@ -4,8 +4,8 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Dashboard from './pages/Dashboard';
 import Activity from './pages/Activity';
 import Login from './pages/Login';
+import HomePage from './pages/HomePage';
 import './i18n';
-
 
 // Composant pour protéger les routes privées
 function PrivateRoute({ children }) {
@@ -34,22 +34,26 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          {/* Route publique */}
+          {/* Nouvelle route publique pour la page d'accueil */}
+          <Route path="/" element={<HomePage />} />
+          
+          {/* Route publique de connexion */}
           <Route path="/login" element={<Login />} />
           
           {/* Routes protégées */}
-          <Route path="/" element={
+          <Route path="/dashboard" element={
             <PrivateRoute>
               <Dashboard />
             </PrivateRoute>
           } />
+          
           <Route path="/activity" element={
             <PrivateRoute>
               <Activity />
             </PrivateRoute>
           } />
           
-          {/* Redirection par défaut */}
+          {/* Redirection par défaut vers la page d'accueil */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </AuthProvider>

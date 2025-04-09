@@ -13,14 +13,14 @@
   "login": {
     "welcome": "Welcome!",
     "optimizeStudyTime": "Optimize your study time",
-    "optimizeStudyProductivity": "Optimize your study time and productivity",
+    "optimizeStudyProductivity": "Optimize your study time",
     "features": "Features",
     "trackStudyTime": "Track your study time",
     "trackStudyTimeDesc": "Record your study sessions with our intuitive timer.",
     "setGoals": "Set goals",
     "setGoalsDesc": "Create and track your study goals effectively.",
-    "organizeDays": "Organize your days",
-    "organizeDaysDesc": "Plan your week with our task list.",
+    "organizeDays": "Keep track of your progress",
+    "organizeDaysDesc": "Visualize your progress and the achievement of your goals.",
     "getStarted": "Get started",
     "allRightsReserved": "All rights reserved."
   },
@@ -586,7 +586,33 @@
         "foundGoal": "Found goal:",
         "fallingBackToFirstGoal": "Falling back to first available goal:"
       }
-    }
+    },
+    "home": {
+    "signInButton": "Sign in",
+    "signUpButton": "Sign up",
+    "alertMessage": "Sign up to access advanced features: goal tracking, statistics and much more!",
+    "footerText": "All rights reserved"
+  },
+  "timer": {
+    "title": "Study Timer",
+    "elapsedTime": "Elapsed time",
+    "start": "Start",
+    "pause": "Pause",
+    "reset": "Reset",
+    "pomodoro": "Pomodoro",
+    "focus": "Focus",
+    "break": "Break",
+    "remainingBeforeBreak": "{{time}} until break",
+    "remainingBeforeResume": "{{time}} until focus",
+    "focusMode": "Focus mode",
+    "focusModeTooltip": "Switch to fullscreen",
+    "lofiMusic": "Lofi music",
+    "lofiMusicTitle": "Lofi Hip Hop - Music to study to",
+    "lofiChannelTitle": "Lofi Girl",
+    "hideYouTube": "Hide",
+    "mute": "Mute",
+    "unmute": "Unmute"
+  }
   
   
   

@@ -618,7 +618,7 @@ function Activity() {
   {goalCompletionData.map((day) => (
     <div
       key={day.date}
-      className={`flex flex-col items-center justify-center h-24 w-24 md:w-auto p-2 rounded-lg bg-white shadow-sm border ${
+      className={`flex flex-col items-center justify-center h-24 w-24 md:w-auto p-2 rounded-lg bg-accent-content shadow-sm border ${
         day.isCompleted 
           ? 'border-success border-2' 
           : 'border-gray-200'

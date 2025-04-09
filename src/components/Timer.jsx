@@ -54,6 +54,17 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
       console.error(t('timer.errorSavingState'), error);
     }
   };
+
+  // Fonction pour jouer le son de notification
+  const playNotificationSound = () => {
+    try {
+      const notification = new Audio('/notification.mp3');
+      notification.volume = 0.7; // Ajuster le volume à 70%
+      notification.play().catch(e => console.log(t('timer.audioPlayFailed'), e));
+    } catch (e) {
+      console.log(t('timer.audioPlayFailed'), e);
+    }
+  };
   
   // Charger l'état du timer depuis le localStorage au démarrage
   useEffect(() => {
@@ -119,12 +130,8 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
             if (currentSession === 'focus' && sessionElapsed >= pomodoroFocusTime) {
               // Transition de focus à pause
               setPomodoroSession('break');
-              try {
-                const notification = new Audio('/notification.mp3');
-                notification.play().catch(e => console.log(t('timer.audioPlayFailed'), e));
-              } catch (e) {
-                console.log(t('timer.audioPlayFailed'), e);
-              }
+              // Jouer le son de notification pour la transition vers la pause
+              playNotificationSound();
               
               // Mettre à jour l'état stocké
               saveTimerState({
@@ -136,12 +143,8 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
             } else if (currentSession === 'break' && sessionElapsed < pomodoroFocusTime) {
               // Transition de pause à focus
               setPomodoroSession('focus');
-              try {
-                const notification = new Audio('/notification.mp3');
-                notification.play().catch(e => console.log(t('timer.audioPlayFailed'), e));
-              } catch (e) {
-                console.log(t('timer.audioPlayFailed'), e);
-              }
+              // Jouer le son de notification pour la transition vers le focus
+              playNotificationSound();
               
               // Mettre à jour l'état stocké
               saveTimerState({

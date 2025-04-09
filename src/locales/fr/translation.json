@@ -13,14 +13,14 @@
   "login": {
     "welcome": "Bienvenue !",
     "optimizeStudyTime": "Optimisez votre temps d'étude",
-    "optimizeStudyProductivity": "Optimisez votre temps d'étude et votre productivité",
+    "optimizeStudyProductivity": "Optimisez votre temps",
     "features": "Fonctionnalités",
     "trackStudyTime": "Suivez votre temps d'étude",
     "trackStudyTimeDesc": "Enregistrez vos sessions d'étude avec notre timer intuitif.",
     "setGoals": "Fixez des objectifs",
     "setGoalsDesc": "Créez et suivez vos objectifs d'étude efficacement.",
-    "organizeDays": "Organisez vos journées",
-    "organizeDaysDesc": "Planifiez votre semaine avec notre liste de tâches.",
+    "organizeDays": "Gardez une trace de vos progrès",
+    "organizeDaysDesc": "Visualisez votre activité et la réussite de vos objectifs.",
     "getStarted": "Commencer",
     "allRightsReserved": "Tous droits réservés."
   },
@@ -587,7 +587,35 @@
         "foundGoal": "Objectif trouvé:",
         "fallingBackToFirstGoal": "Repli sur le premier objectif disponible:"
       }
-    }
+      
+
+    },
+    "home": {
+    "signInButton": "Se connecter",
+    "signUpButton": "S'inscrire",
+    "alertMessage": "Inscrivez-vous pour accéder à des fonctionnalités avancées : suivi d'objectifs, statistiques et bien plus !",
+    "footerText": "Tous droits réservés"
+  },
+  "timerMini": {
+    "title": "Chronomètre d'étude",
+    "elapsedTime": "Temps écoulé",
+    "start": "Démarrer",
+    "pause": "Pause",
+    "reset": "Réinitialiser",
+    "pomodoro": "Pomodoro",
+    "focus": "Concentration",
+    "break": "Pause",
+    "remainingBeforeBreak": "{{time}} avant pause",
+    "remainingBeforeResume": "{{time}} avant reprise",
+    "focusMode": "Mode focus",
+    "focusModeTooltip": "Passer en plein écran",
+    "lofiMusic": "Musique lofi",
+    "lofiMusicTitle": "Lofi Hip Hop - Musique pour étudier",
+    "lofiChannelTitle": "Lofi Girl",
+    "hideYouTube": "Masquer",
+    "mute": "Couper le son",
+    "unmute": "Rétablir le son"
+  }
   
     
   
