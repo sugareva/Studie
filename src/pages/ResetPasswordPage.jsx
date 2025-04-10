@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useTranslation } from 'react-i18next';
 import { Lock, Loader } from 'lucide-react';
@@ -11,47 +11,55 @@ function ResetPasswordPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [session, setSession] = useState(null);
+  const [sessionEstablished, setSessionEstablished] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Vérifier s'il y a une session au chargement de la page
+  // À l'initialisation, récupérer le code de l'URL et échanger contre une session
   useEffect(() => {
-    async function checkSession() {
+    const establishSession = async () => {
       try {
         setIsLoading(true);
-        const { data, error } = await supabase.auth.getSession();
         
-        if (error) {
-          console.error('Session error:', error);
-          setError(t('resetPassword.errors.sessionError'));
+        // Extraire le code de l'URL
+        const urlParams = new URLSearchParams(location.search);
+        const code = urlParams.get('code');
+        
+        // Vérifier si le code est présent
+        if (!code) {
+          console.log('No code found in URL');
+          setError(t('resetPassword.errors.noCode'));
           return;
         }
         
-        // Stocker la session si elle existe
-        setSession(data.session);
+        // Échanger le code contre une session
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
         
-        if (!data.session) {
-          // Pas de session, l'utilisateur n'est pas authentifié
-          console.log('No active session found');
-          setError(t('resetPassword.errors.noSession'));
+        if (error) {
+          console.error('Error exchanging code for session:', error);
+          setError(error.message || t('resetPassword.errors.invalidCode'));
+          return;
         }
+        
+        // Session établie avec succès
+        console.log('Session established successfully');
+        setSessionEstablished(true);
       } catch (err) {
-        console.error('Error checking session:', err);
-        setError(t('resetPassword.errors.sessionCheckError'));
+        console.error('Error during session establishment:', err);
+        setError(t('resetPassword.errors.sessionError'));
       } finally {
         setIsLoading(false);
       }
-    }
+    };
     
-    checkSession();
-  }, [t]);
+    establishSession();
+  }, [location, t]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Si pas de session, ne pas continuer
-    if (!session) {
-      setError(t('resetPassword.errors.authRequired'));
+    if (!sessionEstablished) {
+      setError(t('resetPassword.errors.noSession'));
       return;
     }
     
@@ -60,16 +68,11 @@ function ResetPasswordPage() {
       return;
     }
     
-    if (newPassword.length < 6) {
-      setError(t('resetPassword.errors.passwordTooShort'));
-      return;
-    }
-    
     setIsLoading(true);
     setError('');
     
     try {
-      // Mettre à jour le mot de passe
+      // Maintenant que nous avons une session, nous pouvons mettre à jour le mot de passe
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
@@ -89,30 +92,6 @@ function ResetPasswordPage() {
       setIsLoading(false);
     }
   };
-
-  // Si l'utilisateur n'est pas authentifié et que ce n'est pas en train de charger
-  if (!isLoading && !session) {
-    return (
-      <div className="max-w-md mx-auto p-6 bg-base-100 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-6">{t('resetPassword.title')}</h1>
-        
-        <div className="alert alert-error mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          <span>{error || t('resetPassword.errors.sessionExpired')}</span>
-        </div>
-        
-        <div className="text-center">
-          <p className="mb-4">{t('resetPassword.messages.needReset')}</p>
-          <button
-            className="btn btn-outline btn-primary"
-            onClick={() => navigate('/login')}
-          >
-            {t('resetPassword.buttons.backToLogin')}
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-md mx-auto p-6 bg-base-100 rounded-lg shadow-lg">
@@ -137,7 +116,17 @@ function ResetPasswordPage() {
           <Loader className="animate-spin h-10 w-10 text-primary" />
           <span className="ml-3">{t('resetPassword.messages.loading')}</span>
         </div>
-      ) : (
+      ) : !sessionEstablished && error ? (
+        <div className="text-center">
+          <p className="mb-4">{t('resetPassword.messages.invalidLink')}</p>
+          <button
+            className="btn btn-outline btn-primary"
+            onClick={() => navigate('/login')}
+          >
+            {t('resetPassword.buttons.backToLogin')}
+          </button>
+        </div>
+      ) : sessionEstablished && (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="form-control">
             <label className="block text-sm font-medium text-base-content/50 mb-1">
