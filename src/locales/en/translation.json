@@ -20,7 +20,7 @@
     "setGoals": "Set goals",
     "setGoalsDesc": "Create and track your study goals effectively.",
     "organizeDays": "Keep track of your progress",
-    "organizeDaysDesc": "Visualize your progress and the achievement of your goals.",
+    "organizeDaysDesc": "Plan your week with our task list.",
     "getStarted": "Get started",
     "allRightsReserved": "All rights reserved."
   },
@@ -118,6 +118,7 @@
     "skip": "Skip"
   },
   "common": {
+    "progress": "Progress",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -374,7 +375,8 @@
       "welcome": "Welcome to Studie!",
       "firstGoal": "Let's create your first goal",
       "useTimer": "Using the timer",
-      "todoList": "The to-do list"
+      "todoList": "The to-do list",
+      "targetLanguage": "Language Learning"
     },
     "buttons": {
       "previous": "Previous",
@@ -407,6 +409,14 @@
         "customDays": "Custom",
         "timeObjective": "Time objective"
       },
+      "language": {
+      "title": "Are you planning to use Studie to learn a language?",
+      "description": "You'll have access to a dedicated section to track your language learning progress.",
+      "selectLabel": "Pick one of the supported languages below",
+      "useLearning": "I want to learn a language",
+      "warningTitle": "Be careful!",
+      "warningText": "Your progress will be reset."
+    },
       "timer": {
         "title": "How does it work?",
         "step1Title": "Select a goal",
@@ -441,7 +451,7 @@
       "title": "User Settings",
       "labels": {
         "chooseAvatar": "Choose an avatar",
-        "showTodoList": "Show to-do list",
+        "showTodoList": "Advanced features",
         "todoToggleHint": "Enabling or disabling the task list doesn't delete your existing todos."
       },
       "placeholders": {
@@ -593,7 +603,7 @@
     "alertMessage": "Sign up to access advanced features: goal tracking, statistics and much more!",
     "footerText": "All rights reserved"
   },
-  "timer": {
+  "timerHome": {
     "title": "Study Timer",
     "elapsedTime": "Elapsed time",
     "start": "Start",
@@ -612,6 +622,128 @@
     "hideYouTube": "Hide",
     "mute": "Mute",
     "unmute": "Unmute"
+  },
+  "roadmap": {
+    "levels": "Skills to learn",
+    "globalProgress": "Global progress",
+    "acquiredSkills": "Acquired skills",
+    "remainingSkills": "Remaining",
+    "levelLocked": "Level locked",
+    "completePreviousLevels": "Complete previous levels to unlock this one.",
+    "title": "Learning Roadmap",
+    "subtitle": "Track your language learning progress",
+    "targetLanguage": "Target language",
+    "completed": "completed",
+    "levelDescription": {
+      "a1": "A1 : Beginner",
+      "a2": "A2 : Elementary",
+      "b1": "B1 : Intermediate",
+      "b2": "B2 : Upper Intermediate",
+      "c1": "C1 : Advanced",
+      "c2": "C2 : Proficient"
+    },
+    "sections": {
+      "fundamentalSystems": "Fundamental Systems",
+      "minimalCommunication": "Basic Communication",
+      "elementaryGrammar": "Elementary Grammar",
+      "lexicalExpansion": "Vocabulary Building",
+      "functionalGrammar": "Functional Grammar",
+      "practicalCommunication": "Practical Communication",
+      "languageAutonomy": "Language Autonomy",
+      "grammaticalComplexity": "Grammar Complexity",
+      "personalExpression": "Personal Expression",
+      "contextualMastery": "Contextual Mastery",
+      "grammaticalFinesse": "Grammar Finesse",
+      "elaborateExpression": "Advanced Expression",
+      "deepCompetence": "Deep Competence",
+      "linguisticSubtleties": "Linguistic Subtleties", 
+      "sophisticatedCommunication": "Sophisticated Communication",
+      "linguisticExcellence": "Linguistic Excellence",
+      "nuancesAndFinesse": "Nuances and Finesse",
+      "nativeCommunication": "Native-like Communication"
+    },
+    "subsections": {
+      "a1_1_1": "Alphabet/Writing system",
+      "a1_1_2": "Tones (tonal languages)",
+      "a1_1_3": "Basic pronunciation",
+      "a1_1_4": "Basic declensions",
+      "a1_2_1": "Survival vocabulary (100-500 words)",
+      "a1_2_2": "Set phrases, greetings",
+      "a1_2_3": "Introducing oneself",
+      "a1_3_1": "Simple present tense",
+      "a1_3_2": "Affirmative sentences",
+      "a1_3_3": "Simple questions",
+      "a1_3_4": "Simple negations",
+      "a2_1_1": "Everyday vocabulary (500-1000 words)",
+      "a2_1_2": "Basic idiomatic expressions",
+      "a2_2_1": "Past tenses",
+      "a2_2_2": "Simple future/conditional",
+      "a2_2_3": "Other declensions",
+      "a2_2_4": "Particles",
+      "a2_3_1": "Descriptions (places, people)",
+      "a2_3_2": "Expressing preferences",
+      "a2_3_3": "Common situations (shopping, restaurant)",
+      "a2_3_4": "Formal/informal registers",
+      "b1_1_1": "Extended vocabulary (1000-2000 words)",
+      "b1_1_2": "Unprepared conversations",
+      "b1_1_3": "Global comprehension (simplified media)",
+      "b1_2_1": "Sequence of tenses",
+      "b1_2_2": "Subjunctive/optative mood",
+      "b1_2_3": "Honorific system",
+      "b1_2_4": "Verbal aspect",
+      "b1_3_1": "Narrating experiences",
+      "b1_3_2": "Expressing simple opinions",
+      "b1_3_3": "Formulating plans",
+      "b2_1_1": "Specialized vocabulary (2000-4000 words)",
+      "b2_1_2": "Conversations on various topics",
+      "b2_1_3": "Regional variations",
+      "b2_2_1": "Complex structures",
+      "b2_2_2": "Passive/middle voice",
+      "b2_2_3": "Specific advanced constructions",
+      "b2_3_1": "Argumentation",
+      "b2_3_2": "Hypotheses",
+      "b2_3_3": "Nuances of opinion",
+      "c1_1_1": "Rich vocabulary (4000-8000 words)",
+      "c1_1_2": "Fine comprehension (native content)",
+      "c1_1_3": "Cultural references",
+      "c1_2_1": "Advanced idiomatic expressions",
+      "c1_2_2": "Language registers (literary, familiar, slang)",
+      "c1_2_3": "Implicits and connotations",
+      "c1_3_1": "Expressing abstract ideas",
+      "c1_3_2": "Adapting speech (to context)",
+      "c1_3_3": "Intercultural mediation",
+      "c2_1_1": "Extensive vocabulary (+8000 words)",
+      "c2_1_2": "Exhaustive comprehension",
+      "c2_1_3": "Creative/literary expression",
+      "c2_2_1": "Wordplay and humor",
+      "c2_2_2": "Style and rhetoric",
+      "c2_2_3": "Dialects and sociolects",
+      "c2_3_1": "Total fluency",
+      "c2_3_2": "Complex mediation",
+      "c2_3_3": "Finely adapt one's register"
+    },
+    "language": {
+      "french": "French",
+      "english": "English",
+      "russian": "Russian",
+      "italian": "Italian",
+      "german": "German",
+      "korean": "Korean",
+      "japanese": "Japanese",
+      "spanish": "Spanish",
+      "languageSelection": "Pick one"
+      
+    }
+    
+  },
+  "encouragement": {
+    "a1": "You're learning the basics!",
+    "a2": "You can manage on vacation!",
+    "b1": "You can chat with locals!",
+    "b2": "You can work in this language!",
+    "c1": "You're almost as fluent as a native!",
+    "c2": "You have professional mastery!",
+    "default": "Keep up the good work!"
   }
   
   

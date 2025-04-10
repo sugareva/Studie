@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 
-function Navbar({ onOpenUserModal, userSettings: propUserSettings }) {
+function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLanguage }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const location = useLocation();
@@ -93,21 +93,32 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings }) {
           
           {/* Navigation links - visible sur desktop, caché sur mobile */}
           <div className="hidden sm:flex gap-2">
-            <Link 
-              to="/dashboard" 
-              className={`tab ${location.pathname === '/' ? 'tab-active' : ''}`}
-            >
-              <Grid size={16} className="mr-1" />
-              {t('navbar.links.dashboard')}
-            </Link>
-            <Link 
-              to="/activity" 
-              className={`tab ${location.pathname === '/activity' ? 'tab-active' : ''}`}
-            >
-              <BarChart2 size={16} className="mr-1" />
-              {t('navbar.links.activity')}
-            </Link>
-          </div>
+  <Link
+    to="/dashboard"
+    className={`tab ${location.pathname === '/' ? 'tab-active' : ''}`}
+  >
+    <Grid size={16} className="mr-1" />
+    {t('navbar.links.dashboard')}
+  </Link>
+  
+  <Link
+    to="/activity"
+    className={`tab ${location.pathname === '/activity' ? 'tab-active' : ''}`}
+  >
+    <BarChart2 size={16} className="mr-1" />
+    {t('navbar.links.activity')}
+  </Link>
+  
+  {userSettings?.learning_language && (
+    <Link
+      to="/roadmap"
+      className={`tab ${location.pathname === '/roadmap' ? 'tab-active' : ''}`}
+    >
+      <Grid size={16} className="mr-1" />
+      {t('roadmap.title')}
+    </Link>
+  )}
+</div>
         </div>
         
         {/* Actions Desktop - visible sur desktop, caché sur mobile */}

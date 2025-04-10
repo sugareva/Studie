@@ -1,6 +1,7 @@
 // src/contexts/AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import i18n from '../i18n'; // Importez votre configuration i18n (ajustez le chemin)
 
 const AuthContext = createContext();
 
@@ -22,7 +23,7 @@ export function AuthProvider({ children }) {
     };
     
     checkUser();
-
+    
     // Écouter les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -30,7 +31,7 @@ export function AuthProvider({ children }) {
         setLoading(false);
       }
     );
-
+    
     return () => subscription.unsubscribe();
   }, []);
 
@@ -49,7 +50,23 @@ export function AuthProvider({ children }) {
     },
     signUp: async (email, password) => {
       try {
-        const response = await supabase.auth.signUp({ email, password });
+        // Obtenir la langue actuelle
+        const currentLanguage = i18n.language || 'en';
+        
+        // URL de redirection vers le dashboard
+        const redirectUrl = `${window.location.origin}/dashboard`;
+        
+        const response = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            emailRedirectTo: redirectUrl,
+            data: {
+              lang: currentLanguage // Inclure la langue actuelle
+            }
+          }
+        });
+        
         console.log("Réponse de signUp:", response); // Log pour déboguer
         return response;
       } catch (error) {
@@ -59,7 +76,7 @@ export function AuthProvider({ children }) {
     },
     signOut: () => supabase.auth.signOut(),
   };
-
+  
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

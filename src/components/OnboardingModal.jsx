@@ -1,6 +1,6 @@
 // src/components/OnboardingModal.jsx
 import { useState, useEffect } from 'react';
-import { X, ArrowLeft, ArrowRight, Check, User, Target, Clock, ListTodo, Mail } from 'lucide-react';
+import { X, ArrowLeft, ArrowRight, Check, User, Target, Clock, ListTodo, Mail, Globe, AlertTriangle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useTranslation } from 'react-i18next';
 
@@ -38,10 +38,26 @@ const tagOptions = [
   { value: 'optional', labelKey: 'todoList.tags.optional', color: 'primary' }
 ];
 
+
+
 function OnboardingModal({ isOpen, onClose, user, onComplete }) {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
-  const [totalSteps] = useState(4);
+  const [totalSteps] = useState(5);
+  const [targetLanguage, setTargetLanguage] = useState('french');
+  const [learningLanguage, setLearningLanguage] = useState(false);
+
+  const availableLanguages = [
+    { id: 'french', name: t('roadmap.language.french') },
+    { id: 'english', name: t('roadmap.language.english') },
+    { id: 'german', name: t('roadmap.language.german') },
+    { id: 'italian', name: t('roadmap.language.italian') },
+    { id: 'spanish', name: t('roadmap.language.spanish') },
+    { id: 'japanese', name: t('roadmap.language.japanese') },
+    { id: 'korean', name: t('roadmap.language.korean') },
+    { id: 'russian', name: t('roadmap.language.russian') }
+  ];
+
   
   // Transformer les clés de jours en noms de jours traduits
   const DAYS = DAY_KEYS.map(day => t(`days.${day}`));
@@ -155,6 +171,8 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
     } else {
       setTodoTag(tag);
     }
+
+  
   };
   
   // Terminer le processus d'onboarding et sauvegarder les données
@@ -180,6 +198,7 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
         nickname,
         avatar,
         show_todo_list: showTodoList,
+        learning_language: learningLanguage,
         onboarding_completed: true
       };
       
@@ -228,6 +247,20 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
         .single();
       
       if (goalError) throw goalError;
+
+      if (learningLanguage) {
+        const languageProgress = {
+          user_id: user.id,
+          target_language: targetLanguage,
+          completed_skills: []
+        };
+      
+        const { error: langError } = await supabase
+          .from('language_progress')
+          .insert(languageProgress);
+      
+        if (langError) throw langError;
+      }
       
       // 3. Créer la todo si elle existe
       if (todoText.trim()) {
@@ -324,10 +357,11 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
         {/* En-tête */}
         <div className="flex justify-between items-center mb-6">
           <h3 className="font-bold text-xl">
-              {step === 1 && t('onboarding.headings.welcome')}
-              {step === 2 && t('onboarding.headings.firstGoal')}
-              {step === 3 && t('onboarding.headings.useTimer')}
-              {step === 4 && t('onboarding.headings.todoList')}
+          {step === 1 && t('onboarding.headings.welcome')}
+  {step === 2 && t('onboarding.headings.firstGoal')}
+  {step === 3 && t('onboarding.headings.targetLanguage')} {/* Nouvelle étape */}
+  {step === 4 && t('onboarding.headings.useTimer')}
+  {step === 5 && t('onboarding.headings.todoList')}
           </h3>
           <button 
             className="btn btn-sm btn-ghost" 
@@ -434,130 +468,175 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
           
           {/* Étape 2: Création d'objectif */}
           {step === 2 && (
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Target size={20} />
-                <h4 className="font-semibold">{t('onboarding.steps.goal.title')}</h4>
-              </div>
-              
-              <p className="text-sm text-opacity-70 mb-6">
-                {t('onboarding.steps.goal.description')}
-              </p>
-              
-              <div className="form-control mb-4">
-                <label className="input w-full">
-                  <span className="opacity-50">{t('onboarding.steps.goal.name')}</span>
-                  <input 
-                    type="text" 
-                    value={goalName} 
-                    onChange={(e) => setGoalName(e.target.value)} 
-                    placeholder={t('onboarding.steps.goal.namePlaceholder')}
-                  />
-                </label>
-              </div>
-              
-              <div className="form-control mb-4">
-                <label className="label">
-                  <span className="label-text">{t('onboarding.steps.goal.color')}</span>
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {COLORS.map((color) => (
-                    <button
-                      key={color.hex}
-                      type="button"
-                      className={`w-8 h-8 rounded-full cursor-pointer border-2 ${goalColor === color.hex ? 'border-secondary' : 'border-transparent'}`}
-                      style={{ backgroundColor: color.hex }}
-                      title={t(color.nameKey)}
-                      onClick={() => setGoalColor(color.hex)}
-                    />
-                  ))}
-                </div>
-              </div>
-              
-              <div className="form-control mb-4">
-                <label className="label">
-                  <span className="label-text">{t('onboarding.steps.goal.days')}</span>
-                </label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  <button
-                    type="button"
-                    className={`btn btn-sm ${daysSelectionMode === 'all' ? 'btn-info' : 'btn-outline'}`}
-                    onClick={() => handleDaySelection([...DAYS], 'all')}
-                  >
-                    {t('days.everyday')}
-                  </button>
-                  <button
-                    type="button"
-                    className={`btn btn-sm ${daysSelectionMode === 'weekdays' ? 'btn-info' : 'btn-outline'}`}
-                    onClick={() => handleDaySelection([...WEEKDAYS], 'weekdays')}
-                  >
-                    {t('days.weekdays')}
-                  </button>
-                  <button
-                    type="button"
-                    className={`btn btn-sm ${daysSelectionMode === 'weekend' ? 'btn-info' : 'btn-outline'}`}
-                    onClick={() => handleDaySelection([...WEEKEND], 'weekend')}
-                  >
-                    {t('days.weekend')}
-                  </button>
-                  <button
-                    type="button"
-                    className={`btn btn-sm ${daysSelectionMode === 'custom' ? 'btn-info' : 'btn-outline'}`}
-                    onClick={() => setDaysSelectionMode('custom')}
-                  >
-                    {t('onboarding.steps.goal.customDays')}
-                  </button>
-                </div>
-                
-                {daysSelectionMode === 'custom' && (
-                  <div className="grid grid-cols-7 gap-1">
-                    {DAY_KEYS.map((dayKey, index) => (
-                      <button
-                        key={dayKey}
-                        type="button"
-                        className={`btn btn-xs ${selectedDays.includes(DAYS[index]) ? 'btn-info' : 'btn-outline'}`}
-                        onClick={() => toggleDay(DAYS[index])}
-                      >
-                        {t(`days.${dayKey}Short`)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              
-              <div className="form-control mb-4">
-                <label className="label">
-                  <span className="label-text">{t('onboarding.steps.goal.timeObjective')}</span>
-                </label>
-                <div className="join w-full">
-                  <div className="grow">
-                    <input 
-                      type="number" 
-                      className="input input-bordered w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      value={dailyTime}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value) || 1;
-                        setDailyTime(value);
-                      }}
-                      min="1"
-                      required
-                    />
-                  </div>
-                  <select 
-                    className="select select-bordered" 
-                    value={timeUnit}
-                    onChange={(e) => setTimeUnit(e.target.value)}
-                  >
-                    <option value="minutes">{t('time.minutes')}</option>
-                    <option value="heures">{t('time.hours')}</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          )}
+  <div>
+    <div className="flex items-center gap-2 mb-4">
+      <Target size={20} />
+      <h4 className="font-semibold">{t('onboarding.steps.goal.title')}</h4>
+    </div>
+    
+    <p className="text-sm text-opacity-70 mb-6">
+      {t('onboarding.steps.goal.description')}
+    </p>
+    
+    <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text">{t('onboarding.steps.goal.name')}</span>
+      </label>
+      <input 
+        type="text" 
+        className="input input-bordered w-full"
+        value={goalName} 
+        onChange={(e) => setGoalName(e.target.value)} 
+        placeholder={t('onboarding.steps.goal.namePlaceholder')}
+        required
+      />
+    </div>
+    
+    <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text">{t('onboarding.steps.goal.timeObjective')}</span>
+      </label>
+      <div className="flex items-center space-x-2">
+        <div className="relative flex-grow">
+          <input 
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            className="input input-bordered w-full pl-10"
+            value={dailyTime}
+            onChange={(e) => {
+              const value = e.target.value;
+              setDailyTime(value === '' ? 1 : parseInt(value) || 1);
+            }}
+            onFocus={(e) => e.target.select()}
+            min="1"
+            required
+          />
+          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+        </div>
+        <select 
+          className="select select-bordered w-full max-w-[120px]" 
+          value={timeUnit}
+          onChange={(e) => setTimeUnit(e.target.value)}
+        >
+          <option value="minutes">{t('time.minutes')}</option>
+          <option value="heures">{t('time.hours')}</option>
+        </select>
+      </div>
+    </div>
+    
+    <div className="form-control mb-4">
+      <fieldset className="fieldset bg-base-200 rounded-lg p-2 border border-base-300">
+        <legend className="fieldset-legend">{t('onboarding.steps.goal.days')}</legend>
+        <div className="flex flex-wrap gap-1 justify-center mb-2">
+          <button
+            type="button"
+            className={`btn btn-sm ${daysSelectionMode === 'all' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => handleDaySelection([...DAYS], 'all')}
+          >
+            {t('days.everyday')}
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${daysSelectionMode === 'weekdays' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => handleDaySelection([...WEEKDAYS], 'weekdays')}
+          >
+            {t('days.weekdays')}
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${daysSelectionMode === 'weekend' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => handleDaySelection([...WEEKEND], 'weekend')}
+          >
+            {t('days.weekend')}
+          </button>
+        </div>
+        
+        <div className="flex flex-wrap gap-1 justify-center">
+          {DAY_KEYS.map((dayKey, index) => (
+            <button
+              key={dayKey}
+              type="button"
+              className={`btn btn-xs ${
+                selectedDays.includes(DAYS[index]) 
+                  ? 'btn-primary' 
+                  : 'bg-base-300 text-base-content opacity-60'
+              }`}
+              onClick={() => toggleDay(DAYS[index])}
+            >
+              {t(`days.${dayKey}Short`)}
+            </button>
+          ))}
+        </div>
+        
+      </fieldset>
+    </div>
+    
+    <div className="form-control mb-4">
+      <label className="label">
+        <span className="label-text">{t('onboarding.steps.goal.color')}</span>
+      </label>
+      <div className="flex flex-wrap gap-2">
+        {COLORS.map((color) => (
+          <button
+            key={color.hex}
+            type="button"
+            className={`w-8 h-8 rounded-full border-2 ${goalColor === color.hex ? 'border-primary' : 'border-transparent'}`}
+            style={{ backgroundColor: color.hex }}
+            title={t(color.nameKey)}
+            onClick={() => setGoalColor(color.hex)}
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
+          {/* Nouvelle étape: Sélection de la langue cible */}
+          {step === 3 && (
+  <div>
+    <div className="flex items-center gap-2 mb-4">
+      <Globe size={20} />
+      <h4 className="font-semibold">{t('onboarding.steps.language.title')}</h4>
+    </div>
+    
+    <p className="text-base-content text-opacity-70 mb-6">
+      {t('onboarding.steps.language.description')}
+    </p>
+    
+    <div className="form-control mb-6">
+      <label className="cursor-pointer label justify-start gap-4">
+        <span className="label-text font-medium">{t('onboarding.steps.language.useLearning')}</span>
+        <input 
+          type="checkbox" 
+          className="toggle toggle-primary" 
+          checked={learningLanguage} 
+          onChange={() => setLearningLanguage(!learningLanguage)}
+        />
+      </label>
+    </div>
+    
+    {learningLanguage && (
+      <div className="form-control mb-4">
+        <label className="label">
+          <span className="label-text">{t('onboarding.steps.language.selectLabel')}</span>
+        </label>
+        <select 
+          className="select select-bordered w-full" 
+          value={targetLanguage}
+          onChange={(e) => setTargetLanguage(e.target.value)}
+        >
+          {availableLanguages.map(lang => (
+            <option key={lang.id} value={lang.id}>{lang.name}</option>
+          ))}
+        </select>
+      </div>
+    )}
+  </div>
+)}
           
           {/* Étape 3: Timer */}
-          {step === 3 && (
+          {step === 4 && (
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Clock size={20} />
@@ -617,7 +696,7 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
           )}
           
           {/* Étape 4: Todo */}
-          {step === 4 && (
+          {step === 5 && (
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <ListTodo size={20} />

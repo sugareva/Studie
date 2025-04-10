@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Dashboard from './pages/Dashboard';
 import Activity from './pages/Activity';
 import Login from './pages/Login';
+import Roadmap from './pages/Roadmap';
 import HomePage from './pages/HomePage';
 import './i18n';
 
@@ -50,6 +51,11 @@ function App() {
           <Route path="/activity" element={
             <PrivateRoute>
               <Activity />
+            </PrivateRoute>
+          } />
+          <Route path="/roadmap" element={
+            <PrivateRoute>
+              <Roadmap />
             </PrivateRoute>
           } />
           

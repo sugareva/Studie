@@ -25,6 +25,18 @@ function UserOptionsModal({ isOpen, onClose, user, onUpdateSettings, onSignOut }
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [learningLanguage, setLearningLanguage] = useState(false);
+  const [targetLanguage, setTargetLanguage] = useState('french');
+  const [showLanguageWarning, setShowLanguageWarning] = useState(false);
+  const [previousLanguage, setPreviousLanguage] = useState('');
+
+  const handleLearningToggle = (value) => {
+    setLearningLanguage(value);
+    if (!value) {
+      // Si désactivé, on ne montre pas d'avertissement
+      setShowLanguageWarning(false);
+    }
+  };
   
   // Charger les paramètres actuels de l'utilisateur
   useEffect(() => {
@@ -34,109 +46,262 @@ function UserOptionsModal({ isOpen, onClose, user, onUpdateSettings, onSignOut }
   }, [isOpen, user]);
   
   // Récupérer les paramètres utilisateur depuis la base de données
-  const fetchUserSettings = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('user_settings')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-      
-      if (error && error.code !== 'PGRST116') { // PGRST116 = Pas de données trouvées
-        console.error(t('userOptions.errors.fetchSettingsLogError'), error);
-        setError(t('userOptions.errors.loadSettingsError'));
-        return;
-      }
-      
-      if (data) {
-        setNickname(data.nickname || '');
-        setAvatar(data.avatar || avatars[0]);
-        setShowTodoList(data.show_todo_list !== false); // Default to true if not set
-      } else {
-        // Valeurs par défaut si pas de données trouvées
-        setNickname('');
-        setAvatar(avatars[0]);
-        setShowTodoList(true);
-      }
-      
-      setError(null);
-      
-    } catch (err) {
-      console.error(t('userOptions.errors.fetchSettingsTryCatchError'), err);
+// Récupérer les paramètres utilisateur depuis la base de données
+const fetchUserSettings = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('user_settings')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') { // PGRST116 = Pas de données trouvées
+      console.error(t('userOptions.errors.fetchSettingsLogError'), error);
       setError(t('userOptions.errors.loadSettingsError'));
+      return;
     }
-  };
+    
+    if (data) {
+      setNickname(data.nickname || '');
+      setAvatar(data.avatar || avatars[0]);
+      setShowTodoList(data.show_todo_list !== false); // Default to true if not set
+    } else {
+      // Valeurs par défaut si pas de données trouvées
+      setNickname('');
+      setAvatar(avatars[0]);
+      setShowTodoList(true);
+    }
+    
+    setError(null);
+    
+    // Récupérer les données de langue cible
+    // Récupérer les données de langue cible
+try {
+  const { data: langData, error: langError } = await supabase
+    .from('language_progress')
+    .select('target_language')
+    .eq('user_id', user.id)
+    .single();
+  
+  if (langError && langError.code !== 'PGRST116') {
+    console.error('Erreur lors de la récupération de la langue cible:', langError);
+    return;
+  }
+  
+  if (langData) {
+    setLearningLanguage(true);
+    setTargetLanguage(langData.target_language);
+    setPreviousLanguage(langData.target_language);
+  } else {
+    setLearningLanguage(false);
+    setTargetLanguage('french');
+    setPreviousLanguage('');
+  }
+} catch (langErr) {
+  console.error('Erreur lors de la récupération de la langue cible:', langErr);
+}
+
+// Ajouter cette fonction pour gérer le changement d'état d'apprentissage
+const handleLearningToggle = (value) => {
+  setLearningLanguage(value);
+  if (!value) {
+    // Si désactivé, on ne montre pas d'avertissement
+    setShowLanguageWarning(false);
+  }
+};
+
+// Fonction pour gérer le changement de langue cible
+const handleTargetLanguageChange = (e) => {
+  const newLanguage = e.target.value;
+  if (previousLanguage && newLanguage !== previousLanguage) {
+    setPreviousLanguage(targetLanguage);
+    setTargetLanguage(newLanguage);
+    setShowLanguageWarning(true);
+  } else {
+    setTargetLanguage(newLanguage);
+    setShowLanguageWarning(false);
+  }
+};
+
+// Fonction pour confirmer le changement de langue
+const confirmLanguageChange = async () => {
+  try {
+    setSaving(true);
+    
+    const { data: existingData, error: checkError } = await supabase
+      .from('language_progress')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    
+    if (checkError && checkError.code !== 'PGRST116') {
+      throw checkError;
+    }
+    
+    const newProgress = {
+      user_id: user.id,
+      target_language: targetLanguage,
+      completed_skills: []
+    };
+    
+    let result;
+    
+    if (existingData) {
+      result = await supabase
+        .from('language_progress')
+        .update(newProgress)
+        .eq('user_id', user.id);
+    } else {
+      result = await supabase
+        .from('language_progress')
+        .insert(newProgress);
+    }
+    
+    if (result.error) throw result.error;
+    
+    setPreviousLanguage(targetLanguage);
+    setShowLanguageWarning(false);
+    
+  } catch (err) {
+    console.error('Erreur lors de la mise à jour de la langue cible:', err);
+    setError(t('userOptions.errors.saveLanguageError'));
+  } finally {
+    setSaving(false);
+  }
+};
+    
+  } catch (err) {
+    console.error(t('userOptions.errors.fetchSettingsTryCatchError'), err);
+    setError(t('userOptions.errors.loadSettingsError'));
+  }
+};
+  
   
   // Enregistrer les paramètres utilisateur
-  const saveSettings = async () => {
-    if (!user) return;
+const saveSettings = async () => {
+  if (!user) return;
+  
+  try {
+    setSaving(true);
+    setError(null);
     
-    try {
-      setSaving(true);
-      setError(null);
-      
-      const settings = {
-        user_id: user.id,
-        nickname,
-        avatar,
-        show_todo_list: showTodoList
-      };
-      
-      // Vérifier si des paramètres existent déjà pour cet utilisateur
-      const { data: existingData, error: checkError } = await supabase
+    const settings = {
+      user_id: user.id,
+      nickname,
+      avatar,
+      show_todo_list: showTodoList,
+      learning_language: learningLanguage // Ajouter cette propriété
+    };
+    
+    // Vérifier si des paramètres existent déjà pour cet utilisateur
+    const { data: existingData, error: checkError } = await supabase
+      .from('user_settings')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    
+    if (checkError) {
+      throw checkError;
+    }
+    
+    let result;
+    
+    if (existingData) {
+      // Mettre à jour les paramètres existants
+      result = await supabase
         .from('user_settings')
+        .update(settings)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+    } else {
+      // Insérer de nouveaux paramètres
+      result = await supabase
+        .from('user_settings')
+        .insert(settings)
+        .select()
+        .single();
+    }
+    
+    // Gestion de la progression linguistique (ce code semble correct)
+    if (!learningLanguage) {
+      // Supprimer l'enregistrement de progression linguistique s'il existe
+      const { error: deleteError } = await supabase
+        .from('language_progress')
+        .delete()
+        .eq('user_id', user.id);
+        
+      if (deleteError && deleteError.code !== 'PGRST116') {
+        console.error('Erreur lors de la suppression de la progression linguistique:', deleteError);
+      }
+    } 
+    else if (showLanguageWarning) {
+      // La langue a changé, on confirme d'abord
+      await confirmLanguageChange();
+    } 
+    else if (learningLanguage) {
+      // L'apprentissage est activé mais pas de changement de langue
+      // Vérifier si un enregistrement existe déjà
+      const { data: existingLangData, error: checkLangError } = await supabase
+        .from('language_progress')
         .select('id')
         .eq('user_id', user.id)
         .maybeSingle();
       
-      if (checkError) {
-        throw checkError;
+      if (checkLangError && checkLangError.code !== 'PGRST116') {
+        console.error('Erreur lors de la vérification de la progression linguistique:', checkLangError);
+      } else if (!existingLangData) {
+        // Si pas d'enregistrement, en créer un nouveau
+        const { error: insertError } = await supabase
+          .from('language_progress')
+          .insert({
+            user_id: user.id,
+            target_language: targetLanguage,
+            completed_skills: []
+          });
+        
+        if (insertError) {
+          console.error('Erreur lors de la création de la progression linguistique:', insertError);
+        }
       }
-      
-      let result;
-      
-      if (existingData) {
-        // Mettre à jour les paramètres existants
-        result = await supabase
-          .from('user_settings')
-          .update(settings)
-          .eq('user_id', user.id)
-          .select()
-          .single();
-      } else {
-        // Insérer de nouveaux paramètres
-        result = await supabase
-          .from('user_settings')
-          .insert(settings)
-          .select()
-          .single();
-      }
-      
-      if (result.error) {
-        throw result.error;
-      }
-      
-      // Mettre à jour les paramètres dans le composant parent
-      if (onUpdateSettings) {
-        onUpdateSettings(result.data);
-      }
-      
-      // Afficher un message de succès
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
-      
-    } catch (err) {
-      console.error(t('userOptions.errors.saveSettingsError'), err);
-      setError(t('userOptions.errors.saveSettingsErrorMessage'));
-    } finally {
-      setSaving(false);
     }
-  };
+    
+    if (result.error) {
+      throw result.error;
+    }
+    
+    // Mettre à jour les paramètres dans le composant parent
+    if (onUpdateSettings) {
+      onUpdateSettings(result.data);
+    }
+    
+    // Afficher un message de succès
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 3000);
+    
+  } catch (err) {
+    console.error(t('userOptions.errors.saveSettingsError'), err);
+    setError(t('userOptions.errors.saveSettingsErrorMessage'));
+  } finally {
+    setSaving(false);
+  }
+};
   
   // Sélectionner un avatar
   const handleAvatarSelect = (avatarUrl) => {
     setAvatar(avatarUrl);
   };
+
+  const availableLanguages = [
+    { id: 'french', name: t('roadmap.language.french') },
+    { id: 'english', name: t('roadmap.language.english') },
+    { id: 'german', name: t('roadmap.language.german') },
+    { id: 'italian', name: t('roadmap.language.italian') },
+    { id: 'spanish', name: t('roadmap.language.spanish') },
+    { id: 'japanese', name: t('roadmap.language.japanese') },
+    { id: 'korean', name: t('roadmap.language.korean') },
+    { id: 'russian', name: t('roadmap.language.russian') }
+  ];
   
   // Fermer le modal et réinitialiser les états
   const handleClose = () => {
@@ -144,6 +309,79 @@ function UserOptionsModal({ isOpen, onClose, user, onUpdateSettings, onSignOut }
     setSuccess(false);
     onClose();
   };
+
+  // Fonction pour gérer le changement de langue cible
+const handleTargetLanguageChange = (e) => {
+  const newLanguage = e.target.value;
+  if (newLanguage !== previousLanguage) {
+    setPreviousLanguage(targetLanguage);
+    setTargetLanguage(newLanguage);
+    setShowLanguageWarning(true);
+  } else {
+    setTargetLanguage(newLanguage);
+    setShowLanguageWarning(false);
+  }
+};
+
+// Fonction pour confirmer le changement de langue
+const confirmLanguageChange = async () => {
+  try {
+    setSaving(true);
+    
+    // Vérifier si un enregistrement existe déjà pour cet utilisateur
+    const { data: existingData, error: checkError } = await supabase
+      .from('language_progress')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    
+    if (checkError && checkError.code !== 'PGRST116') {
+      throw checkError;
+    }
+    
+    const newProgress = {
+      user_id: user.id,
+      target_language: targetLanguage,
+      completed_skills: []
+    };
+    
+    let result;
+    
+    if (existingData) {
+      // Mettre à jour la langue et réinitialiser les compétences
+      result = await supabase
+        .from('language_progress')
+        .update(newProgress)
+        .eq('user_id', user.id);
+    } else {
+      // Créer un nouvel enregistrement
+      result = await supabase
+        .from('language_progress')
+        .insert(newProgress);
+    }
+    
+    if (result.error) {
+      throw result.error;
+    }
+    
+    setPreviousLanguage(targetLanguage);
+    setShowLanguageWarning(false);
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 3000);
+    
+  } catch (err) {
+    console.error('Erreur lors de la mise à jour de la langue cible:', err);
+    setError(t('userOptions.errors.saveLanguageError'));
+  } finally {
+    setSaving(false);
+  }
+};
+
+// Fonction pour annuler le changement de langue
+const cancelLanguageChange = () => {
+  setTargetLanguage(previousLanguage);
+  setShowLanguageWarning(false);
+};
   
   // Gérer la déconnexion
   const handleSignOut = () => {
@@ -185,6 +423,7 @@ function UserOptionsModal({ isOpen, onClose, user, onUpdateSettings, onSignOut }
             <span>{t('userOptions.messages.settingsSaved')}</span>
           </div>
         )}
+       
         
         <div className="form-control mb-4 w-full">
           <label className="input w-full">
@@ -234,6 +473,7 @@ function UserOptionsModal({ isOpen, onClose, user, onUpdateSettings, onSignOut }
             </div>
           </div>
         </div>
+
         
         <div className="form-control mb-4">
           <label className="label">
@@ -290,17 +530,48 @@ function UserOptionsModal({ isOpen, onClose, user, onUpdateSettings, onSignOut }
           </div>
         </div>
         
+
+        
         <fieldset className="w-full fieldset p-4 bg-base-100 border border-base-300 rounded-box w-64">
           <legend className="fieldset-legend">{t('userOptions.labels.showTodoList')}</legend>
           <label className="fieldset-label">
-            <input 
-              type="checkbox" 
-              className="toggle toggle-secondary" 
-              checked={showTodoList} 
-              onChange={() => setShowTodoList(!showTodoList)} 
-            />
-            {t('userOptions.labels.todoToggleHint')}
+          <input 
+      type="checkbox" 
+      className="toggle toggle-primary" 
+      checked={learningLanguage} 
+      onChange={(e) => handleLearningToggle(e.target.checked)}
+    />
+            {t('onboarding.steps.language.useLearning')}
           </label>
+          {learningLanguage && (
+  <div className="form-control flex mb-4 gap-4">
+    <label className="label">
+      <span className="label-text">{t('roadmap.language.languageSelection')}</span>
+    </label>
+    <select 
+      className="select select-sm select-bordered" 
+      value={targetLanguage}
+      onChange={handleTargetLanguageChange}
+    >
+      {availableLanguages.map(lang => (
+        <option key={lang.id} value={lang.id}>{lang.name}</option>
+      ))}
+    </select>
+  </div>
+)}
+
+{/* Alerte d'avertissement pour le changement de langue */}
+{showLanguageWarning && (
+  <div className="alert alert-soft alert-warning mb-2">
+    <AlertTriangle size={16} />
+    <div>
+      
+      <h3 className="font-bold">{t('onboarding.steps.language.warningTitle')}</h3>
+      <div className="text-xs">{t('onboarding.steps.language.warningText')}</div>
+      
+    </div>
+  </div>
+)}
         </fieldset>
         
         <div className="flex justify-between mt-6">
