@@ -331,14 +331,17 @@
 "auth": {
     "headings": {
       "login": "Connexion",
+      "forgotPassword": "Récupération de mot de passe",
       "createAccount": "Créer un compte"
     },
     "descriptions": {
+      "forgotPasswordDescription": "Entrez votre adresse email pour recevoir un lien de réinitialisation",
       "loginDescription": "Entrez vos identifiants pour accéder à votre compte",
       "signupDescription": "Remplissez le formulaire pour créer votre compte"
     },
     "labels": {
       "email": "Email",
+      "rememberMe": "Rester connecté",
       "password": "Mot de passe",
       "passwordWithRequirement": "Mot de passe (8 caractères min.)"
     },
@@ -350,17 +353,24 @@
     "buttons": {
       "login": "Se connecter",
       "signup": "S'inscrire",
-      "loading": "Chargement..."
+      "loading": "Chargement...",
+      "sendResetLink": "Envoyer le lien de réinitialisation",
+      "forgotPassword": "Mot de passe oublié ?"
     },
     "toggleButtons": {
       "toSignup": "Pas encore de compte ? Créer un compte",
-      "toLogin": "Déjà un compte ? Se connecter"
+      "toLogin": "Déjà un compte ? Se connecter",
+      "backToLogin": "Retour à la connexion"
     },
     "messages": {
-      "checkEmailConfirmation": "Veuillez vérifier votre email pour confirmer votre inscription."
+      "checkEmailConfirmation": "Veuillez vérifier votre email pour confirmer votre inscription.",
+            "passwordResetEmailSent": "Un email de réinitialisation a été envoyé à votre adresse"
     },
     "errors": {
       "authError": "Erreur d'authentification:",
+      "emailRequired": "L'adresse email est requise",
+      "passwordResetError": "Erreur lors de la réinitialisation du mot de passe",
+      "genericPasswordResetError": "Une erreur est survenue lors de la demande de réinitialisation",
       "genericAuthError": "Erreur d'authentification"
     },
     "disclaimers": {

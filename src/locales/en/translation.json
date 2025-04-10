@@ -331,15 +331,18 @@
     "auth": {
       "headings": {
         "login": "Login",
+        "forgotPassword": "Password Recovery",
         "createAccount": "Create an Account"
       },
       "descriptions": {
+        "forgotPasswordDescription": "Enter your email address to receive a reset link",
         "loginDescription": "Enter your credentials to access your account",
         "signupDescription": "Fill out the form to create your account"
       },
       "labels": {
         "email": "Email",
         "password": "Password",
+        "rememberMe": "Stay signed in",
         "passwordWithRequirement": "Password (8 characters min.)"
       },
       "placeholders": {
@@ -350,18 +353,25 @@
       "buttons": {
         "login": "Login",
         "signup": "Sign up",
+        "sendResetLink": "Send Reset Link",
+      "forgotPassword": "Forgot password?",
         "loading": "Loading..."
       },
       "toggleButtons": {
         "toSignup": "Don't have an account? Create one",
-        "toLogin": "Already have an account? Log in"
+        "toLogin": "Already have an account? Log in",
+              "backToLogin": "Back to login"
       },
       "messages": {
-        "checkEmailConfirmation": "Please check your email to confirm your registration."
+        "checkEmailConfirmation": "Please check your email to confirm your registration.",
+              "passwordResetEmailSent": "A password reset email has been sent to your address"
       },
       "errors": {
         "authError": "Authentication error:",
-        "genericAuthError": "Authentication error"
+        "genericAuthError": "Authentication error",
+        "emailRequired": "Email address is required",
+      "passwordResetError": "Error resetting password",
+      "genericPasswordResetError": "An error occurred during the reset request"
       },
       "disclaimers": {
         "privacyInfo": "This information is used only for your login and to save your actions on Studie. No data is shared or sold."

@@ -6,6 +6,7 @@ import Activity from './pages/Activity';
 import Login from './pages/Login';
 import Roadmap from './pages/Roadmap';
 import HomePage from './pages/HomePage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import './i18n';
 
 // Composant pour protéger les routes privées
@@ -53,11 +54,15 @@ function App() {
               <Activity />
             </PrivateRoute>
           } />
+          
           <Route path="/roadmap" element={
             <PrivateRoute>
               <Roadmap />
             </PrivateRoute>
           } />
+          
+          {/* Route de réinitialisation de mot de passe */}
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           
           {/* Redirection par défaut vers la page d'accueil */}
           <Route path="*" element={<Navigate to="/" />} />
