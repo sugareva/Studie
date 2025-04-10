@@ -1,4 +1,3 @@
-// src/pages/ResetPasswordPage.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -12,56 +11,48 @@ function ResetPasswordPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
+  const [isTokenVerified, setIsTokenVerified] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Récupérer et utiliser le token d'accès au chargement de la page
   useEffect(() => {
-    const handleHashParams = async () => {
+    const processToken = async () => {
       try {
         setIsLoading(true);
         
-        // Extraire le hash de l'URL (tout ce qui suit le #)
-        const hash = location.hash;
+        // Extraire les paramètres de l'URL
+        // Supabase ajoute des paramètres comme #access_token, #type, #refresh_token
+        const hash = location.hash.substring(1);
+        const params = new URLSearchParams(hash);
         
-        if (hash && hash.includes('access_token')) {
-          // Récupérer le token d'accès du hash
-          const accessToken = new URLSearchParams(hash.substring(1)).get('access_token');
-          
-          if (accessToken) {
-            // Utiliser le token pour établir une session
-            const { error } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: ''
-            });
-            
-            if (error) {
-              console.error('Error setting session:', error);
-              setError(t('resetPassword.errors.invalidLink'));
-            } else {
-              setAuthenticated(true);
-            }
+        // Pour le reset de mot de passe, type=recovery
+        if (params.get('type') === 'recovery') {
+          // Vérifier simplement si nous avons un token, sans essayer de l'utiliser tout de suite
+          if (params.get('access_token')) {
+            // Si nous avons un token de récupération, nous pouvons procéder
+            setIsTokenVerified(true);
+          } else {
+            setError(t('resetPassword.errors.missingToken'));
           }
         } else {
-          setError(t('resetPassword.errors.missingToken'));
+          setError(t('resetPassword.errors.invalidTokenType'));
         }
       } catch (err) {
-        console.error('Error processing token:', err);
+        console.error('Error processing URL parameters:', err);
         setError(t('resetPassword.errors.tokenProcessingError'));
       } finally {
         setIsLoading(false);
       }
     };
     
-    handleHashParams();
+    processToken();
   }, [location, t]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!authenticated) {
-      setError(t('resetPassword.errors.notAuthenticated'));
+    if (!isTokenVerified) {
+      setError(t('resetPassword.errors.tokenNotVerified'));
       return;
     }
     
@@ -74,11 +65,19 @@ function ResetPasswordPage() {
     setError('');
     
     try {
+      // Extraire le token de récupération
+      const hash = location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      const accessToken = params.get('access_token');
+      
+      // Utiliser updateUser pour définir le nouveau mot de passe
+      // En mode récupération, Supabase utilise le token automatiquement
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
       
       if (error) {
+        console.error('Password update error:', error);
         setError(error.message);
       } else {
         setSuccess(t('resetPassword.success'));
@@ -93,6 +92,7 @@ function ResetPasswordPage() {
     }
   };
 
+  // Reste du code du composant comme avant...
   return (
     <div className="max-w-md mx-auto p-6 bg-base-100 rounded-lg shadow-lg">
       <h1 className="text-2xl font-bold mb-6">{t('resetPassword.title')}</h1>
@@ -111,13 +111,13 @@ function ResetPasswordPage() {
         </div>
       )}
       
-      {isLoading && !authenticated ? (
+      {isLoading && !isTokenVerified ? (
         <div className="flex justify-center items-center py-10">
           <Loader className="animate-spin h-10 w-10 text-primary" />
           <span className="ml-3">{t('resetPassword.messages.validatingLink')}</span>
         </div>
       ) : (
-        authenticated && (
+        isTokenVerified && (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-control">
               <label className="block text-sm font-medium text-base-content/50 mb-1">
@@ -179,7 +179,7 @@ function ResetPasswordPage() {
         )
       )}
       
-      {!isLoading && !authenticated && error && (
+      {!isLoading && !isTokenVerified && error && (
         <div className="mt-4 text-center">
           <p className="mb-4">{t('resetPassword.messages.invalidLinkInfo')}</p>
           <button

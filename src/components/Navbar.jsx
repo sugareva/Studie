@@ -1,6 +1,6 @@
 // src/components/Navbar.jsx
 import { useState, useEffect } from 'react';
-import { User, Grid, BarChart2, Sun, Moon, Menu, X } from 'lucide-react';
+import { User, Grid, BarChart2, Sun, Moon, Map, Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -114,7 +114,7 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
       to="/roadmap"
       className={`tab ${location.pathname === '/roadmap' ? 'tab-active' : ''}`}
     >
-      <Grid size={16} className="mr-1" />
+      <Map size={16} className="mr-1" />
       {t('roadmap.title')}
     </Link>
   )}
