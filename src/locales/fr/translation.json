@@ -736,6 +736,21 @@
     "c1": "Vous maîtrisez presque comme un natif !",
     "c2": "Vous avez une maîtrise professionnelle !",
     "default": "Continuez vos efforts !"
+  },
+  "resetPassword": {
+    "title": "Réinitialisez votre mot de passe",
+    "labels": {
+      "newPassword": "Choisissez un nouveau mot de passe",
+      "confirmPassword": "8 caractères minimum"
+  },
+  "placeholders": {
+    "newPassword": "Confirmez votre nouveau mot de passe",
+    "confirmPassword": "8 caractères minimum"
+  },
+  "buttons": {
+    "updatePassword": "Mettre à jour le mot de passe"
+  }
+  
   }
   
 

@@ -754,6 +754,22 @@
     "c1": "You're almost as fluent as a native!",
     "c2": "You have professional mastery!",
     "default": "Keep up the good work!"
+  },
+
+  "resetPassword": {
+    "title": "Reset your password",
+    "labels": {
+      "newPassword": "Choose a new password",
+      "confirmPassword": "8 characters required"
+  },
+  "placeholders": {
+    "newPassword": "Please confirm your new password",
+    "confirmPassword": "8 characters required"
+  },
+  "buttons": {
+    "updatePassword": "Update your password"
+  }
+  
   }
   
   
