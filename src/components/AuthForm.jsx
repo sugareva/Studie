@@ -217,8 +217,6 @@ function AuthForm({ setIsLoading: setParentLoading }) {
                 <Loader className="animate-spin h-4 w-4" />
                 {t('auth.buttons.loading')}
               </>
-            ) : isForgotPassword ? (
-              t('auth.buttons.sendResetLink')
             ) : isLogin ? (
               <>
                 <LogIn className="h-4 w-4" />
@@ -254,18 +252,7 @@ function AuthForm({ setIsLoading: setParentLoading }) {
               {isLogin ? t('auth.toggleButtons.toSignup') : t('auth.toggleButtons.toLogin')}
             </button>
             
-            {/* Afficher le bouton "Mot de passe oublié" uniquement en mode connexion */}
-            {isLogin && (
-              <div className="mt-2">
-                <button
-                  type="button"
-                  className="btn btn-link text-sm text-primary hover:text-primary-focus p-0 h-auto min-h-0"
-                  onClick={() => setIsForgotPassword(true)}
-                >
-                  {t('auth.buttons.forgotPassword')}
-                </button>
-              </div>
-            )}
+            
           </>
         )}
       </div>

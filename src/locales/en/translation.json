@@ -28,6 +28,7 @@
     "title": "Dashboard",
     "welcome": "Welcome back",
     "goals": "Goals",
+    "today": "Today",
     "addGoal": "Add goal",
     "editGoal": "Edit goal",
     "deleteGoal": "Delete goal",
@@ -634,6 +635,8 @@
     "unmute": "Unmute"
   },
   "roadmap": {
+    "aboutCourse": "Discover Learning Roadmap",
+    "aboutText": "Track your progress through the levels of the Common European Framework of Reference for Languages (CEFR), from beginner (A1) to expert (C2). Check off acquired skills to monitor your advancement and unlock new levels.",
     "levels": "Skills to learn",
     "globalProgress": "Global progress",
     "acquiredSkills": "Acquired skills",

@@ -31,6 +31,20 @@ function Dashboard() {
     setSelectedGoal(goal);
   };
 
+  const goToToday = () => {
+    setCurrentDate(new Date());
+    setIgnoreDate(false);
+  };
+
+  const isToday = (date) => {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+  };
+  
+  
+
   // Ajouter cette constante
 const DAILY_PROGRESS_KEY = 'DAILY_PROGRESS';
 
@@ -153,6 +167,7 @@ const updateDailyProgress = (goalId, duration) => {
     fetchUserSettings();
   }, [user, t]);
 
+  
   // Gestionnaire de mise à jour des paramètres utilisateur
   const handleUpdateSettings = (updatedSettings) => {
     setUserSettings(updatedSettings);
@@ -202,7 +217,7 @@ const updateDailyProgress = (goalId, duration) => {
   };
 
   return (
-    <div className="min-h-screen bg-base-200 flex flex-col pt-4">
+    <div className="min-h-screen bg-base-200 flex flex-col pt-4 overflow-x-hidden">
       {/* Utiliser le composant Navbar partagé */}
       <Navbar
         onOpenUserModal={() => setIsModalOpen(true)}
@@ -212,36 +227,49 @@ const updateDailyProgress = (goalId, duration) => {
       {/* Conteneur principal avec largeur maximale de 80% */}
       <div className="flex-1 p-4 w-full max-w-[90%] sm:max-w-[80%] mx-auto">
         {/* Barre de date */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-4">
-            <button
-              className="btn btn-xs btn-outline btn-secondary btn-circle"
-              onClick={goToPreviousDay}
-              aria-label={t('dashboard.previousDay')}
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <span className="font-medium text-xl">{formatCurrentDate()}</span>
-            <button
-              className="btn btn-xs btn-outline btn-secondary btn-circle"
-              onClick={goToNextDay}
-              aria-label={t('dashboard.nextDay')}
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm">{t('dashboard.viewAll')}</span>
-            <input 
-              type="checkbox" 
-              className="toggle toggle-secondary" 
-              checked={ignoreDate} 
-              onChange={toggleIgnoreDate}
-              aria-label={t('dashboard.toggleDateFilter')}
-            />
-          </div>
-        </div>
-        
+        <div className="flex justify-between items-center mb-4 mt-2">
+  <div className="flex items-center gap-1 sm:gap-2">
+    <button
+      className="btn btn-xs btn-outline btn-secondary btn-circle"
+      onClick={goToPreviousDay}
+      aria-label={t('dashboard.previousDay')}
+    >
+      <ChevronLeft size={16} />
+    </button>
+    <span className="font-medium text-sm sm:text-lg truncate max-w-[180px] sm:max-w-none">
+      {formatCurrentDate()}
+    </span>
+    <button
+      className="btn btn-xs btn-outline btn-secondary btn-circle"
+      onClick={goToNextDay}
+      aria-label={t('dashboard.nextDay')}
+    >
+      <ChevronRight size={16} />
+    </button>
+    
+    {/* Bouton "Aujourd'hui" visible uniquement sur desktop et si la date n'est pas aujourd'hui */}
+    {!isToday(currentDate) && (
+      <button
+        className="sm:flex btn btn-xs btn-outline btn-secondary items-center gap-1 ml-2"
+        onClick={goToToday}
+        aria-label={t('dashboard.today')}
+      >
+        <Calendar size={14} />
+        <span>{t('dashboard.today')}</span>
+      </button>
+    )}
+  </div>
+  <div className="flex items-center gap-1 sm:gap-2">
+    <span className="text-xs sm:text-sm whitespace-nowrap">{t('dashboard.viewAll')}</span>
+    <input 
+      type="checkbox" 
+      className="toggle toggle-secondary toggle-sm sm:toggle-md" 
+      checked={ignoreDate} 
+      onChange={toggleIgnoreDate}
+      aria-label={t('dashboard.toggleDateFilter')}
+    />
+  </div>
+</div>
         {/* Grille des composants principaux */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="md:col-span-1">

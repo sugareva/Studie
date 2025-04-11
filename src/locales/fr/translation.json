@@ -30,6 +30,7 @@
     "goals": "Objectifs",
     "addGoal": "Ajouter un objectif",
     "editGoal": "Modifier l'objectif",
+    "today": "Aujourd'hui",
     "deleteGoal": "Supprimer l'objectif",
     "study": "Étudier",
     "todos": "Liste de tâches",
@@ -617,6 +618,8 @@
     "footerText": "Tous droits réservés"
   },
   "roadmap": {
+    "aboutCourse": "Découvrez Studie Langues!",
+    "aboutText": "Suivez votre progression à travers les niveaux du Cadre européen commun de référence pour les langues (CECRL), de débutant (A1) à expert (C2). Cochez les compétences acquises pour suivre votre avancement et débloquer de nouveaux niveaux.",
     "levels": "Compétences à acquérir",
     "globalProgress": "Progression globale",
     "acquiredSkills": "Compétences acquises",

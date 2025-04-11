@@ -57,3 +57,265 @@
   /* Pour Chrome, Safari et Opera */
   display: none;
 }
+/* Dans votre fichier CSS global ou à importer */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Effet de transition pendant le swipe */
+.snap-transition {
+  transition: transform 0.3s ease-out;
+}
+
+/* Pour l'effet hover sur desktop */
+@media (min-width: 768px) {
+  .hover\:scale-102:hover {
+    transform: scale(1.02);
+  }
+}
+
+/* Styles globaux améliorés */
+.bg-primary\/5 {
+  background-color: #f8f9fe;
+  background-image: 
+    radial-gradient(circle at 90% 10%, rgba(var(--p)/0.1) 10%, transparent 20%),
+    radial-gradient(circle at 10% 90%, rgba(var(--p)/0.08) 10%, transparent 20%),
+    radial-gradient(circle at 50% 50%, rgba(var(--p)/0.05) 30%, transparent 70%);
+  background-size: 50px 50px, 50px 50px, 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
+}
+
+/* Styles améliorés pour les cartes */
+.level-card {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 2px solid transparent;
+  overflow: visible;
+}
+
+.level-card:hover:not(.level-card-disabled) {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(var(--p)/0.15);
+  border-color: var(--color-secondary);
+}
+
+.level-card-selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 5px 20px rgba(var(--p)/0.2);
+}
+
+.level-card-disabled {
+  opacity: 0.7;
+  filter: grayscale(30%);
+}
+
+/* Style pour l'alerte explicative */
+.info-alert {
+  
+  border-left: 4px solid hsl(var(--p));
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.info-alert-title {
+  display: flex;
+  align-items: center;
+  color: hsl(var(--p));
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.info-alert-content {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.info-alert-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+
+
+/* Amélioration du carousel */
+.snap-container {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.snap-container::-webkit-scrollbar {
+  display: none;
+}
+
+.snap-item {
+  scroll-snap-align: center;
+  flex-shrink: 0;
+  width: 100%;
+  padding: 0.5rem;
+}
+
+/* Amélioration des indicateurs du carousel */
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+}
+
+.carousel-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.carousel-indicator-active {
+  width: 16px; 
+  border-radius: 4px;
+  background-color: hsl(var(--p));
+}
+
+/* Style pour le header avec titre de langue */
+.language-header {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(var(--p)/0.1);
+}
+
+.language-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(var(--p)/0.1);
+  color: hsl(var(--p));
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  margin-top: 0.5rem;
+}
+
+/* Animation pour le carousel */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.carousel-animation {
+  animation: slideIn 0.3s ease-out;
+}
+/* Animations supplémentaires */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--p), 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(var(--p), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--p), 0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s ease-out;
+}
+
+.animate-pulse-soft {
+  animation: pulse 2s infinite;
+}
+
+/* Transitions douces pour les éléments */
+.level-card, 
+.info-alert,
+.language-header,
+.carousel-indicator {
+  transition: all 0.3s ease;
+}
+
+/* Effet de profondeur pour les cartes sélectionnées */
+.level-card-selected {
+  position: relative;
+}
+
+.level-card-selected::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 1rem;
+  box-shadow: 0 0 0 5px rgba(var(--p), 0.2);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.level-card-selected:hover::after {
+  opacity: 1;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+  position: relative;
+}
+
+/* Pour les appareils mobiles */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}

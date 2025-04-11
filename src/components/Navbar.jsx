@@ -109,15 +109,14 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
     {t('navbar.links.activity')}
   </Link>
   
-  {userSettings?.learning_language && (
-    <Link
-      to="/roadmap"
-      className={`tab ${location.pathname === '/roadmap' ? 'tab-active' : ''}`}
-    >
-      <Map size={16} className="mr-1" />
-      {t('roadmap.title')}
-    </Link>
-  )}
+  {/* Toujours afficher le lien Roadmap, mais le désactiver si nécessaire */}
+  <Link
+    to="/roadmap"
+    className={`tab ${location.pathname === '/roadmap' ? 'tab-active' : ''} ${!userSettings?.learning_language ? 'opacity-50 pointer-events-none' : ''}`}
+  >
+    <Map size={16} className="mr-1" />
+    {t('roadmap.title')}
+  </Link>
 </div>
         </div>
         
@@ -185,7 +184,7 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
         <div className="fixed top-16 left-0 w-full flex justify-center z-50 sm:hidden">
           <div className="max-w-[80%] w-full mx-auto bg-base-100 shadow-lg rounded-box p-4 flex flex-col gap-4">
             <Link 
-              to="/" 
+              to="/dashboard" 
               className={`btn justify-start ${location.pathname === '/' ? 'btn-soft btn-secondary' : 'btn-ghost'}`}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -200,6 +199,15 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
               <BarChart2 size={16} className="mr-2" />
               {t('navbar.links.activity')}
             </Link>
+            <Link 
+  to="/roadmap" 
+  className={`btn justify-start ${location.pathname === '/roadmap' ? 'btn-soft btn-secondary' : 'btn-ghost'} ${!userSettings?.learning_language ? 'opacity-50 pointer-events-none' : ''}`}
+  onClick={() => setIsMenuOpen(false)}
+>
+  <Map size={16} className="mr-2" />
+  {t('roadmap.title')}
+</Link>
+            
             
             <div className="divider"></div>
             

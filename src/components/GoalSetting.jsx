@@ -11,6 +11,7 @@ const DAYS_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'satu
 const WEEKDAYS_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 const WEEKEND_KEYS = ['saturday', 'sunday'];
 const DAILY_PROGRESS_KEY = 'DAILY_PROGRESS';
+
 // Définir la limite d'objectifs ici
 const GOALS_LIMIT = 3;
 
@@ -53,6 +54,7 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedGoalId, setSelectedGoalId] = useState(null);
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
   // État pour suivre si la limite est atteinte
   const [isLimitReached, setIsLimitReached] = useState(false);
   
@@ -76,6 +78,17 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
     daysOfWeek: [...DAYS],
     color: COLORS[0].hex
   });
+
+  const handleSliderScroll = (e) => {
+    const container = e.currentTarget;
+    const scrollPosition = container.scrollLeft;
+    const cardWidth = container.offsetWidth * 0.85; // 85% de la largeur
+    const newIndex = Math.round(scrollPosition / cardWidth);
+    
+    if (newIndex !== activeCardIndex) {
+      setActiveCardIndex(newIndex);
+    }
+  };
 
   // Récupérer la date actuelle au format YYYY-MM-DD
   const getTodayDate = () => {
@@ -379,6 +392,16 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
     const todayProgress = getDailyProgress(goal.id);
     return Math.min(100, Math.round((todayProgress / goal.duration) * 100));
   };
+  const scrollToCard = (index) => {
+      const container = document.querySelector('.snap-x');
+      if (container) {
+        const cardWidth = container.offsetWidth * 0.85; // 85% de la largeur
+        container.scrollTo({
+          left: index * cardWidth,
+          behavior: 'smooth'
+        });
+      }
+    };
   
   // Filtrer les objectifs en fonction du jour de la semaine
 // Filtrer les objectifs en fonction du jour de la semaine
@@ -465,169 +488,270 @@ const filteredGoals = useMemo(() => {
             </span>
           </div>
         ) : (
-          <div className="space-y-3 overflow-y-auto flex-grow">
-            {/* Si un objectif est sélectionné, on n'affiche que celui-ci */}
-            {selectedGoalId ? (
-              filteredGoals
-                .filter(goal => goal.id === selectedGoalId)
-                .map((goal) => (
-                  <div
-                    key={goal.id}
-                    className="border-2 border-primary rounded-lg p-4 shadow-md"
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex items-center gap-3">
-                        {/* Puce de couleur devant le titre */}
-                        <div 
-                          className="w-4 h-4 rounded-full flex-shrink-0 ring-secondary ring-offset-1" 
-                          style={{ backgroundColor: goal.color || COLORS[0].hex }}
-                        ></div>
-                        <div>
-                          <h3 className="font-semibold text-base">{goal.name}</h3>
-                          <div className="text-sm text-gray-500 mt-0.5">
-                          {formatTime(goal.time_unit === 'minutes' ? goal.duration / 60 : goal.duration / 3600, goal.time_unit)} 
-                          {/* Affichage des jours sélectionnés en format compact */}
-                          <span className="mx-1">•</span>
-                          <span className="inline-flex gap-1">
-                          {DAYS_KEYS.map((day, index) => {
-  // Convertir le jour traduit (DAYS[index]) au format stocké (français)
-  const storedFormatDay = convertToStoredFormat(DAYS[index], i18n.language);
-  
-  return (
-    <span
-      key={day}
-      className={`text-xs ${
-        goal.days_of_week.includes(storedFormatDay)
-          ? 'font-bold'
-          : 'opacity-30'
-      }`}
-    >
-      {t(`days.${day}Short`)}
-    </span>
-  );
-})}
-                          </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-1">
-                        <button
-                          className="btn btn-xs btn-ghost rounded-full"
-                          onClick={() => handleEditGoal(goal)}
-                          disabled={loading}
-                          aria-label={t('buttons.editAriaLabel')}
+<div className="space-y-3 overflow-y-auto flex-grow">
+  {/* Si un objectif est sélectionné, on n'affiche que celui-ci */}
+  {selectedGoalId ? (
+    filteredGoals
+      .filter(goal => goal.id === selectedGoalId)
+      .map((goal) => (
+        <div
+          key={goal.id}
+          className="border-2 border-primary rounded-lg p-4 shadow-md"
+        >
+          {/* Contenu existant inchangé */}
+          <div className="flex justify-between items-start mb-3">
+            <div className="flex items-center gap-3">
+              <div 
+                className="w-4 h-4 rounded-full flex-shrink-0 ring-secondary ring-offset-1" 
+                style={{ backgroundColor: goal.color || COLORS[0].hex }}
+              ></div>
+              <div>
+                <h3 className="font-semibold text-base">{goal.name}</h3>
+                <div className="text-sm text-gray-500 mt-0.5">
+                  {formatTime(goal.time_unit === 'minutes' ? goal.duration / 60 : goal.duration / 3600, goal.time_unit)} 
+                  <span className="mx-1">•</span>
+                  <span className="inline-flex gap-1">
+                    {DAYS_KEYS.map((day, index) => {
+                      const storedFormatDay = convertToStoredFormat(DAYS[index], i18n.language);
+                      return (
+                        <span
+                          key={day}
+                          className={`text-xs ${
+                            goal.days_of_week.includes(storedFormatDay)
+                              ? 'font-bold'
+                              : 'opacity-30'
+                          }`}
                         >
-                          <Edit size={14} />
-                        </button>
-                        <button
-                          className="btn btn-xs btn-ghost rounded-full text-error"
-                          onClick={() => handleDeleteGoal(goal.id)}
-                          disabled={loading}
-                          aria-label={t('buttons.deleteAriaLabel')}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <div className="flex justify-between text-sm mb-1.5">
-                        <span className="text-gray-600">{formatRemainingTime(goal)}</span>
-                        <span className="font-medium">
-                          {t('status.percentCompleted', { percent: calculateProgress(goal) })}
+                          {t(`days.${day}Short`)}
                         </span>
-                      </div>
-                      <progress
-                        className="progress progress-info w-full"
-                        value={calculateProgress(goal)}
-                        max="100"
-                      ></progress>
-                    </div>
-                  </div>
-                ))
-            ) : (
-              /* Sinon, on affiche tous les objectifs */
-              filteredGoals.map((goal) => (
-                <div
-                  key={goal.id}
-                  className="border border-base-200 rounded-lg p-4 cursor-pointer hover:bg-base-200 transition-all shadow-sm"
-                  onClick={() => handleSelectGoal(goal)}
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center gap-3">
-                      {/* Puce de couleur devant le titre */}
-                      <div 
-                        className="w-4 h-4 rounded-full flex-shrink-0" 
-                        style={{ backgroundColor: goal.color || COLORS[0].hex }}
-                      ></div>
-                      <div>
-                        <h3 className="font-semibold text-base">{goal.name}</h3>
-                        <div className="text-sm text-gray-500 mt-0.5">
-                        {formatTime(goal.time_unit === 'minutes' ? goal.duration / 60 : goal.duration / 3600, goal.time_unit)} 
-                        {/* Affichage des jours sélectionnés en format compact */}
-                        <span className="mx-1">•</span>
-                        <span className="inline-flex gap-1">
+                      );
+                    })}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-1">
+              <button
+                className="btn btn-xs btn-ghost rounded-full"
+                onClick={() => handleEditGoal(goal)}
+                disabled={loading}
+                aria-label={t('buttons.editAriaLabel')}
+              >
+                <Edit size={14} />
+              </button>
+              <button
+                className="btn btn-xs btn-ghost rounded-full text-error"
+                onClick={() => handleDeleteGoal(goal.id)}
+                disabled={loading}
+                aria-label={t('buttons.deleteAriaLabel')}
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="flex justify-between text-sm mb-1.5">
+              <span className="text-gray-600">{formatRemainingTime(goal)}</span>
+              <span className="font-medium">
+                {t('status.percentCompleted', { percent: calculateProgress(goal) })}
+              </span>
+            </div>
+            <progress
+              className="progress progress-info w-full"
+              value={calculateProgress(goal)}
+              max="100"
+            ></progress>
+          </div>
+        </div>
+      ))
+  ) : (
+    /* Slider pour mobile, liste pour desktop */
+    <>
+      {/* Affichage sur mobile - slider horizontal */}
+      <div className="sm:hidden">
+  <div 
+    className="overflow-x-auto snap-x snap-mandatory flex gap-4 pb-6 scrollbar-hide -mx-5 px-5"
+    onScroll={handleSliderScroll}
+  >
+    {filteredGoals.map((goal, index) => (
+      <div
+        key={goal.id}
+        className="border border-base-200 rounded-lg p-4 cursor-pointer hover:bg-base-200 transition-all shadow-sm snap-center min-w-[85%] first:ml-5 last:mr-5"
+        onClick={() => handleSelectGoal(goal)}
+      >
+              {/* Contenu de la carte d'objectif */}
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="w-4 h-4 rounded-full flex-shrink-0" 
+                    style={{ backgroundColor: goal.color || COLORS[0].hex }}
+                  ></div>
+                  <div>
+                    <h3 className="font-semibold text-base">{goal.name}</h3>
+                    <div className="text-sm text-gray-500 mt-0.5">
+                      {formatTime(goal.time_unit === 'minutes' ? goal.duration / 60 : goal.duration / 3600, goal.time_unit)} 
+                      <span className="mx-1">•</span>
+                      <span className="inline-flex gap-1">
                         {DAYS_KEYS.map((day, index) => {
-
-  
-  const storedFormatDay = convertToStoredFormat(DAYS[index], i18n.language);
-  
-  return (
-    <span
-      key={day}
-      className={`text-xs ${
-        goal.days_of_week.includes(storedFormatDay)
-          ? 'font-bold'
-          : 'opacity-30'
-      }`}
-    >
-      {t(`days.${day}Short`)}
-    </span>
-  );
-})}
-                        </span>
-                        </div>
-                      </div>
+                          const storedFormatDay = convertToStoredFormat(DAYS[index], i18n.language);
+                          return (
+                            <span
+                              key={day}
+                              className={`text-xs ${
+                                goal.days_of_week.includes(storedFormatDay)
+                                  ? 'font-bold'
+                                  : 'opacity-30'
+                              }`}
+                            >
+                              {t(`days.${day}Short`)}
+                            </span>
+                          );
+                        })}
+                      </span>
                     </div>
-                    <div className="flex gap-1">
-                      <button
-                        className="btn btn-xs btn-ghost rounded-full"
-                        onClick={(e) => {
-                          e.stopPropagation(); // Empêche le déclenchement du onClick du parent
-                          handleEditGoal(goal);
-                        }}
-                        disabled={loading}
-                        aria-label={t('buttons.editAriaLabel')}
-                      >
-                        <Edit size={14} />
-                      </button>
-                      <button
-                        className="btn btn-xs btn-ghost rounded-full text-error"
-                        onClick={(e) => {
-                          e.stopPropagation(); // Empêche le déclenchement du onClick du parent
-                          handleDeleteGoal(goal.id);
-                        }}
-                        disabled={loading}
-                        aria-label={t('buttons.deleteAriaLabel')}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <div className="flex justify-between text-sm mb-1.5">
-                      <span className="text-gray-600">{formatRemainingTime(goal)}</span>
-                      <span className="font-medium">{calculateProgress(goal)}%</span>
-                    </div>
-                    <progress
-                      className="progress progress-info w-full"
-                      value={calculateProgress(goal)}
-                      max="100"
-                    ></progress>
                   </div>
                 </div>
-              ))
-            )}
+                <div className="flex gap-1">
+                  <button
+                    className="btn btn-xs btn-ghost rounded-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditGoal(goal);
+                    }}
+                    disabled={loading}
+                    aria-label={t('buttons.editAriaLabel')}
+                  >
+                    <Edit size={14} />
+                  </button>
+                  <button
+                    className="btn btn-xs btn-ghost rounded-full text-error"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteGoal(goal.id);
+                    }}
+                    disabled={loading}
+                    aria-label={t('buttons.deleteAriaLabel')}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+              <div className="mt-4">
+                <div className="flex justify-between text-sm mb-1.5">
+                  <span className="text-gray-600">{formatRemainingTime(goal)}</span>
+                  <span className="font-medium">{calculateProgress(goal)}%</span>
+                </div>
+                <progress
+                  className="progress progress-info w-full"
+                  value={calculateProgress(goal)}
+                  max="100"
+                ></progress>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Indicateurs de pagination pour mobile */}
+        {filteredGoals.length > 1 && (
+  <div className="flex justify-center gap-1 mt-2">
+    {filteredGoals.map((_, index) => (
+      <button
+        key={index}
+        onClick={() => scrollToCard(index)}
+        className={`h-2 rounded-full transition-all ${
+          index === activeCardIndex 
+            ? 'bg-primary w-4' 
+            : 'bg-gray-300 w-2'
+        }`}
+        aria-label={`Go to card ${index + 1}`}
+      ></button>
+    ))}
+  </div>
+  )}
+</div>
+      
+      {/* Affichage desktop - liste verticale */}
+      <div className="hidden sm:space-y-3 sm:block">
+        {filteredGoals.map((goal) => (
+          <div
+            key={goal.id}
+            className="border border-base-200 rounded-lg p-4 cursor-pointer hover:bg-base-200 transition-all shadow-sm"
+            onClick={() => handleSelectGoal(goal)}
+          >
+            {/* Contenu existant inchangé */}
+            <div className="flex justify-between items-start mb-3">
+              <div className="flex items-center gap-3">
+                <div 
+                  className="w-4 h-4 rounded-full flex-shrink-0" 
+                  style={{ backgroundColor: goal.color || COLORS[0].hex }}
+                ></div>
+                <div>
+                  <h3 className="font-semibold text-base">{goal.name}</h3>
+                  <div className="text-sm text-gray-500 mt-0.5">
+                    {formatTime(goal.time_unit === 'minutes' ? goal.duration / 60 : goal.duration / 3600, goal.time_unit)} 
+                    <span className="mx-1">•</span>
+                    <span className="inline-flex gap-1">
+                      {DAYS_KEYS.map((day, index) => {
+                        const storedFormatDay = convertToStoredFormat(DAYS[index], i18n.language);
+                        return (
+                          <span
+                            key={day}
+                            className={`text-xs ${
+                              goal.days_of_week.includes(storedFormatDay)
+                                ? 'font-bold'
+                                : 'opacity-30'
+                            }`}
+                          >
+                            {t(`days.${day}Short`)}
+                          </span>
+                        );
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-1">
+                <button
+                  className="btn btn-xs btn-ghost rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditGoal(goal);
+                  }}
+                  disabled={loading}
+                  aria-label={t('buttons.editAriaLabel')}
+                >
+                  <Edit size={14} />
+                </button>
+                <button
+                  className="btn btn-xs btn-ghost rounded-full text-error"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteGoal(goal.id);
+                  }}
+                  disabled={loading}
+                  aria-label={t('buttons.deleteAriaLabel')}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="flex justify-between text-sm mb-1.5">
+                <span className="text-gray-600">{formatRemainingTime(goal)}</span>
+                <span className="font-medium">{calculateProgress(goal)}%</span>
+              </div>
+              <progress
+                className="progress progress-info w-full"
+                value={calculateProgress(goal)}
+                max="100"
+              ></progress>
+            </div>
           </div>
+        ))}
+      </div>
+    </>
+  )}
+</div>
         )}
 
 {/* Modal de création d'objectif */}
