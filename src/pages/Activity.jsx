@@ -141,20 +141,22 @@ function Activity() {
         
         // Récupérer les sessions avec les informations sur les objectifs associés
         const { data: sessionsData, error: sessionsError } = await supabase
-          .from('study_sessions')
-          .select(`
-            id,
-            duration,
-            created_at,
-            goal_id,
-            goals (
-              id,
-              name,
-              color
-            )
-          `)
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+  .from('study_sessions')
+  .select(`
+    id,
+    duration,
+    created_at,
+    goal_id,
+    goals (
+      id,
+      name,
+      color
+    )
+  `)
+  .eq('user_id', user.id)
+  .order('created_at', { ascending: false })
+  .limit(15); // Limiter à 15 sessions maximum
+
         
         if (sessionsError) {
           throw sessionsError;
@@ -750,50 +752,50 @@ function Activity() {
             )}
             
             {!loading && sessions.length > 0 && (
-              <div className="overflow-x-auto">
-                <table className="table table-zebra w-full">
-                  <thead>
-                    <tr>
-                      <th>{t('activity.table.date')}</th>
-                      <th>{t('activity.table.goal')}</th>
-                      <th>{t('activity.table.duration')}</th>
-                      <th>{t('activity.table.actions')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sessions.map(session => (
-                      <tr key={session.id}>
-                        <td>{formatDateTime(session.created_at)}</td>
-                        <td>
-                          <div className="flex items-center gap-2">
-                            {session.goals && (
-                              <>
-                                <div 
-                                  className="w-3 h-3 rounded-full" 
-                                  style={{ backgroundColor: session.goals.color || 'hsl(var(--p))' }}
-                                ></div>
-                                <span>{session.goals.name}</span>
-                              </>
-                            )}
-                            {!session.goals && <span className="text-opacity-50">{t('activity.labels.deletedGoal')}</span>}
-                          </div>
-                        </td>
-                        <td>{formatDuration(session.duration)}</td>
-                        <td>
-                          <button 
-                            className="btn btn-sm btn-ghost text-error" 
-                            onClick={() => prepareDeleteSession(session)}
-                            aria-label={t('activity.ariaLabels.deleteSession')}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+  <div className="overflow-y-auto max-h-[400px] scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
+    <table className="table table-zebra w-full">
+      <thead className="sticky top-0 bg-base-100 z-10">
+        <tr>
+          <th>{t('activity.table.date')}</th>
+          <th>{t('activity.table.goal')}</th>
+          <th>{t('activity.table.duration')}</th>
+          <th>{t('activity.table.actions')}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sessions.map(session => (
+          <tr key={session.id}>
+            <td>{formatDateTime(session.created_at)}</td>
+            <td>
+              <div className="flex items-center gap-2">
+                {session.goals && (
+                  <>
+                    <div 
+                      className="w-3 h-3 rounded-full" 
+                      style={{ backgroundColor: session.goals.color || 'hsl(var(--p))' }}
+                    ></div>
+                    <span>{session.goals.name}</span>
+                  </>
+                )}
+                {!session.goals && <span className="text-opacity-50">{t('activity.labels.deletedGoal')}</span>}
               </div>
-            )}
+            </td>
+            <td>{formatDuration(session.duration)}</td>
+            <td>
+              <button 
+                className="btn btn-sm btn-ghost text-error" 
+                onClick={() => prepareDeleteSession(session)}
+                aria-label={t('activity.ariaLabels.deleteSession')}
+              >
+                <Trash2 size={16} />
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
           </div>
         </div>
       </div>
