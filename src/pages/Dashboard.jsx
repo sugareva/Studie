@@ -278,6 +278,7 @@ const updateDailyProgress = (goalId, duration) => {
               refreshTrigger={refreshTrigger}
               currentDay={getCurrentDayName()}
               ignoreDate={ignoreDate}
+              selectedDate={currentDate}
             />
           </div>
           <div className="md:col-span-1">

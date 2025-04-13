@@ -85,44 +85,51 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
     setIsMenuOpen(!isMenuOpen);
   };
 
+  // Fonction pour vérifier si le chemin actuel correspond à la page dashboard
+  const isDashboardActive = () => {
+    return location.pathname === '/' || location.pathname === '/dashboard';
+  };
+
   return (
     <div className="w-full flex justify-center">
       <div className="navbar bg-base-100 rounded-box mb-4 max-w-[90%] sm:max-w-[80%] w-full">
         <div className="flex flex-1">
-          <a className="px-4 text-2xl app-title">Studie</a>
+          {/* Lien vers dashboard depuis le titre de l'application */}
+          <Link to="/dashboard" className="px-4 text-2xl app-title hover:opacity-80 transition-opacity">
+            Studie
+          </Link>
           
           {/* Navigation links - visible sur desktop, caché sur mobile */}
           <div className="hidden sm:flex gap-2">
-  <Link
-    to="/dashboard"
-    className={`tab ${location.pathname === '/' ? 'tab-active' : ''}`}
-  >
-    <Grid size={16} className="mr-1" />
-    {t('navbar.links.dashboard')}
-  </Link>
-  
-  <Link
-    to="/activity"
-    className={`tab ${location.pathname === '/activity' ? 'tab-active' : ''}`}
-  >
-    <BarChart2 size={16} className="mr-1" />
-    {t('navbar.links.activity')}
-  </Link>
-  
-  {/* Toujours afficher le lien Roadmap, mais le désactiver si nécessaire */}
-  <Link
-    to="/roadmap"
-    className={`tab ${location.pathname === '/roadmap' ? 'tab-active' : ''} ${!userSettings?.learning_language ? 'opacity-50 pointer-events-none' : ''}`}
-  >
-    <Map size={16} className="mr-1" />
-    {t('roadmap.title')}
-  </Link>
-</div>
+            <Link
+              to="/dashboard"
+              className={`tab ${isDashboardActive() ? 'tab-active' : ''}`}
+            >
+              <Grid size={16} className="mr-1" />
+              {t('navbar.links.dashboard')}
+            </Link>
+            
+            <Link
+              to="/activity"
+              className={`tab ${location.pathname === '/activity' ? 'tab-active' : ''}`}
+            >
+              <BarChart2 size={16} className="mr-1" />
+              {t('navbar.links.activity')}
+            </Link>
+            
+            {/* Toujours afficher le lien Roadmap, mais le désactiver si nécessaire */}
+            <Link
+              to="/roadmap"
+              className={`tab ${location.pathname === '/roadmap' ? 'tab-active' : ''} ${!userSettings?.learning_language ? 'opacity-50 pointer-events-none' : ''}`}
+            >
+              <Map size={16} className="mr-1" />
+              {t('roadmap.title')}
+            </Link>
+          </div>
         </div>
         
         {/* Actions Desktop - visible sur desktop, caché sur mobile */}
         <div className="flex-none hidden sm:flex items-center gap-3">
-
           
           {/* Bouton pour basculer entre les thèmes */}
           <button 
@@ -185,7 +192,7 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
           <div className="max-w-[80%] w-full mx-auto bg-base-100 shadow-lg rounded-box p-4 flex flex-col gap-4">
             <Link 
               to="/dashboard" 
-              className={`btn justify-start ${location.pathname === '/' ? 'btn-soft btn-secondary' : 'btn-ghost'}`}
+              className={`btn justify-start ${isDashboardActive() ? 'btn-soft btn-secondary' : 'btn-ghost'}`}
               onClick={() => setIsMenuOpen(false)}
             >
               <Grid size={16} className="mr-2" />
@@ -200,18 +207,15 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
               {t('navbar.links.activity')}
             </Link>
             <Link 
-  to="/roadmap" 
-  className={`btn justify-start ${location.pathname === '/roadmap' ? 'btn-soft btn-secondary' : 'btn-ghost'} ${!userSettings?.learning_language ? 'opacity-50 pointer-events-none' : ''}`}
-  onClick={() => setIsMenuOpen(false)}
->
-  <Map size={16} className="mr-2" />
-  {t('roadmap.title')}
-</Link>
-            
+              to="/roadmap" 
+              className={`btn justify-start ${location.pathname === '/roadmap' ? 'btn-soft btn-secondary' : 'btn-ghost'} ${!userSettings?.learning_language ? 'opacity-50 pointer-events-none' : ''}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Map size={16} className="mr-2" />
+              {t('roadmap.title')}
+            </Link>
             
             <div className="divider"></div>
-            
-
             
             {/* Bouton pour basculer entre les thèmes */}
             <button 

@@ -6,7 +6,46 @@ import UserOptionsModal from '../components/UserOptionsModal';
 import { supabase } from '../lib/supabase';
 import { useTranslation } from 'react-i18next';
 
-// Nous gardons les mêmes composants avec une UI améliorée
+
+const InfoModal = ({ isOpen, onClose, language }) => {
+  const { t } = useTranslation();
+  
+  if (!isOpen) return null;
+  
+  const handleBackdropClick = (e) => {
+    // Ferme la modale uniquement si on clique sur le fond et non sur le contenu
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+  
+  return (
+    <div 
+      className="fixed inset-0 bg-black/50 z-[1000] flex items-center justify-center p-4"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-base-100 rounded-xl w-full max-w-md shadow-xl">
+        <div className="p-4 border-b flex justify-between items-center">
+          <h2 className="text-xl font-bold text-primary">{t('roadmap.infoTitle')}</h2>
+          <button 
+            onClick={(e) => {
+              e.stopPropagation(); // Empêche la propagation du clic vers le parent
+              onClose();
+            }} 
+            className="btn btn-sm btn-circle"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <div className="p-6">
+          <p className="mb-4 text-sm">{t('roadmap.infoDesc', { language })}</p>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{t('roadmap.infoText')}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const SkillCard = ({ skill, onToggle, isCompleted, isDisabled = false }) => {
   const { id, title, hours } = skill;
 
@@ -215,9 +254,10 @@ const LevelDetailView = ({ level, completedSkills, onToggleSkill, isDisabled, on
 
 
 
-const ProgressSummary = ({ levels, completedSkills, onShowRemaining, currentLanguageName }) => {
+const ProgressSummary = ({ levels, completedSkills, onShowRemaining, currentLanguageName, onInfoClick }) => {
   const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false); // Ajoutez cette ligne
   
   // Détecter si on est sur mobile pour désactiver le bouton sur desktop
 // Correction de la fonction de nettoyage dans useEffect pour éviter une fuite de mémoire
@@ -291,9 +331,18 @@ useEffect(() => {
     <div className="bg-base-200 rounded-2xl border border-base-300 p-6 h-full">
       <div className="flex flex-col items-center text-center mb-6">
         {/* Badge de langue */}
-        <div className="badge badge-primary gap-2 mb-4">
-          <Globe size={14} />
-          {currentLanguageName}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="badge badge-primary gap-2">
+            <Globe size={14} />
+            {currentLanguageName}
+          </div>
+          <button 
+            className="btn btn-circle btn-xs btn-ghost text-primary"
+            onClick={onInfoClick}
+            aria-label="Informations"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </button>
         </div>
         
         <div className="relative mb-4">
@@ -324,6 +373,7 @@ useEffect(() => {
           style={{ width: `${totalProgressPercent}%` }}
         ></div>
       </div>
+      
       
       <div className="space-y-3">
         <div className="bg-base-100 rounded-xl p-4 border border-base-200">
@@ -547,11 +597,26 @@ useEffect(() => {
   };
 
   // Composant d'alerte pour l'information explicative
-const InfoAlert = ({ language, onClose }) => {
-  const { t } = useTranslation();
-  
-  
-};
+  const InfoAlert = ({ language, onClose }) => {
+    const { t } = useTranslation();
+    
+    return (
+      <div className="alert alert-info shadow-lg mb-6 animate-fadeIn">
+        <div className="flex justify-between w-full">
+          <div className="flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current flex-shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div className="ml-2">
+              <h3 className="font-bold">{t('roadmap.infoTitle')}</h3>
+              <div className="text-sm">{t('roadmap.infoDesc', { language: language })}</div>
+            </div>
+          </div>
+          <button onClick={onClose} className="btn btn-sm btn-circle btn-ghost">
+            <X size={20} />
+          </button>
+        </div>
+      </div>
+    );
+  };
 // Page principale Roadmap redesignée
 const RoadmapPage = () => {
   const [showRemainingModal, setShowRemainingModal] = useState(false);
@@ -563,7 +628,7 @@ const RoadmapPage = () => {
   const [errorLoading, setErrorLoading] = useState(null);
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [mobileView, setMobileView] = useState("progress");
-  const [showInfoAlert, setShowInfoAlert] = useState(true);
+  const [showInfoModal, setShowInfoModal] = useState(false);
   
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
@@ -963,7 +1028,7 @@ const RoadmapPage = () => {
   }, [a1Data, a2Data, b1Data, b2Data, c1Data, isLevelCompleted]);
 
   // Trouver le nom complet de la langue sélectionnée
-  const currentLanguageName = languages.find(lang => lang.id === selectedLanguage)?.name || selectedLanguage;
+  const currentLanguageName = t(`roadmap.language.${selectedLanguage}`) || selectedLanguage;
 
   const levels = [
     { id: 'a1', title: 'A1', data: a1Data },
@@ -1004,14 +1069,7 @@ const RoadmapPage = () => {
   
       <div className="container mx-auto px-4 py-6 flex-1">
         {/* En-tête avec information sur la langue */}
-        
-        {/* Alerte informative qu'on peut fermer */}
-        {showInfoAlert && (
-          <InfoAlert 
-            language={currentLanguageName} 
-            onClose={() => setShowInfoAlert(false)} 
-          />
-        )}
+
   
         {/* Layout responsive */}
         <div className="h-full">
@@ -1024,6 +1082,7 @@ const RoadmapPage = () => {
   completedSkills={completedSkills} 
   onShowRemaining={() => setMobileView("levels")}
   currentLanguageName={currentLanguageName}
+  onInfoClick={() => setShowInfoModal(true)}
 />
               </div>
             ) : (
@@ -1071,6 +1130,7 @@ const RoadmapPage = () => {
   completedSkills={completedSkills} 
   onShowRemaining={() => {}}
   currentLanguageName={currentLanguageName}
+  onInfoClick={() => setShowInfoModal(true)}
 />
               </div>
             </div>
@@ -1131,6 +1191,11 @@ const RoadmapPage = () => {
         user={user}
         onUpdateSettings={handleUpdateSettings}
         onSignOut={signOut}
+      />
+      <InfoModal 
+        isOpen={showInfoModal} 
+        onClose={() => setShowInfoModal(false)} 
+        language={currentLanguageName}
       />
     </div>
   );

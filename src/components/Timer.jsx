@@ -1,16 +1,26 @@
 // src/components/Timer.jsx
-import { useState, useEffect } from 'react';
-import { Play, Coffee, Pause, RotateCcw, Clock, StopCircle, Maximize, Minimize, Volume2, VolumeX } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Play, Coffee, Pause, RotateCcw, Clock, StopCircle, Maximize, Minimize, Volume2, VolumeX, Settings, ChevronDown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
 const TIMER_STORAGE_KEY = 'STUDY_APP_TIMER_STATE';
 const DAILY_PROGRESS_KEY = 'DAILY_PROGRESS';
+const POMODORO_SETTINGS_KEY = 'POMODORO_SETTINGS';
+const ORIGINAL_TITLE = 'Studie'; // Titre par défaut de l'application
 // URL de la chaîne lofi girl par défaut
 const DEFAULT_LOFI_URL = 'https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1';
 // Thumbnail de la vidéo lofi girl
 const LOFI_THUMBNAIL = 'https://i.ytimg.com/vi/jfKfPfyJRdk/maxresdefault.jpg';
+
+// Valeurs par défaut pour le Pomodoro
+const DEFAULT_POMODORO_SETTINGS = {
+  focusTime: 25 * 60, // 25 minutes par défaut
+  breakTime: 5 * 60,   // 5 minutes par défaut
+  longBreakTime: 15 * 60, // 15 minutes par défaut
+  longBreakInterval: 4    // Long break tous les 4 pomodoros
+};
 
 const Timer = ({ selectedGoal, onTimerStop }) => {
   const { t } = useTranslation();
@@ -21,13 +31,19 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showYouTube, setShowYouTube] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [showPomodoroSettings, setShowPomodoroSettings] = useState(false);
+  const [pomodoroSettings, setPomodoroSettings] = useState(() => {
+    try {
+      const storedSettings = localStorage.getItem(POMODORO_SETTINGS_KEY);
+      return storedSettings ? JSON.parse(storedSettings) : DEFAULT_POMODORO_SETTINGS;
+    } catch (error) {
+      return DEFAULT_POMODORO_SETTINGS;
+    }
+  });
+  const [pomodoroCount, setPomodoroCount] = useState(0);
   
   const { user } = useAuth();
   
-  // Paramètres Pomodoro
-  const pomodoroFocusTime = 25 * 60; // 25 minutes
-  const pomodoroBreakTime = 5 * 60; // 5 minutes
-
   // Récupérer la date actuelle au format YYYY-MM-DD
   const getTodayDate = () => {
     return new Date().toISOString().split('T')[0];
@@ -55,6 +71,15 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
     }
   };
 
+  // Enregistrer les paramètres du pomodoro dans le localStorage
+  const savePomodoroSettings = (settings) => {
+    try {
+      localStorage.setItem(POMODORO_SETTINGS_KEY, JSON.stringify(settings));
+    } catch (error) {
+      console.error('Error saving pomodoro settings', error);
+    }
+  };
+
   // Fonction pour jouer le son de notification
   const playNotificationSound = () => {
     try {
@@ -63,6 +88,35 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
       notification.play().catch(e => console.log(t('timer.audioPlayFailed'), e));
     } catch (e) {
       console.log(t('timer.audioPlayFailed'), e);
+    }
+  };
+  
+  // Fonction pour mettre à jour le titre de l'onglet
+  const updatePageTitle = (time = null) => {
+    if (!isRunning) {
+      document.title = ORIGINAL_TITLE;
+      return;
+    }
+
+    if (time !== null) {
+      // Format HH:MM:SS pour le titre
+      const hours = Math.floor(time / 3600);
+      const minutes = Math.floor((time % 3600) / 60);
+      const seconds = time % 60;
+      
+      // Afficher uniquement HH:MM si heures > 0, sinon MM:SS
+      let timeStr;
+      if (hours > 0) {
+        timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      } else {
+        timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }
+
+      // Afficher le temps dans le titre avec le nom de l'application
+      document.title = `${timeStr} - ${ORIGINAL_TITLE}`;
+    } else {
+      // Titre simple quand on n'affiche pas le temps
+      document.title = `${ORIGINAL_TITLE} - ${t('timer.running')}`;
     }
   };
   
@@ -76,18 +130,78 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
       setPomodoroSession(storedState.pomodoroSession);
       setShowYouTube(storedState.showYouTube || false);
       setIsMuted(storedState.isMuted || false);
+      setPomodoroCount(storedState.pomodoroCount || 0);
       
       // Si le timer était en cours, calculer le temps écoulé
       if (storedState.isRunning) {
         const elapsedSinceSave = Math.floor((Date.now() - storedState.timestamp) / 1000);
-        setDisplayTime(storedState.elapsedTime + elapsedSinceSave);
+        const totalElapsed = storedState.elapsedTime + elapsedSinceSave;
+        setDisplayTime(totalElapsed);
+        
+        // Mettre à jour le titre de l'onglet
+        updatePageTitle(totalElapsed);
       } else {
         setDisplayTime(storedState.elapsedTime);
+        updatePageTitle(null);
       }
     } else {
       resetTimer();
     }
+    
+    // Restaurer le titre original quand le composant est démonté
+    return () => {
+      document.title = ORIGINAL_TITLE;
+    };
   }, [selectedGoal]);
+  
+  // Calculer la durée totale d'un cycle Pomodoro
+  const getTotalPomodoroTime = () => {
+    const { focusTime, breakTime, longBreakTime, longBreakInterval } = pomodoroSettings;
+    // Un cycle complet est: (focus + break) * (longBreakInterval - 1) + focus + longBreak
+    return (focusTime + breakTime) * (longBreakInterval - 1) + focusTime + longBreakTime;
+  };
+  
+  // Calculer le temps écoulé dans le cycle Pomodoro actuel
+  const getCurrentSessionElapsedTime = (totalTimeInSeconds) => {
+    const { focusTime, breakTime, longBreakTime, longBreakInterval } = pomodoroSettings;
+    const cycleDuration = getTotalPomodoroTime();
+    
+    // Obtenir le temps dans le cycle actuel (modulo la durée totale du cycle)
+    const timeInCurrentCycle = totalTimeInSeconds % cycleDuration;
+    
+    // Calculer le nombre de sessions complètes dans le cycle actuel
+    let timeSum = 0;
+    let currentSession = 'focus';
+    let completedSessions = 0;
+    
+    for (let i = 0; i < longBreakInterval * 2; i++) {
+      const isEven = i % 2 === 0;
+      const isLastBreak = i === longBreakInterval * 2 - 1;
+      
+      // Durée de la session actuelle
+      const sessionDuration = isEven 
+        ? focusTime 
+        : (isLastBreak ? longBreakTime : breakTime);
+      
+      // Si l'ajout de cette session dépasse le temps écoulé, nous sommes dans cette session
+      if (timeSum + sessionDuration > timeInCurrentCycle) {
+        return {
+          sessionType: isEven ? 'focus' : (isLastBreak ? 'longBreak' : 'break'),
+          elapsedInSession: timeInCurrentCycle - timeSum,
+          completedPomodoros: Math.floor(completedSessions)
+        };
+      }
+      
+      // Sinon, ajouter cette session et continuer
+      timeSum += sessionDuration;
+      if (isEven) {
+        completedSessions += 0.5; // Chaque focus complété compte comme 0.5
+      }
+    }
+    
+    // Par défaut, retourner le début d'un cycle
+    return { sessionType: 'focus', elapsedInSession: 0, completedPomodoros: 0 };
+  };
   
   // Mettre à jour le timer à intervalles réguliers
   useEffect(() => {
@@ -106,7 +220,8 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
           isPomodoroMode,
           pomodoroSession,
           showYouTube,
-          isMuted
+          isMuted,
+          pomodoroCount
         });
       }
       
@@ -121,42 +236,42 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
           
           setDisplayTime(totalElapsed);
           
+          // Mettre à jour le titre de l'onglet avec le temps actuel
+          updatePageTitle(totalElapsed);
+          
           // Gestion du mode pomodoro
           if (isPomodoroMode) {
-            const currentSession = pomodoroSession;
-            const sessionDuration = currentSession === 'focus' ? pomodoroFocusTime : pomodoroBreakTime;
-            const sessionElapsed = totalElapsed % (pomodoroFocusTime + pomodoroBreakTime);
+            const { focusTime, breakTime, longBreakTime, longBreakInterval } = pomodoroSettings;
+            const { sessionType, elapsedInSession, completedPomodoros } = getCurrentSessionElapsedTime(totalElapsed);
             
-            if (currentSession === 'focus' && sessionElapsed >= pomodoroFocusTime) {
-              // Transition de focus à pause
-              setPomodoroSession('break');
-              // Jouer le son de notification pour la transition vers la pause
+            // Mettre à jour le compteur de pomodoros
+            if (completedPomodoros !== pomodoroCount) {
+              setPomodoroCount(completedPomodoros);
+            }
+            
+            // Détecter les changements de session
+            if (sessionType !== pomodoroSession) {
+              // Transition vers une nouvelle session
+              setPomodoroSession(sessionType);
+              
+              // Jouer le son de notification pour la transition
               playNotificationSound();
               
               // Mettre à jour l'état stocké
               saveTimerState({
                 ...currentState,
-                pomodoroSession: 'break',
+                pomodoroSession: sessionType,
                 timestamp: now,
-                elapsedTime: totalElapsed
-              });
-            } else if (currentSession === 'break' && sessionElapsed < pomodoroFocusTime) {
-              // Transition de pause à focus
-              setPomodoroSession('focus');
-              // Jouer le son de notification pour la transition vers le focus
-              playNotificationSound();
-              
-              // Mettre à jour l'état stocké
-              saveTimerState({
-                ...currentState,
-                pomodoroSession: 'focus',
-                timestamp: now,
-                elapsedTime: totalElapsed
+                elapsedTime: totalElapsed,
+                pomodoroCount: completedPomodoros
               });
             }
           }
         }
       }, 1000);
+    } else {
+      // Réinitialiser le titre quand le timer n'est pas en cours
+      updatePageTitle(null);
     }
     
     return () => {
@@ -164,7 +279,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
         clearInterval(intervalId);
       }
     };
-  }, [isRunning, isPomodoroMode, pomodoroSession, selectedGoal, t]);
+  }, [isRunning, isPomodoroMode, pomodoroSession, selectedGoal, t, pomodoroCount, pomodoroSettings]);
   
   // Vérifier si nous devons mettre à jour l'état quand la page devient visible
   useEffect(() => {
@@ -174,12 +289,18 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
         
         if (storedState && storedState.isRunning) {
           const elapsedSinceSave = Math.floor((Date.now() - storedState.timestamp) / 1000);
-          setDisplayTime(storedState.elapsedTime + elapsedSinceSave);
+          const totalElapsed = storedState.elapsedTime + elapsedSinceSave;
+          
+          setDisplayTime(totalElapsed);
           setIsRunning(true);
           setIsPomodoroMode(storedState.isPomodoroMode);
           setPomodoroSession(storedState.pomodoroSession);
           setShowYouTube(storedState.showYouTube || false);
           setIsMuted(storedState.isMuted || false);
+          setPomodoroCount(storedState.pomodoroCount || 0);
+          
+          // Mettre à jour le titre lorsque la page redevient visible
+          updatePageTitle(totalElapsed);
         }
       }
     };
@@ -200,6 +321,9 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
     
     setIsRunning(true);
     
+    // Mettre à jour le titre lors du démarrage
+    updatePageTitle(displayTime);
+    
     // Enregistrer l'état initial
     saveTimerState({
       isRunning: true,
@@ -209,12 +333,16 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
       isPomodoroMode,
       pomodoroSession,
       showYouTube,
-      isMuted
+      isMuted,
+      pomodoroCount
     });
   };
   
   const pauseTimer = () => {
     setIsRunning(false);
+    
+    // Réinitialiser le titre lors de la pause
+    document.title = ORIGINAL_TITLE;
     
     const storedState = getTimerState();
     
@@ -239,6 +367,10 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
     setIsRunning(false);
     setDisplayTime(0);
     setPomodoroSession('focus');
+    setPomodoroCount(0);
+    
+    // Réinitialiser le titre
+    document.title = ORIGINAL_TITLE;
     
     // Effacer l'état du timer
     localStorage.removeItem(TIMER_STORAGE_KEY);
@@ -314,6 +446,42 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
   const togglePomodoroMode = () => {
     setIsPomodoroMode(!isPomodoroMode);
     resetTimer();
+  };
+
+  const togglePomodoroSettings = () => {
+    setShowPomodoroSettings(!showPomodoroSettings);
+  };
+
+  const handlePomodoroSettingChange = (setting, value) => {
+    // Assurer que la valeur est un nombre et convertir en secondes
+    const numValue = parseInt(value, 10) * 60;
+    
+    if (!isNaN(numValue) && numValue > 0) {
+      const newSettings = { ...pomodoroSettings, [setting]: numValue };
+      setPomodoroSettings(newSettings);
+      savePomodoroSettings(newSettings);
+      
+      // Réinitialiser le timer si nécessaire
+      if (isRunning && isPomodoroMode) {
+        resetTimer();
+      }
+    }
+  };
+
+  const handleLongBreakIntervalChange = (value) => {
+    // Assurer que la valeur est un nombre
+    const numValue = parseInt(value, 10);
+    
+    if (!isNaN(numValue) && numValue > 0) {
+      const newSettings = { ...pomodoroSettings, longBreakInterval: numValue };
+      setPomodoroSettings(newSettings);
+      savePomodoroSettings(newSettings);
+      
+      // Réinitialiser le timer si nécessaire
+      if (isRunning && isPomodoroMode) {
+        resetTimer();
+      }
+    }
   };
   
   const toggleFullscreen = () => {
@@ -408,13 +576,23 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
     return Math.min(100, Math.round((todayProgress / totalDuration) * 100));
   };
   
-  // Calcul du temps restant en mode pomodoro
+  // Calcul du temps restant dans la session pomodoro actuelle
   const calculatePomodoroRemaining = () => {
     if (!isPomodoroMode) return '00:00';
     
-    const sessionDuration = pomodoroSession === 'focus' ? pomodoroFocusTime : pomodoroBreakTime;
-    const sessionElapsed = displayTime % (pomodoroFocusTime + pomodoroBreakTime);
-    const sessionRemaining = sessionDuration - (sessionElapsed % sessionDuration);
+    const { focusTime, breakTime, longBreakTime } = pomodoroSettings;
+    const { sessionType, elapsedInSession } = getCurrentSessionElapsedTime(displayTime);
+    
+    let sessionDuration;
+    if (sessionType === 'focus') {
+      sessionDuration = focusTime;
+    } else if (sessionType === 'break') {
+      sessionDuration = breakTime;
+    } else {
+      sessionDuration = longBreakTime;
+    }
+    
+    const sessionRemaining = Math.max(0, sessionDuration - elapsedInSession);
     
     const minutes = Math.floor(sessionRemaining / 60);
     const seconds = sessionRemaining % 60;
@@ -427,6 +605,17 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
     const baseUrl = DEFAULT_LOFI_URL;
     const muteParam = isMuted ? '&mute=1' : '';
     return `${baseUrl}${muteParam}`;
+  };
+
+  // Obtenir le libellé de la session Pomodoro actuelle
+  const getPomodoroSessionLabel = () => {
+    if (pomodoroSession === 'focus') {
+      return t('timer.focus');
+    } else if (pomodoroSession === 'break') {
+      return t('timer.break');
+    } else {
+      return t('timer.longBreak');
+    }
   };
 
   // Rendu du composant en mode plein écran
@@ -458,15 +647,18 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
         )}
         
         <div className="flex flex-col items-center">
-          <div className="text-6xl font-bold mb-8">
+          <div className="text-6xl font-bold mb-4">
             {formatTime(displayTime)}
           </div>
           
           {isPomodoroMode && (
-            <div className="text-lg md:text-xl mb-6">
-              {pomodoroSession === 'focus' 
-                ? t('timer.remainingBeforeBreak', { time: calculatePomodoroRemaining() })
-                : t('timer.remainingBeforeResume', { time: calculatePomodoroRemaining() })}
+            <div className="flex flex-col items-center mb-6 gap-2">
+              <div className="badge badge-lg badge-primary mb-2">
+                {getPomodoroSessionLabel()} {pomodoroCount > 0 && `(${Math.floor(pomodoroCount)}/${pomodoroSettings.longBreakInterval})`}
+              </div>
+              <div className="text-lg md:text-xl">
+                {t('timer.remainingInSession', { time: calculatePomodoroRemaining() })}
+              </div>
             </div>
           )}
           
@@ -574,18 +766,86 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
       <div className="card-body h-full flex flex-col">
         <h2 className="card-title text-lg flex justify-between items-center">
           <span>{t('timer.title')}</span>
-          <div className="form-control">
-            <label className="label cursor-pointer gap-2">
-            <Coffee size={14} /><span className="label-text text-xs"> {t('timer.pomodoro')}</span>
-              <input
-                type="checkbox"
-                className="toggle toggle-secondary toggle-sm"
-                checked={isPomodoroMode}
-                onChange={togglePomodoroMode}
-              />
-            </label>
+          <div className="flex items-center gap-2">
+            <div className="form-control">
+              <label className="label cursor-pointer gap-2">
+                <span className="label-text text-xs">{t('timer.pomodoro')}</span>
+                <input
+                  type="checkbox"
+                  className="toggle toggle-secondary toggle-sm"
+                  checked={isPomodoroMode}
+                  onChange={togglePomodoroMode}
+                />
+              </label>
+            </div>
+            {isPomodoroMode && (
+              <button 
+                className="btn btn-ghost btn-circle btn-xs"
+                onClick={togglePomodoroSettings}
+                aria-label={t('timer.pomodoroSettings')}
+              >
+                <Settings size={16} />
+              </button>
+            )}
           </div>
         </h2>
+
+        {/* Panneau de paramétrage du Pomodoro */}
+        {isPomodoroMode && showPomodoroSettings && (
+          <div className="bg-base-200 rounded-lg p-3 mb-3 animate-fadeIn">
+            <h3 className="font-medium text-sm mb-2">{t('timer.pomodoroSettings')}</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="form-control w-full">
+                <label className="label py-0">
+                  <span className="label-text text-xs">{t('timer.focusTime')} (min)</span>
+                </label>
+                <input 
+                  type="number" 
+                  className="input input-sm input-bordered w-full" 
+                  value={pomodoroSettings.focusTime / 60}
+                  min="1"
+                  onChange={(e) => handlePomodoroSettingChange('focusTime', e.target.value)}
+                />
+              </div>
+              <div className="form-control w-full">
+                <label className="label py-0">
+                  <span className="label-text text-xs">{t('timer.breakTime')} (min)</span>
+                </label>
+                <input 
+                  type="number" 
+                  className="input input-sm input-bordered w-full" 
+                  value={pomodoroSettings.breakTime / 60}
+                  min="1"
+                  onChange={(e) => handlePomodoroSettingChange('breakTime', e.target.value)}
+                />
+              </div>
+              <div className="form-control w-full">
+                <label className="label py-0">
+                  <span className="label-text text-xs">{t('timer.longBreakTime')} (min)</span>
+                </label>
+                <input 
+                  type="number" 
+                  className="input input-sm input-bordered w-full" 
+                  value={pomodoroSettings.longBreakTime / 60}
+                  min="5"
+                  onChange={(e) => handlePomodoroSettingChange('longBreakTime', e.target.value)}
+                />
+              </div>
+              <div className="form-control w-full">
+                <label className="label py-0">
+                  <span className="label-text text-xs">{t('timer.longBreakInterval')}</span>
+                </label>
+                <input 
+                  type="number" 
+                  className="input input-sm input-bordered w-full" 
+                  value={pomodoroSettings.longBreakInterval}
+                  min="1"
+                  onChange={(e) => handleLongBreakIntervalChange(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Information sur l'objectif */}
         {selectedGoal ? (
@@ -617,19 +877,26 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
         <div className="grid place-items-center flex-grow">
           <div className="stats shadow">
             <div className="stat p-4">
-              <div className="stat-title text-sm">
-                {isPomodoroMode 
-                  ? (pomodoroSession === 'focus' ? t('timer.focus') : t('timer.break'))
-                  : t('timer.elapsedTime')}
+              <div className="stat-title text-sm flex items-center justify-between">
+                {isPomodoroMode ? (
+                  <div className="flex items-center gap-1">
+                    {getPomodoroSessionLabel()} 
+                    {pomodoroCount > 0 && (
+                      <span className="badge badge-xs badge-primary ml-1">
+                        {Math.floor(pomodoroCount)}/{pomodoroSettings.longBreakInterval}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  t('timer.elapsedTime')
+                )}
               </div>
               <div className={`stat-value text-3xl ${!selectedGoal ? 'text-gray-400' : ''}`}>
                 {formatTime(displayTime)}
               </div>
               {isPomodoroMode && (
                 <div className="stat-desc text-xs">
-                  {pomodoroSession === 'focus' 
-                    ? t('timer.remainingBeforeBreak', { time: calculatePomodoroRemaining() })
-                    : t('timer.remainingBeforeResume', { time: calculatePomodoroRemaining() })}
+                  {t('timer.remainingInSession', { time: calculatePomodoroRemaining() })}
                 </div>
               )}
             </div>

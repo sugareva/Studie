@@ -47,7 +47,7 @@ const Modal = ({ isOpen, onClose, children, title }) => {
 };
 
 
-const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, ignoreDate = false }) => {
+const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, ignoreDate = false, selectedDate = new Date()  }) => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [goals, setGoals] = useState([]);
@@ -97,12 +97,16 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
 
   
   // Fonction pour récupérer la progression quotidienne
-  const getDailyProgress = (goalId) => {
+  const getDailyProgress = (goalId, date = null) => {
     if (!goalId) return 0;
     
     try {
-      const today = getTodayDate();
-      const key = `${DAILY_PROGRESS_KEY}_${goalId}_${today}`;
+      // Utiliser la date fournie ou la date actuelle
+      const dateToUse = date ? new Date(date) : new Date();
+      const dateString = dateToUse.toISOString().split('T')[0];
+      
+      // Utiliser dateString au lieu de today pour construire la clé
+      const key = `${DAILY_PROGRESS_KEY}_${goalId}_${dateString}`;
       const storedProgress = localStorage.getItem(key);
       
       if (storedProgress) {
@@ -142,6 +146,14 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
       fetchGoals();
     }
   }, [user]); // Dépend seulement de user
+
+  useEffect(() => {
+    // Si des objectifs sont chargés, recalculer leurs progressions
+    if (goals.length > 0) {
+      // Forcer un rafraîchissement des composants
+      setGoals([...goals]);
+    }
+  }, [selectedDate]);
   
   // Effet séparé pour le rafraîchissement
   useEffect(() => {
@@ -389,7 +401,7 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
   const calculateProgress = (goal) => {
     if (!goal.duration) return 0;
     
-    const todayProgress = getDailyProgress(goal.id);
+    const todayProgress = getDailyProgress(goal.id, selectedDate);
     return Math.min(100, Math.round((todayProgress / goal.duration) * 100));
   };
   const scrollToCard = (index) => {
@@ -425,7 +437,7 @@ const filteredGoals = useMemo(() => {
     if (!goal) return '';
     
     const totalSeconds = goal.duration || 0;
-    const completedSeconds = getDailyProgress(goal.id);
+    const completedSeconds = getDailyProgress(goal.id, selectedDate);
     const remainingSeconds = totalSeconds - completedSeconds;
     
     if (remainingSeconds <= 0) return t('status.completed');
