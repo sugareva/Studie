@@ -4,7 +4,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Dashboard from './pages/Dashboard';
 import Activity from './pages/Activity';
 import Login from './pages/Login';
-import Roadmap from './pages/Roadmap';
 import HomePage from './pages/HomePage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import './i18n';
@@ -55,12 +54,7 @@ function App() {
             </PrivateRoute>
           } />
           
-          <Route path="/roadmap" element={
-            <PrivateRoute>
-              <Roadmap />
-            </PrivateRoute>
-          } />
-          
+
           {/* Route de réinitialisation de mot de passe */}
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           

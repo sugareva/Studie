@@ -5,13 +5,16 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 // Import des traductions
 import translationFR from './locales/fr/translation.json';
 import translationEN from './locales/en/translation.json';
+import roadmapTranslation from './locales/roadmapTranslation.json';
 
 const resources = {
   fr: {
-    translation: translationFR
+    translation: translationFR,
+    roadmap: roadmapTranslation // Ajouter comme namespace séparé
   },
   en: {
-    translation: translationEN
+    translation: translationEN,
+    roadmap: roadmapTranslation // Ajouter comme namespace séparé
   }
 };
 

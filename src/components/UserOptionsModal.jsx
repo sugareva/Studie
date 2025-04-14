@@ -532,48 +532,6 @@ const cancelLanguageChange = () => {
         
 
         
-        <fieldset className="w-full fieldset p-4 bg-base-100 border border-base-300 rounded-box w-64">
-          <legend className="fieldset-legend">{t('userOptions.labels.showTodoList')}</legend>
-          <label className="fieldset-label">
-          <input 
-      type="checkbox" 
-      className="toggle toggle-primary" 
-      checked={learningLanguage} 
-      onChange={(e) => handleLearningToggle(e.target.checked)}
-    />
-            {t('onboarding.steps.language.useLearning')}
-          </label>
-          {learningLanguage && (
-  <div className="form-control flex mb-4 gap-4">
-    <label className="label">
-      <span className="label-text">{t('roadmap.language.languageSelection')}</span>
-    </label>
-    <select 
-      className="select select-sm select-bordered" 
-      value={targetLanguage}
-      onChange={handleTargetLanguageChange}
-    >
-      {availableLanguages.map(lang => (
-        <option key={lang.id} value={lang.id}>{lang.name}</option>
-      ))}
-    </select>
-  </div>
-)}
-
-{/* Alerte d'avertissement pour le changement de langue */}
-{showLanguageWarning && (
-  <div className="alert alert-soft alert-warning mb-2">
-    <AlertTriangle size={16} />
-    <div>
-      
-      <h3 className="font-bold">{t('onboarding.steps.language.warningTitle')}</h3>
-      <div className="text-xs">{t('onboarding.steps.language.warningText')}</div>
-      
-    </div>
-  </div>
-)}
-        </fieldset>
-        
         <div className="flex justify-between mt-6">
           <button 
             className="btn btn-neutral flex items-center gap-2" 

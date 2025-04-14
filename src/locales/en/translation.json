@@ -744,7 +744,17 @@
       "c2_2_3": "Dialects and sociolects",
       "c2_3_1": "Total fluency",
       "c2_3_2": "Complex mediation",
-      "c2_3_3": "Finely adapt one's register"
+      "c2_3_3": "Finely adapt one's register",
+      "a1_1_5": "Articles and determiners",
+"a1_1_6": "Grammatical gender",
+"a1_3_5": "Basics of honorific system",
+"a1_3_6": "Basic particles",
+"a2_2_5": "Advanced articles and prepositions",
+"a2_2_6": "Gerund/Infinitive",
+"b1_2_5": "Specific politeness forms",
+"b1_2_6": "Logical connectors",
+"b2_2_4": "Intermediate idiomatic expressions",
+"b2_2_5": "Discourse structure"
     },
     "language": {
       "french": "French",
@@ -784,6 +794,12 @@
     "updatePassword": "Update your password"
   }
   
+  },
+  "skillDetail": {
+    "description": "Description",
+    "examples": "Examples",
+    "tips": "Tips",
+    "noDetailsAvailable": "No content available for that language"
   }
   
   

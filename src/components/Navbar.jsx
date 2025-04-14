@@ -117,14 +117,6 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
               {t('navbar.links.activity')}
             </Link>
             
-            {/* Toujours afficher le lien Roadmap, mais le désactiver si nécessaire */}
-            <Link
-              to="/roadmap"
-              className={`tab ${location.pathname === '/roadmap' ? 'tab-active' : ''} ${!userSettings?.learning_language ? 'opacity-50 pointer-events-none' : ''}`}
-            >
-              <Map size={16} className="mr-1" />
-              {t('roadmap.title')}
-            </Link>
           </div>
         </div>
         
@@ -206,14 +198,7 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
               <BarChart2 size={16} className="mr-2" />
               {t('navbar.links.activity')}
             </Link>
-            <Link 
-              to="/roadmap" 
-              className={`btn justify-start ${location.pathname === '/roadmap' ? 'btn-soft btn-secondary' : 'btn-ghost'} ${!userSettings?.learning_language ? 'opacity-50 pointer-events-none' : ''}`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <Map size={16} className="mr-2" />
-              {t('roadmap.title')}
-            </Link>
+            
             
             <div className="divider"></div>
             

@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Globe, X, ChevronRight, ChevronLeft, Award, Bar
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import UserOptionsModal from '../components/UserOptionsModal';
+import SkillDetailModal from '../components/SkillDetailModal';
 import { supabase } from '../lib/supabase';
 import { useTranslation } from 'react-i18next';
 
@@ -46,95 +47,135 @@ const InfoModal = ({ isOpen, onClose, language }) => {
   );
 };
 
-const SkillCard = ({ skill, onToggle, isCompleted, isDisabled = false }) => {
+const SkillCard = ({ skill, onToggle, isCompleted, isDisabled = false, onInfoClick }) => {
   const { id, title, hours } = skill;
+
+  
+    // Gestion séparée des clics avec failsafe
+    const handleInfoClick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Vérifier si la fonction existe avant de l'appeler
+      if (!isDisabled && typeof onInfoClick === 'function') {
+        onInfoClick(id, title);
+      } else {
+        console.warn(`Info click handler not available for skill ${id}`);
+        // Action alternative
+        alert(`Informations sur: ${title}`);
+      }
+    };
+  
+
+
+  const handleCheckboxChange = (e) => {
+    e.preventDefault(); // Important pour éviter les doubles déclenchements sur mobile
+    e.stopPropagation();
+    if (!isDisabled) {
+      onToggle(id);
+    }
+  };
 
   return (
     <div className={`border rounded-lg p-3 transition-all ${
       isCompleted ? 'bg-primary/10 border-primary' : 'bg-base-100 border-gray-200'
     } ${isDisabled ? 'opacity-70' : ''}`}>
       <div className="flex items-center justify-between">
-        <div className="flex-1">
+        <div 
+          className={`flex-1 ${!isDisabled ? 'cursor-pointer' : ''}`}
+          onClick={handleInfoClick}
+          role="button"
+          tabIndex={isDisabled ? -1 : 0}
+          aria-disabled={isDisabled}
+        >
           <h3 className="font-medium text-base-content">{title}</h3>
-          {hours && <p className="text-xs text-base-content ">{hours}</p>}
+          {hours && <p className="text-xs text-base-content">{hours}</p>}
         </div>
-        <label className={`${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+        
+        {/* Bouton de checkbox séparé avec une zone de clic plus grande */}
+        <div 
+          className={`p-2 -mr-2 ${isDisabled ? 'opacity-60' : ''}`}
+          onClick={handleCheckboxChange}
+          role="button"
+          tabIndex={isDisabled ? -1 : 0}
+          aria-disabled={isDisabled}
+        >
           <input
             type="checkbox"
-            className="checkbox checkbox-primary"
+            className="checkbox checkbox-primary pointer-events-none"
             checked={isCompleted}
-            onChange={() => onToggle(id)}
+            readOnly
             disabled={isDisabled}
           />
-        </label>
+        </div>
       </div>
     </div>
   );
 };
 
-const SectionCard = ({ section, completedSkills, onToggleSkill, isDisabled = false }) => {
-    const { id, title, skills } = section;
-    const [isOpen, setIsOpen] = useState(false);
+const SectionCard = ({ section, completedSkills, onToggleSkill, isDisabled = false, onSkillInfoClick }) => {
+  const { id, title, skills } = section;
+  const [isOpen, setIsOpen] = useState(false);
+
+  const totalSkills = skills.length;
+  const completedCount = skills.filter(skill =>
+    completedSkills.includes(skill.id)
+  ).length;
+
+  // Format fractionnel au lieu du pourcentage
+  const progressText = `${completedCount}/${totalSkills}`;
   
-    const totalSkills = skills.length;
-    const completedCount = skills.filter(skill =>
-      completedSkills.includes(skill.id)
-    ).length;
-  
-    // Format fractionnel au lieu du pourcentage
-    const progressText = `${completedCount}/${totalSkills}`;
-    
-    // On garde quand même le pourcentage pour la barre de progression
-    const progressPercent = totalSkills > 0
-      ? Math.round((completedCount / totalSkills) * 100)
-      : 0;
-  
-    return (
-      <div className={`bg-base-100 rounded-lg border border-base-300 p-4 mb-4 transition-all ${
-        isDisabled ? 'opacity-70' : ''
-      }`}>
-        <div className="mb-3">
-          <div className="flex justify-between items-center mb-2">
-            <button
-              className="flex items-center gap-2 text-lg font-semibold text-base-content hover:text-primary transition-colors"
-              onClick={() => setIsOpen(!isOpen)}
-              disabled={isDisabled}
-            >
-              <h2>{title}</h2>
-              {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-            </button>
-            <span className={`text-sm font-medium ${completedCount === totalSkills ? 'text-primary' : 'text-base-content'}`}>
-              {progressText}
-            </span>
-          </div>
-          <div className="w-full bg-base-200 rounded-full h-2.5">
-            <div
-              className={`${completedCount === totalSkills ? 'bg-primary' : 'bg-primary'} h-2.5 rounded-full transition-all duration-300`}
-              style={{ width: `${progressPercent}%` }}
-            ></div>
-          </div>
+  // On garde quand même le pourcentage pour la barre de progression
+  const progressPercent = totalSkills > 0
+    ? Math.round((completedCount / totalSkills) * 100)
+    : 0;
+
+  return (
+    <div className={`bg-base-100 rounded-lg border border-base-300 p-4 mb-4 transition-all ${
+      isDisabled ? 'opacity-70' : ''
+    }`}>
+      <div className="mb-3">
+        <div className="flex justify-between items-center mb-2">
+          <button
+            className="flex items-center gap-2 text-lg font-semibold text-base-content hover:text-primary transition-colors"
+            onClick={() => setIsOpen(!isOpen)}
+            disabled={isDisabled}
+          >
+            <h2>{title}</h2>
+            {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </button>
+          <span className={`text-sm font-medium ${completedCount === totalSkills ? 'text-primary' : 'text-base-content'}`}>
+            {progressText}
+          </span>
         </div>
-  
-        {/* Le reste du code reste identique */}
-        {isOpen && !isDisabled && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 transition-all duration-300">
-            {skills.map(skill => (
-              <SkillCard
-                key={skill.id}
-                skill={skill}
-                isCompleted={completedSkills.includes(skill.id)}
-                onToggle={onToggleSkill}
-                isDisabled={isDisabled}
-              />
-            ))}
-          </div>
-        )}
-        {isOpen && isDisabled && (
-           <p className="text-sm text-base-content italic mt-2">Complétez les niveaux précédents pour débloquer cette section.</p>
-        )}
+        <div className="w-full bg-base-200 rounded-full h-2.5">
+          <div
+            className={`${completedCount === totalSkills ? 'bg-primary' : 'bg-primary'} h-2.5 rounded-full transition-all duration-300`}
+            style={{ width: `${progressPercent}%` }}
+          ></div>
+        </div>
       </div>
-    );
-  };
+
+      {isOpen && !isDisabled && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 transition-all duration-300">
+          {skills.map(skill => (
+            <SkillCard
+              key={skill.id}
+              skill={skill}
+              isCompleted={completedSkills.includes(skill.id)}
+              onToggle={onToggleSkill}
+              isDisabled={isDisabled}
+              onInfoClick={onSkillInfoClick}
+            />
+          ))}
+        </div>
+      )}
+      {isOpen && isDisabled && (
+         <p className="text-sm text-base-content italic mt-2">Complétez les niveaux précédents pour débloquer cette section.</p>
+      )}
+    </div>
+  );
+};
 
 // Composant de carte de niveau miniature (pour la grille)
 const LevelCardMini = ({ level, completedSkills, isDisabled, onClick, isSelected }) => {
@@ -187,68 +228,69 @@ const LevelCardMini = ({ level, completedSkills, isDisabled, onClick, isSelected
 };
 
 // Composant détaillé de niveau (affiché après clic)
-const LevelDetailView = ({ level, completedSkills, onToggleSkill, isDisabled, onClose }) => {
-    const { title, timeInfo, sections } = level;
-    
-    // Calcul de la progression globale
-    const allSkills = sections.flatMap(section => section.skills);
-    const totalSkills = allSkills.length;
-    const completedCount = allSkills.filter(skill => completedSkills.includes(skill.id)).length;
-    const progressPercent = totalSkills > 0 ? Math.round((completedCount / totalSkills) * 100) : 0;
-    
-    const { t } = useTranslation();
-    
-    return (
-      <div className="bg-primary/10 rounded-2xl p-6">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-primary-content">{title}</h1>
-            {timeInfo && <p className="text-sm text-primary-content">{timeInfo}</p>}
-          </div>
-          <button onClick={onClose} className="btn btn-circle btn-sm btn-ghost">
-            <X size={20} />
-          </button>
+const LevelDetailView = ({ level, completedSkills, onToggleSkill, isDisabled, onClose, onSkillInfoClick }) => {
+  const { title, timeInfo, sections } = level;
+  
+  // Calcul de la progression globale
+  const allSkills = sections.flatMap(section => section.skills);
+  const totalSkills = allSkills.length;
+  const completedCount = allSkills.filter(skill => completedSkills.includes(skill.id)).length;
+  const progressPercent = totalSkills > 0 ? Math.round((completedCount / totalSkills) * 100) : 0;
+  
+  const { t } = useTranslation();
+  
+  return (
+    <div className="bg-primary/10 rounded-2xl p-6">
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-primary-content">{title}</h1>
+          {timeInfo && <p className="text-sm text-primary-content">{timeInfo}</p>}
         </div>
-        
-        <div className="mb-6">
-          <div className="flex justify-between items-end mb-2">
-            <span className="text-lg text-primary-content font-medium">{t('common.progress')}</span>
-            <span className={`text-xl font-bold ${progressPercent === 100 ? 'text-primary' : 'text-primary-content'}`}>
-              {progressPercent}%
-            </span>
-          </div>
-          <div className="w-full bg-base-100 rounded-full h-3">
-            <div
-              className={`${progressPercent === 100 ? 'bg-primary' : 'bg-primary'} h-3 rounded-full transition-all duration-300`}
-              style={{ width: `${progressPercent}%` }}
-            ></div>
-          </div>
+        <button onClick={onClose} className="btn btn-circle btn-sm btn-ghost">
+          <X size={20} />
+        </button>
+      </div>
+      
+      <div className="mb-6">
+        <div className="flex justify-between items-end mb-2">
+          <span className="text-lg text-primary-content font-medium">{t('common.progress')}</span>
+          <span className={`text-xl font-bold ${progressPercent === 100 ? 'text-primary' : 'text-primary-content'}`}>
+            {progressPercent}%
+          </span>
         </div>
-        
-        <div className=" rounded-xl">
-          {isDisabled ? (
-            <div className="text-center py-8">
-              <Lock size={48} className="mx-auto text-gray-400 mb-4" />
-              <h2 className="text-xl font-semibold text-gray-600 mb-2">{t('roadmap.levelLocked')}</h2>
-              <p className="text-gray-500">{t('roadmap.completePreviousLevels')}</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {sections.map(section => (
-                <SectionCard
-                  key={section.id}
-                  section={section}
-                  completedSkills={completedSkills}
-                  onToggleSkill={onToggleSkill}
-                  isDisabled={isDisabled}
-                />
-              ))}
-            </div>
-          )}
+        <div className="w-full bg-base-100 rounded-full h-3">
+          <div
+            className={`${progressPercent === 100 ? 'bg-primary' : 'bg-primary'} h-3 rounded-full transition-all duration-300`}
+            style={{ width: `${progressPercent}%` }}
+          ></div>
         </div>
       </div>
-    );
-  };
+      
+      <div className="rounded-xl">
+        {isDisabled ? (
+          <div className="text-center py-8">
+            <Lock size={48} className="mx-auto text-gray-400 mb-4" />
+            <h2 className="text-xl font-semibold text-gray-600 mb-2">{t('roadmap.levelLocked')}</h2>
+            <p className="text-gray-500">{t('roadmap.completePreviousLevels')}</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {sections.map(section => (
+              <SectionCard
+                key={section.id}
+                section={section}
+                completedSkills={completedSkills}
+                onToggleSkill={onToggleSkill}
+                isDisabled={isDisabled}
+                onSkillInfoClick={onSkillInfoClick}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 // Composant de progression globale
 
@@ -431,15 +473,15 @@ useEffect(() => {
           
           <div className="p-4">
             <div className="mb-6">
-              <MobileCarousel 
-                levels={levels} 
-                completedSkills={completedSkills} 
-                onSelectLevel={(level) => {
-                  onSelectLevel(level);
-                  onClose();
-                }} 
-                isLevelDisabled={isLevelDisabled}
-              />
+            <MobileCarousel 
+  levels={levels} 
+  completedSkills={completedSkills} 
+  onSelectLevel={setSelectedLevel} 
+  onToggleSkill={onToggleSkill}
+  isLevelDisabled={isLevelDisabled}
+  onSkillInfoClick={handleSkillInfoClick}
+/>
+
             </div>
             
             <div className="space-y-3">
@@ -478,7 +520,7 @@ useEffect(() => {
     );
   };
   
-  const MobileCarousel = ({ levels, completedSkills, onSelectLevel, isLevelDisabled }) => {
+  const MobileCarousel = ({ levels, completedSkills, onSelectLevel, isLevelDisabled, onSkillInfoClick, onToggleSkill}) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const carouselRef = useRef(null);
   
@@ -587,8 +629,9 @@ useEffect(() => {
               key={section.id}
               section={section}
               completedSkills={completedSkills}
-              onToggleSkill={() => {}} // Lecture seule dans ce mode
+              onToggleSkill={onToggleSkill}
               isDisabled={isLevelDisabled(levels[activeIndex].data)}
+              onSkillInfoClick={onSkillInfoClick}
             />
           ))}
         </div>
@@ -629,20 +672,132 @@ const RoadmapPage = () => {
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [mobileView, setMobileView] = useState("progress");
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [skillDetailModalOpen, setSkillDetailModalOpen] = useState(false);
+const [selectedSkillInfo, setSelectedSkillInfo] = useState({ id: '', title: '' });
+
   
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
 
+  const handleSkillInfoClick = (skillId, skillTitle) => {
+    setSelectedSkillInfo({ id: skillId, title: skillTitle });
+    setSkillDetailModalOpen(true);
+  };
+
   // Langues disponibles
   const languages = [
-    { id: 'french', name: 'Français', hasLatinAlphabet: true, hasTones: false, hasSpecificCases: false },
-    { id: 'english', name: 'Anglais', hasLatinAlphabet: true, hasTones: false, hasSpecificCases: false },
-    { id: 'german', name: 'Allemand', hasLatinAlphabet: true, hasTones: false, hasSpecificCases: true },
-    { id: 'italian', name: 'Italien', hasLatinAlphabet: true, hasTones: false, hasSpecificCases: false },
-    { id: 'spanish', name: 'Espagnol', hasLatinAlphabet: true, hasTones: false, hasSpecificCases: false },
-    { id: 'japanese', name: 'Japonais', hasLatinAlphabet: false, hasTones: false, hasSpecificCases: false },
-    { id: 'korean', name: 'Coréen', hasLatinAlphabet: false, hasTones: false, hasSpecificCases: false },
-    { id: 'russian', name: 'Russe', hasLatinAlphabet: false, hasTones: false, hasSpecificCases: true },
+    { 
+      id: 'french', 
+      name: 'Français', 
+      properties: {
+        alphabet: 'latin',
+        tones: false,
+        cases: false,
+        articles: true,
+        genderSystem: true,
+        verbConjugation: 'complex',
+        honorificSystem: false
+      },
+      specificFeatures: ['liaison', 'elision', 'partitiveArticles']
+    },
+    { 
+      id: 'english', 
+      name: 'Anglais', 
+      properties: {
+        alphabet: 'latin',
+        tones: false,
+        cases: false,
+        articles: true,
+        genderSystem: false,
+        verbConjugation: 'simple',
+        honorificSystem: false
+      },
+      specificFeatures: ['irregularVerbs', 'phrasal verbs', 'gerund']
+    },
+    { 
+      id: 'german', 
+      name: 'Allemand', 
+      properties: {
+        alphabet: 'latin',
+        tones: false,
+        cases: true,
+        articles: true,
+        genderSystem: true,
+        verbConjugation: 'moderate',
+        honorificSystem: false
+      },
+      specificFeatures: ['compoundNouns', 'wordOrder', 'separableVerbs']
+    },
+    { 
+      id: 'italian', 
+      name: 'Italien', 
+      properties: {
+        alphabet: 'latin',
+        tones: false,
+        cases: false,
+        articles: true,
+        genderSystem: true,
+        verbConjugation: 'complex',
+        honorificSystem: false
+      },
+      specificFeatures: ['contractions', 'doubleConsonants', 'subjunctiveMood']
+    },
+    { 
+      id: 'spanish', 
+      name: 'Espagnol', 
+      properties: {
+        alphabet: 'latin',
+        tones: false,
+        cases: false,
+        articles: true,
+        genderSystem: true,
+        verbConjugation: 'complex',
+        honorificSystem: false
+      },
+      specificFeatures: ['subjunctiveMood', 'objectPronouns', 'serVsEstar']
+    },
+    { 
+      id: 'japanese', 
+      name: 'Japonais', 
+      properties: {
+        alphabet: 'mixed',
+        tones: false,
+        cases: true,
+        articles: false,
+        genderSystem: false,
+        verbConjugation: 'agglutinative',
+        honorificSystem: true
+      },
+      specificFeatures: ['kanji', 'hiragana', 'katakana', 'particles', 'counters', 'keigo']
+    },
+    { 
+      id: 'korean', 
+      name: 'Coréen', 
+      properties: {
+        alphabet: 'hangul',
+        tones: false,
+        cases: false,
+        articles: false,
+        genderSystem: false,
+        verbConjugation: 'agglutinative',
+        honorificSystem: true
+      },
+      specificFeatures: ['particles', 'counters', 'honorifics', 'sentenceEndings']
+    },
+    { 
+      id: 'russian', 
+      name: 'Russe', 
+      properties: {
+        alphabet: 'cyrillic',
+        tones: false,
+        cases: true,
+        articles: false,
+        genderSystem: true,
+        verbConjugation: 'aspectual',
+        honorificSystem: false
+      },
+      specificFeatures: ['verbAspect', 'motionVerbs', 'palatalization']
+    }
   ];
 
   // Récupérer les propriétés de la langue sélectionnée
@@ -650,255 +805,335 @@ const RoadmapPage = () => {
     return languages.find(lang => lang.id === selectedLanguage) || languages[0];
   }, [selectedLanguage]);
 
+  const getSkillsForSection = useCallback((sectionId, langProps) => {
+    switch(sectionId) {
+      // Niveau A1
+      case 'a1_1': // Systèmes fondamentaux
+        return [
+          ...(langProps.properties.alphabet !== 'latin' ? [{ id: 'a1_1_1', title: t('roadmap.subsections.a1_1_1') }] : []),
+          ...(langProps.properties.tones ? [{ id: 'a1_1_2', title: t('roadmap.subsections.a1_1_2')}] : []),
+          { id: 'a1_1_3', title: t('roadmap.subsections.a1_1_3')},
+          ...(langProps.properties.cases ? [{ id: 'a1_1_4', title: t('roadmap.subsections.a1_1_4')}] : []),
+          ...(langProps.properties.articles ? [{ id: 'a1_1_5', title: t('roadmap.subsections.a1_1_5')}] : []),
+          ...(langProps.properties.genderSystem ? [{ id: 'a1_1_6', title: t('roadmap.subsections.a1_1_6')}] : [])
+        ].filter(Boolean);
+      
+      case 'a1_2': // Communication minimale
+        return [
+          { id: 'a1_2_1', title: t('roadmap.subsections.a1_2_1')},
+          { id: 'a1_2_2', title: t('roadmap.subsections.a1_2_2')},
+          { id: 'a1_2_3', title: t('roadmap.subsections.a1_2_3')}
+        ];
+      
+      case 'a1_3': // Grammaire élémentaire
+        return [
+          { id: 'a1_3_1', title: t('roadmap.subsections.a1_3_1')},
+          { id: 'a1_3_2', title: t('roadmap.subsections.a1_3_2')},
+          { id: 'a1_3_3', title: t('roadmap.subsections.a1_3_3')},
+          { id: 'a1_3_4', title: t('roadmap.subsections.a1_3_4')},
+          ...(langProps.properties.honorificSystem ? [{ id: 'a1_3_5', title: t('roadmap.subsections.a1_3_5')}] : []),
+          ...(langProps.specificFeatures.includes('particles') ? [{ id: 'a1_3_6', title: t('roadmap.subsections.a1_3_6')}] : [])
+        ].filter(Boolean);
+      
+      // Niveau A2
+      case 'a2_1': // Élargissement lexical
+        return [
+          { id: 'a2_1_1', title: t('roadmap.subsections.a2_1_1')},
+          { id: 'a2_1_2', title: t('roadmap.subsections.a2_1_2')}
+        ];
+      
+      case 'a2_2': // Grammaire fonctionnelle
+        return [
+          { id: 'a2_2_1', title: t('roadmap.subsections.a2_2_1')},
+          { id: 'a2_2_2', title: t('roadmap.subsections.a2_2_2')},
+          ...(langProps.properties.cases ? [{ id: 'a2_2_3', title: t('roadmap.subsections.a2_2_3')}] : []),
+          ...(langProps.specificFeatures.includes('particles') ? [{ id: 'a2_2_4', title: t('roadmap.subsections.a2_2_4')}] : []),
+          ...(langProps.properties.articles ? [{ id: 'a2_2_5', title: t('roadmap.subsections.a2_2_5')}] : []),
+          ...(langProps.specificFeatures.includes('gerund') || langProps.specificFeatures.includes('phrasalVerbs') ? 
+            [{ id: 'a2_2_6', title: t('roadmap.subsections.a2_2_6')}] : [])
+        ].filter(Boolean);
+      
+      case 'a2_3': // Communication pratique
+        return [
+          { id: 'a2_3_1', title: t('roadmap.subsections.a2_3_1')},
+          { id: 'a2_3_2', title: t('roadmap.subsections.a2_3_2')},
+          { id: 'a2_3_3', title: t('roadmap.subsections.a2_3_3')},
+          { id: 'a2_3_4', title: t('roadmap.subsections.a2_3_4')}
+        ];
+      
+      // Niveau B1
+      case 'b1_1': // Autonomie langagière
+        return [
+          { id: 'b1_1_1', title: t('roadmap.subsections.b1_1_1')},
+          { id: 'b1_1_2', title: t('roadmap.subsections.b1_1_2')},
+          { id: 'b1_1_3', title: t('roadmap.subsections.b1_1_3')}
+        ];
+      
+      case 'b1_2': // Complexification grammaticale
+        return [
+          { id: 'b1_2_1', title: t('roadmap.subsections.b1_2_1')},
+          ...(langProps.specificFeatures.includes('subjunctiveMood') ? [{ id: 'b1_2_2', title: t('roadmap.subsections.b1_2_2')}] : []),
+          ...(langProps.properties.honorificSystem ? [{ id: 'b1_2_3', title: t('roadmap.subsections.b1_2_3')}] : []),
+          ...(langProps.specificFeatures.includes('verbAspect') ? [{ id: 'b1_2_4', title: t('roadmap.subsections.b1_2_4')}] : []),
+          ...(langProps.properties.honorificSystem ? [{ id: 'b1_2_5', title: t('roadmap.subsections.b1_2_5')}] : []),
+          { id: 'b1_2_6', title: t('roadmap.subsections.b1_2_6'), hours: '5-10h' }
+        ].filter(Boolean);
+      
+      case 'b1_3': // Expression personnelle
+        return [
+          { id: 'b1_3_1', title: t('roadmap.subsections.b1_3_1')},
+          { id: 'b1_3_2', title: t('roadmap.subsections.b1_3_2')},
+          { id: 'b1_3_3', title: t('roadmap.subsections.b1_3_3')}
+        ];
+      
+      // Niveau B2
+      case 'b2_1': // Maîtrise contextuelle
+        return [
+          { id: 'b2_1_1', title: t('roadmap.subsections.b2_1_1')},
+          { id: 'b2_1_2', title: t('roadmap.subsections.b2_1_2')},
+          { id: 'b2_1_3', title: t('roadmap.subsections.b2_1_3')}
+        ];
+      
+      case 'b2_2': // Finesse grammaticale
+        return [
+          { id: 'b2_2_1', title: t('roadmap.subsections.b2_2_1')},
+          { id: 'b2_2_2', title: t('roadmap.subsections.b2_2_2')},
+          { id: 'b2_2_3', title: t('roadmap.subsections.b2_2_3')},
+          { id: 'b2_2_4', title: t('roadmap.subsections.b2_2_4')},
+          { id: 'b2_2_5', title: t('roadmap.subsections.b2_2_5')}
+        ];
+      
+      case 'b2_3': // Expression élaborée
+        return [
+          { id: 'b2_3_1', title: t('roadmap.subsections.b2_3_1')},
+          { id: 'b2_3_2', title: t('roadmap.subsections.b2_3_2')},
+          { id: 'b2_3_3', title: t('roadmap.subsections.b2_3_3')}
+        ];
+      
+      // Niveau C1
+      case 'c1_1': // Compétence approfondie
+        return [
+          { id: 'c1_1_1', title: t('roadmap.subsections.c1_1_1')},
+          { id: 'c1_1_2', title: t('roadmap.subsections.c1_1_2')},
+          { id: 'c1_1_3', title: t('roadmap.subsections.c1_1_3')}
+        ];
+      
+      case 'c1_2': // Subtilités linguistiques
+        return [
+          { id: 'c1_2_1', title: t('roadmap.subsections.c1_2_1')},
+          { id: 'c1_2_2', title: t('roadmap.subsections.c1_2_2')},
+          { id: 'c1_2_3', title: t('roadmap.subsections.c1_2_3')}
+        ];
+      
+      case 'c1_3': // Communication sophistiquée
+        return [
+          { id: 'c1_3_1', title: t('roadmap.subsections.c1_3_1')},
+          { id: 'c1_3_2', title: t('roadmap.subsections.c1_3_2')},
+          { id: 'c1_3_3', title: t('roadmap.subsections.c1_3_3')}
+        ];
+      
+      // Niveau C2
+      case 'c2_1': // Excellence linguistique
+        return [
+          { id: 'c2_1_1', title: t('roadmap.subsections.c2_1_1')},
+          { id: 'c2_1_2', title: t('roadmap.subsections.c2_1_2')},
+          { id: 'c2_1_3', title: t('roadmap.subsections.c2_1_3')}
+        ];
+      
+      case 'c2_2': // Nuances et finesses
+        return [
+          { id: 'c2_2_1', title: t('roadmap.subsections.c2_2_1')},
+          { id: 'c2_2_2', title: t('roadmap.subsections.c2_2_2')},
+          { id: 'c2_2_3', title: t('roadmap.subsections.c2_2_3')}
+        ];
+      
+      case 'c2_3': // Communication native
+        return [
+          { id: 'c2_3_1', title: t('roadmap.subsections.c2_3_1')},
+          { id: 'c2_3_2', title: t('roadmap.subsections.c2_3_2')},
+          { id: 'c2_3_3', title: t('roadmap.subsections.c2_3_3')}
+        ];
+      
+      default:
+        return [];
+    }
+  }, [t]);
+
   // Fonctions pour générer les données des niveaux
-  // Note: ici on utiliserait les fonctions de génération de données du code original
-  // Je simplifie pour l'exemple
   const getA1Data = useCallback(() => {
     const langProps = getLanguageProps();
     
     return {
-        id: 'a1',
-        title: t('roadmap.levelDescription.a1'),
-        timeInfo: '60-100h',
-        sections: [
-          {
-            id: 'a1_1',
-            title: t('roadmap.sections.fundamentalSystems'),
-            skills: [
-              ...(langProps.hasLatinAlphabet ? [] : [{ id: 'a1_1_1', title: t('roadmap.subsections.a1_1_1'), hours: '5-20h' }]),
-              ...(langProps.hasTones ? [{ id: 'a1_1_2', title: t('roadmap.subsections.a1_1_2'), hours: '10-20h' }] : []),
-              { id: 'a1_1_3', title: t('roadmap.subsections.a1_1_3'), hours: '5-10h' },
-              ...(langProps.hasSpecificCases ? [{ id: 'a1_1_4', title: t('roadmap.subsections.a1_1_4'), hours: '10-15h' }] : [])
-            ].filter(Boolean) // Filtre les éléments potentiellement vides
-          },
-          {
-            id: 'a1_2',
-            title: t('roadmap.sections.minimalCommunication'),
-            skills: [
-              { id: 'a1_2_1', title: t('roadmap.subsections.a1_2_1'), hours: '20-30h' },
-              { id: 'a1_2_2', title: t('roadmap.subsections.a1_2_2'), hours: '5-10h' },
-              { id: 'a1_2_3', title: t('roadmap.subsections.a1_2_3'), hours: '5-10h' }
-            ]
-          },
-          {
-            id: 'a1_3',
-            title: t('roadmap.sections.elementaryGrammar'),
-            skills: [
-              { id: 'a1_3_1', title: t('roadmap.subsections.a1_3_1'), hours: '10-15h' },
-              { id: 'a1_3_2', title: t('roadmap.subsections.a1_3_2'), hours: '5h' },
-              { id: 'a1_3_3', title: t('roadmap.subsections.a1_3_3'), hours: '5-10h' },
-              { id: 'a1_3_4', title: t('roadmap.subsections.a1_3_4'), hours: '5h' }
-            ]
-          }
-        ]
-      };
-    }, [getLanguageProps]);
+      id: 'a1',
+      title: t('roadmap.levelDescription.a1'),
+      timeInfo: '60-100h',
+      sections: [
+        {
+          id: 'a1_1',
+          title: t('roadmap.sections.fundamentalSystems'),
+          skills: getSkillsForSection('a1_1', langProps)
+        },
+        {
+          id: 'a1_2',
+          title: t('roadmap.sections.minimalCommunication'),
+          skills: getSkillsForSection('a1_2', langProps)
+        },
+        {
+          id: 'a1_3',
+          title: t('roadmap.sections.elementaryGrammar'),
+          skills: getSkillsForSection('a1_3', langProps)
+        }
+      ]
+    };
+  }, [getLanguageProps, getSkillsForSection, t]);
   
-  // Fonction pour générer les données du niveau A2 adaptées à la langue sélectionnée
   const getA2Data = useCallback(() => {
     const langProps = getLanguageProps();
-  
+    
     return {
       id: 'a2',
       title: t('roadmap.levelDescription.a2'),
-      timeInfo: '80-100h',
+      timeInfo: '80-120h',
       sections: [
         {
           id: 'a2_1',
           title: t('roadmap.sections.lexicalExpansion'),
-          skills: [
-            { id: 'a2_1_1', title: t('roadmap.subsections.a2_1_1'), hours: '30-40h' },
-            { id: 'a2_1_2', title: t('roadmap.subsections.a2_1_2'), hours: '10h' }
-          ]
+          skills: getSkillsForSection('a2_1', langProps)
         },
         {
           id: 'a2_2',
           title: t('roadmap.sections.functionalGrammar'),
-          skills: [
-            { id: 'a2_2_1', title: t('roadmap.subsections.a2_2_1'), hours: '15-20h' },
-            { id: 'a2_2_2', title: t('roadmap.subsections.a2_2_2'), hours: '10h' },
-            ...(langProps.hasSpecificCases ? [{ id: 'a2_2_3', title: t('roadmap.subsections.a2_2_3'), hours: '15-20h' }] : []),
-            ...(langProps.id === 'japanese' || langProps.id === 'korean' ? [{ id: 'a2_2_4', title: t('roadmap.subsections.a2_2_4'), hours: '15h' }] : [])
-          ].filter(Boolean)
+          skills: getSkillsForSection('a2_2', langProps)
         },
         {
           id: 'a2_3',
           title: t('roadmap.sections.practicalCommunication'),
-          skills: [
-            { id: 'a2_3_1', title: t('roadmap.subsections.a2_3_1'), hours: '10h' },
-            { id: 'a2_3_2', title: t('roadmap.subsections.a2_3_2'), hours: '5h' },
-            { id: 'a2_3_3', title: t('roadmap.subsections.a2_3_3'), hours: '15h' },
-            { id: 'a2_3_4', title: t('roadmap.subsections.a2_3_4'), hours: '5-10h' }
-          ]
+          skills: getSkillsForSection('a2_3', langProps)
         }
       ]
     };
-  }, [getLanguageProps]);
+  }, [getLanguageProps, getSkillsForSection, t]);
   
-  // Fonction pour générer les données du niveau B1 adaptées à la langue sélectionnée
+  // Fonctions similaires pour les niveaux B1, B2, C1 et C2
   const getB1Data = useCallback(() => {
     const langProps = getLanguageProps();
-  
+    
     return {
       id: 'b1',
       title: t('roadmap.levelDescription.b1'),
-      timeInfo: '150-200h',
+      timeInfo: '150-180h',
       sections: [
         {
           id: 'b1_1',
           title: t('roadmap.sections.languageAutonomy'),
-          skills: [
-            { id: 'b1_1_1', title: t('roadmap.subsections.b1_1_1'), hours: '50-60h' },
-            { id: 'b1_1_2', title: t('roadmap.subsections.b1_1_2'), hours: '30-40h' },
-            { id: 'b1_1_3', title: t('roadmap.subsections.b1_1_3'), hours: '30h' }
-          ]
+          skills: getSkillsForSection('b1_1', langProps)
         },
         {
           id: 'b1_2',
           title: t('roadmap.sections.grammaticalComplexity'),
-          skills: [
-            { id: 'b1_2_1', title: t('roadmap.subsections.b1_2_1'), hours: '15-20h' },
-            ...(langProps.id === 'french' || langProps.id === 'spanish' || langProps.id === 'italian' || langProps.id === 'russian' ?
-              [{ id: 'b1_2_2', title: t('roadmap.subsections.b1_2_2'), hours: '20-30h' }] : []),
-            ...(langProps.id === 'japanese' || langProps.id === 'korean' ?
-              [{ id: 'b1_2_3', title: t('roadmap.subsections.b1_2_3'), hours: '20-30h' }] : []),
-            ...(langProps.id === 'russian' ?
-              [{ id: 'b1_2_4', title: t('roadmap.subsections.b1_2_4'), hours: '15-20h' }] : [])
-          ].filter(Boolean)
+          skills: getSkillsForSection('b1_2', langProps)
         },
         {
           id: 'b1_3',
           title: t('roadmap.sections.personalExpression'),
-          skills: [
-            { id: 'b1_3_1', title: t('roadmap.subsections.b1_3_1'), hours: '15h' },
-            { id: 'b1_3_2', title: t('roadmap.subsections.b1_3_2'), hours: '15h' },
-            { id: 'b1_3_3', title: t('roadmap.subsections.b1_3_3'), hours: '10h' }
-          ]
+          skills: getSkillsForSection('b1_3', langProps)
         }
       ]
     };
-  }, [getLanguageProps]);
+  }, [getLanguageProps, getSkillsForSection, t]);
   
-  // Fonction pour générer les données du niveau B2 adaptées à la langue sélectionnée
   const getB2Data = useCallback(() => {
     const langProps = getLanguageProps();
-  
+    
     return {
       id: 'b2',
       title: t('roadmap.levelDescription.b2'),
-      timeInfo: '150-200h',
+      timeInfo: '200-250h',
       sections: [
         {
           id: 'b2_1',
           title: t('roadmap.sections.contextualMastery'),
-          skills: [
-            { id: 'b2_1_1', title: t('roadmap.subsections.b2_1_1'), hours: '60-80h' },
-            { id: 'b2_1_2', title: t('roadmap.subsections.b2_1_2'), hours: '40h' },
-            { id: 'b2_1_3', title: t('roadmap.subsections.b2_1_3'), hours: '10-20h' }
-          ]
+          skills: getSkillsForSection('b2_1', langProps)
         },
         {
           id: 'b2_2',
           title: t('roadmap.sections.grammaticalFinesse'),
-          skills: [
-            { id: 'b2_2_1', title: t('roadmap.subsections.b2_2_1'), hours: '40h' },
-            { id: 'b2_2_2', title: t('roadmap.subsections.b2_2_2'), hours: '10-15h' },
-            { id: 'b2_2_3', title: t('roadmap.subsections.b2_2_3'), hours: '15-20h' }
-          ]
+          skills: getSkillsForSection('b2_2', langProps)
         },
         {
           id: 'b2_3',
           title: t('roadmap.sections.elaborateExpression'),
-          skills: [
-            { id: 'b2_3_1', title: t('roadmap.subsections.b2_3_1'), hours: '20h' },
-            { id: 'b2_3_2', title: t('roadmap.subsections.b2_3_2'), hours: '15h' },
-            { id: 'b2_3_3', title: t('roadmap.subsections.b2_3_3'), hours: '15h' }
-          ]
+          skills: getSkillsForSection('b2_3', langProps)
         }
       ]
     };
-  }, [getLanguageProps]);
+  }, [getLanguageProps, getSkillsForSection, t]);
   
-  // Fonction pour générer les données du niveau C1 adaptées à la langue sélectionnée
   const getC1Data = useCallback(() => {
-    // Pas de dépendance spécifique à la langue dans cet exemple C1, mais on garde la structure pour la cohérence
-    // const langProps = getLanguageProps();
+    const langProps = getLanguageProps();
+    
     return {
       id: 'c1',
       title: t('roadmap.levelDescription.c1'),
-      timeInfo: '+200h',
+      timeInfo: '250-300h',
       sections: [
         {
           id: 'c1_1',
           title: t('roadmap.sections.deepCompetence'),
-          skills: [
-            { id: 'c1_1_1', title: t('roadmap.subsections.c1_1_1'), hours: '80-100h' },
-            { id: 'c1_1_2', title: t('roadmap.subsections.c1_1_2'), hours: '40h' },
-            { id: 'c1_1_3', title: t('roadmap.subsections.c1_1_3'), hours: '20-30h' }
-          ]
+          skills: getSkillsForSection('c1_1', langProps)
         },
         {
           id: 'c1_2',
           title: t('roadmap.sections.linguisticSubtleties'),
-          skills: [
-            { id: 'c1_2_1', title: t('roadmap.subsections.c1_2_1'), hours: '30h' },
-            { id: 'c1_2_2', title: t('roadmap.subsections.c1_2_2'), hours: '30h' },
-            { id: 'c1_2_3', title: t('roadmap.subsections.c1_2_3'), hours: '30h' }
-          ]
+          skills: getSkillsForSection('c1_2', langProps)
         },
         {
           id: 'c1_3',
           title: t('roadmap.sections.sophisticatedCommunication'),
-          skills: [
-            { id: 'c1_3_1', title: t('roadmap.subsections.c1_3_1'), hours: '20h' },
-            { id: 'c1_3_2', title: t('roadmap.subsections.c1_3_2'), hours: '20h' },
-            { id: 'c1_3_3', title: t('roadmap.subsections.c1_3_3'), hours: '20h' }
-          ]
+          skills: getSkillsForSection('c1_3', langProps)
         }
       ]
     };
-  }, [getLanguageProps]); // Garder la dépendance au cas où
+  }, [getLanguageProps, getSkillsForSection, t]);
   
-  // Fonction pour générer les données du niveau C2 adaptées à la langue sélectionnée
   const getC2Data = useCallback(() => {
-    // Pas de dépendance spécifique à la langue dans cet exemple C2
-    // const langProps = getLanguageProps();
+    const langProps = getLanguageProps();
+    
     return {
       id: 'c2',
       title: t('roadmap.levelDescription.c2'),
-      timeInfo: '+200-400h',
+      timeInfo: '300-400h',
       sections: [
         {
           id: 'c2_1',
           title: t('roadmap.sections.linguisticExcellence'),
-          skills: [
-            { id: 'c2_1_1', title: t('roadmap.subsections.c2_1_1'), hours: '100-150h' },
-            { id: 'c2_1_2', title: t('roadmap.subsections.c2_1_2'), hours: '50h' },
-            { id: 'c2_1_3', title: t('roadmap.subsections.c2_1_3'), hours: '50h' }
-          ]
+          skills: getSkillsForSection('c2_1', langProps)
         },
         {
           id: 'c2_2',
           title: t('roadmap.sections.nuancesAndFinesse'),
-          skills: [
-            { id: 'c2_2_1', title: t('roadmap.subsections.c2_2_1'), hours: '30h' },
-            { id: 'c2_2_2', title: t('roadmap.subsections.c2_2_2'), hours: '50h' },
-            { id: 'c2_2_3', title: t('roadmap.subsections.c2_2_3'), hours: '30-50h' }
-          ]
+          skills: getSkillsForSection('c2_2', langProps)
         },
         {
           id: 'c2_3',
           title: t('roadmap.sections.nativeCommunication'),
-          skills: [
-            { id: 'c2_3_1', title: t('roadmap.subsections.c2_3_1'), hours: '30-50h' },
-            { id: 'c2_3_2', title: t('roadmap.subsections.c2_3_2'), hours: '30h' },
-            { id: 'c2_3_3', title: t('roadmap.subsections.c2_3_3'), hours: '30h' }
-          ]
+          skills: getSkillsForSection('c2_3', langProps)
         }
       ]
     };
-  }, [getLanguageProps]); // Garder la dépendance au cas où
+  }, [getLanguageProps, getSkillsForSection, t]);
   
+  // 6. Fonction principale pour obtenir toutes les données
+  const getLanguageRoadmap = useCallback(() => {
+    return {
+      a1: getA1Data(),
+      a2: getA2Data(),
+      b1: getB1Data(),
+      b2: getB2Data(),
+      c1: getC1Data(),
+      c2: getC2Data()
+    };
+  }, [getA1Data, getA2Data, getB1Data, getB2Data, getC1Data, getC2Data]);
 
   // Chargement des données utilisateur
   useEffect(() => {
@@ -1067,7 +1302,7 @@ const RoadmapPage = () => {
         userSettings={userSettings}
       />
   
-      <div className="container mx-auto px-4 py-6 flex-1">
+      <div className="container mx-auto px-4 py-6 flex-1  sm:max-w-[80%]">
         {/* En-tête avec information sur la langue */}
 
   
@@ -1098,11 +1333,14 @@ const RoadmapPage = () => {
                 </div>
                 
                 <MobileCarousel 
-                  levels={levels} 
-                  completedSkills={completedSkills} 
-                  onSelectLevel={setSelectedLevel} 
-                  isLevelDisabled={isLevelDisabled}
-                />
+  levels={levels} 
+  completedSkills={completedSkills} 
+  onSelectLevel={setSelectedLevel} 
+  onToggleSkill={handleToggleSkill}
+  isLevelDisabled={isLevelDisabled}
+  onSkillInfoClick={handleSkillInfoClick}
+/>
+
               </div>
             )}
             
@@ -1110,12 +1348,14 @@ const RoadmapPage = () => {
             {selectedLevel && (
               <div className="fixed inset-0 bg-base-100 z-50 p-4 overflow-y-auto">
                 <LevelDetailView
-                  level={selectedLevel}
-                  completedSkills={completedSkills}
-                  onToggleSkill={handleToggleSkill}
-                  isDisabled={isLevelDisabled(selectedLevel)}
-                  onClose={() => setSelectedLevel(null)}
-                />
+  level={selectedLevel}
+  completedSkills={completedSkills}
+  onToggleSkill={handleToggleSkill}
+  isDisabled={isLevelDisabled(selectedLevel)}
+  onClose={() => setSelectedLevel(null)}
+  onSkillInfoClick={handleSkillInfoClick}
+/>
+
               </div>
             )}
           </div>
@@ -1170,13 +1410,15 @@ const RoadmapPage = () => {
                 
                 {/* Détail du niveau à droite - plus large */}
                 <div className="md:col-span-8">
-                  <LevelDetailView
-                    level={selectedLevel}
-                    completedSkills={completedSkills}
-                    onToggleSkill={handleToggleSkill}
-                    isDisabled={isLevelDisabled(selectedLevel)}
-                    onClose={() => setSelectedLevel(null)}
-                  />
+                <LevelDetailView
+  level={selectedLevel}
+  completedSkills={completedSkills}
+  onToggleSkill={handleToggleSkill}
+  isDisabled={isLevelDisabled(selectedLevel)}
+  onClose={() => setSelectedLevel(null)}
+  onSkillInfoClick={handleSkillInfoClick}
+/>
+
                 </div>
               </div>
             )}
@@ -1192,6 +1434,13 @@ const RoadmapPage = () => {
         onUpdateSettings={handleUpdateSettings}
         onSignOut={signOut}
       />
+      <SkillDetailModal
+  isOpen={skillDetailModalOpen}
+  onClose={() => setSkillDetailModalOpen(false)}
+  skillId={selectedSkillInfo.id}
+  skillTitle={selectedSkillInfo.title}
+  targetLanguage={selectedLanguage}
+/>
       <InfoModal 
         isOpen={showInfoModal} 
         onClose={() => setShowInfoModal(false)} 

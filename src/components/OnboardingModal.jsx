@@ -43,20 +43,8 @@ const tagOptions = [
 function OnboardingModal({ isOpen, onClose, user, onComplete }) {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
-  const [totalSteps] = useState(5);
-  const [targetLanguage, setTargetLanguage] = useState('french');
-  const [learningLanguage, setLearningLanguage] = useState(false);
+  const [totalSteps] = useState(4);
 
-  const availableLanguages = [
-    { id: 'french', name: t('roadmap.language.french') },
-    { id: 'english', name: t('roadmap.language.english') },
-    { id: 'german', name: t('roadmap.language.german') },
-    { id: 'italian', name: t('roadmap.language.italian') },
-    { id: 'spanish', name: t('roadmap.language.spanish') },
-    { id: 'japanese', name: t('roadmap.language.japanese') },
-    { id: 'korean', name: t('roadmap.language.korean') },
-    { id: 'russian', name: t('roadmap.language.russian') }
-  ];
 
   
   // Transformer les clés de jours en noms de jours traduits
@@ -198,7 +186,6 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
         nickname,
         avatar,
         show_todo_list: showTodoList,
-        learning_language: learningLanguage,
         onboarding_completed: true
       };
       
@@ -248,19 +235,7 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
       
       if (goalError) throw goalError;
 
-      if (learningLanguage) {
-        const languageProgress = {
-          user_id: user.id,
-          target_language: targetLanguage,
-          completed_skills: []
-        };
       
-        const { error: langError } = await supabase
-          .from('language_progress')
-          .insert(languageProgress);
-      
-        if (langError) throw langError;
-      }
       
       // 3. Créer la todo si elle existe
       if (todoText.trim()) {
@@ -359,9 +334,8 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
           <h3 className="font-bold text-xl">
           {step === 1 && t('onboarding.headings.welcome')}
   {step === 2 && t('onboarding.headings.firstGoal')}
-  {step === 3 && t('onboarding.headings.targetLanguage')} {/* Nouvelle étape */}
-  {step === 4 && t('onboarding.headings.useTimer')}
-  {step === 5 && t('onboarding.headings.todoList')}
+  {step === 3 && t('onboarding.headings.useTimer')}
+  {step === 4 && t('onboarding.headings.todoList')}
           </h3>
           <button 
             className="btn btn-sm btn-ghost" 
@@ -592,51 +566,9 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
   </div>
 )}
 
-          {/* Nouvelle étape: Sélection de la langue cible */}
-          {step === 3 && (
-  <div>
-    <div className="flex items-center gap-2 mb-4">
-      <Globe size={20} />
-      <h4 className="font-semibold">{t('onboarding.steps.language.title')}</h4>
-    </div>
-    
-    <p className="text-base-content text-opacity-70 mb-6">
-      {t('onboarding.steps.language.description')}
-    </p>
-    
-    <div className="form-control mb-6">
-      <label className="cursor-pointer label justify-start gap-4">
-        <span className="label-text font-medium">{t('onboarding.steps.language.useLearning')}</span>
-        <input 
-          type="checkbox" 
-          className="toggle toggle-primary" 
-          checked={learningLanguage} 
-          onChange={() => setLearningLanguage(!learningLanguage)}
-        />
-      </label>
-    </div>
-    
-    {learningLanguage && (
-      <div className="form-control mb-4">
-        <label className="label">
-          <span className="label-text">{t('onboarding.steps.language.selectLabel')}</span>
-        </label>
-        <select 
-          className="select select-bordered w-full" 
-          value={targetLanguage}
-          onChange={(e) => setTargetLanguage(e.target.value)}
-        >
-          {availableLanguages.map(lang => (
-            <option key={lang.id} value={lang.id}>{lang.name}</option>
-          ))}
-        </select>
-      </div>
-    )}
-  </div>
-)}
           
           {/* Étape 3: Timer */}
-          {step === 4 && (
+          {step === 3 && (
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Clock size={20} />
@@ -696,7 +628,7 @@ function OnboardingModal({ isOpen, onClose, user, onComplete }) {
           )}
           
           {/* Étape 4: Todo */}
-          {step === 5 && (
+          {step === 4 && (
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <ListTodo size={20} />

@@ -727,7 +727,17 @@
       "c2_2_3": "Dialectes et sociolectes",
       "c2_3_1": "Aisance totale", 
       "c2_3_2": "Médiation complexe",
-      "c2_3_3": "Adapter finement son registre"
+      "c2_3_3": "Adapter finement son registre",
+      "a1_1_5": "Articles et déterminants",
+      "a1_1_6": "Genre grammatical",
+      "a1_3_5": "Bases du système honorifique",
+      "a1_3_6": "Particules de base",
+      "a2_2_5": "Articles et prépositions avancés",
+      "a2_2_6": "Gérondif/Infinitif",
+      "b1_2_5": "Formes de politesse spécifiques",
+      "b1_2_6": "Connecteurs logiques",
+      "b2_2_4": "Expressions idiomatiques intermédiaires",
+      "b2_2_5": "Structure du discours"
     },
     "language": {
       "french": "Français",
@@ -765,6 +775,12 @@
     "updatePassword": "Mettre à jour le mot de passe"
   }
   
+  },
+  "skillDetail": {
+    "description": "Description",
+    "examples": "Exemples",
+    "tips": "Conseils",
+    "noDetailsAvailable": "Pas de détails disponibles pour cette compétence."
   }
   
 

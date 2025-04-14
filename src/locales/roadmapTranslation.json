@@ -1,0 +1,44 @@
+{
+    "competence_details": {
+      "a1_1_1": {
+        "fr": {
+          "language_specific": {
+            "japanese": {
+              "description": "Le japonais utilise trois systèmes d’écriture : hiragana (mots grammaticaux, natifs), katakana (mots étrangers), et kanji (idéogrammes chinois). Chaque syllabe correspond à une prononciation fixe. Il n’y a pas d’accent tonique fort, mais une intonation qui peut légèrement modifier le sens.",
+              "examples": "さくら (sakura, hiragana), テレビ (terebi, katakana), 日本 (nihon, kanji)",
+              "tips": "Maîtrise d’abord hiragana pour la lecture de base, puis passe au katakana et aux kanji. L’écoute est essentielle pour saisir les subtilités d’intonation."
+            },
+            "russian": {
+              "description": "Le russe s’écrit en alphabet cyrillique (33 lettres). Chaque lettre correspond à un son, avec quelques exceptions. L’accent tonique est mobile et changeant : il peut tomber sur n’importe quelle syllabe, ce qui affecte la prononciation. Il n’est pas écrit, donc il faut le mémoriser.",
+              "examples": "зАмок (château) vs замОк (serrure)",
+              "tips": "Apprends les lettres en lien avec leur son. Utilise l’audio pour associer visuel et accentuation."
+            },
+            "korean": {
+              "description": "Le coréen utilise hangul, un alphabet inventé pour refléter la phonétique. Il compte 14 consonnes et 10 voyelles de base, combinées en blocs syllabiques. La prononciation est généralement régulière, mais certains sons changent selon le contexte (liaisons, assimilations).",
+              "examples": "학교 (hak-gyo, “école”)",
+              "tips": "Apprends les lettres séparément, puis entraîne-toi à lire les blocs. L’écoute aide à repérer les changements de sons en contexte."
+            }
+          }
+        },
+        "en": {
+            "language_specific": {
+            "japanese": {
+              "description": "Japanese uses three scripts: hiragana (native words/grammar), katakana (foreign words), and kanji (Chinese-origin characters). Each character represents a syllable with fixed pronunciation. No strong stress, but pitch accent can affect meaning.",
+              "examples": "さくら (sakura, hiragana), テレビ (terebi, katakana), 日本 (nihon, kanji)",
+              "tips": "Learn hiragana first for basic reading. Then move on to katakana and kanji. Listening practice helps catch pitch accents."
+            },
+            "russian": {
+              "description": "Russian uses the Cyrillic alphabet (33 letters). Each letter has a sound, though pronunciation can vary. Stress is mobile and unpredictable—it can fall on any syllable and changes meaning. It’s not written, so must be learned by heart.",
+              "examples": "зАмок (castle) vs замОк (lock)",
+              "tips": "Learn letters with sound associations. Use audio often to internalize word stress."
+            },
+            "korean": {
+              "description": "Korean uses Hangul, a phonetic alphabet made of 14 consonants and 10 vowels, combined into syllable blocks. It’s highly regular, though sounds may shift due to context (linking, assimilation).",
+              "examples": "학교 (hak-gyo, school)",
+              "tips": "Learn individual letters first, then practice combining them into blocks. Listening helps catch sound shifts in real speech."
+            }
+          }
+        }
+      }
+    }
+  }
