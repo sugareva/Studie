@@ -500,11 +500,63 @@
           "selectedAvatar": "Avatar sélectionné"
         }
       },
+      "studiePet": {
+    "title": "Mon Animal d'Étude",
+    "loading": "Chargement en cours...",
+    "createYourPet": "Crée ton animal d'étude",
+    "petName": "Nom de ton animal",
+    "petNamePlaceholder": "Donne un nom à ton animal",
+    "createPetButton": "Créer mon animal",
+    "enterPetName": "Merci d'entrer un nom",
+    "noName": "Sans nom",
+    "feedPet": "Nourrir",
+    "noCroquettes": "Pas de croquettes disponibles",
+    "croquettes": "Croquettes",
+    "days": "Jours",
+    "level": "Niveau",
+    "currentLevel": "Niveau actuel",
+    "nextLevel": "Prochain niveau",
+    "nextUnlockIn": "Prochain niveau dans",
+    "claimCroquettes": "Réclamer des croquettes",
+    "claim": "Réclamer",
+    "obtained": "Obtenue",
+    "noGoalsToday": "Aucun objectif prévu aujourd'hui",
+    "fedTimeToday": "Nourri {{time}}",
+    "fedTimeYesterday": "Nourri hier à {{time}}",
+    "fedTimeDateFull": "Nourri le {{date}} à {{time}}",
+    "happyCat": "Chat content",
+    "sadCat": "Chat triste",
+    "vacationMode": "Mode vacances",
+    "vacationOn": "Vacances actives",
+    "todaysGoals": "Objectifs d'aujourd'hui",
+    "helpTitle": "Comment fonctionne Studie Pet ?",
+    "helpDescription": "Studie Pet est une fonctionnalité qui te motive à étudier régulièrement :",
+    "helpComplete": "Complète tes objectifs quotidiens pour obtenir des croquettes",
+    "helpFeed": "Nourris ton animal avec les croquettes pour le garder heureux",
+    "helpHappiness": "S'il n'est pas nourri, il deviendra triste et finira par s'enfuir",
+    "helpLevels": "Ton animal gagne des niveaux au fur et à mesure que tu étudies régulièrement",
+    "helpVacation": "Active le mode vacances quand tu ne peux pas étudier",
+    "understood": "J'ai compris !",
+    "mood": {
+      "veryHappy": "Il est très content et en pleine forme !",
+      "happy": "Il est heureux et satisfait.",
+      "hungry": "Il commence à avoir faim...",
+      "sad": "Il est triste et a besoin d'attention.",
+      "verySad": "Il est très malheureux et pourrait s'enfuir."
+    },
+    "fedMessage": "{{petName}} a été nourri à {{time}}",
+    "errors": {
+      "fetchError": "Impossible de récupérer les données de l'animal",
+      "createError": "Impossible de créer l'animal",
+      "updateError": "Impossible de mettre à jour les données"
+    }
+  
+  },
       "navbar": {
     "links": {
       "dashboard": "Dashboard",
       "activity": "Activité",
-      "language": "Changer de langue"
+      "studiePet": "Studie Pet"
     },
     "buttons": {
       "darkMode": "Mode sombre",
@@ -623,7 +675,32 @@
     "signInButton": "Se connecter",
     "signUpButton": "S'inscrire",
     "alertMessage": "Inscrivez-vous pour accéder à des fonctionnalités avancées : suivi d'objectifs, statistiques et bien plus !",
-    "footerText": "Tous droits réservés"
+    "footerText": "Tous droits réservés",
+    "seoTitle": "Timer Pomodoro et Suivi d'objectifs personnalisés",
+    "scrollToContent":"En savoir plus",
+    "seoDescription":"Studie vous aide à structurer votre apprentissage, visualiser votre progression et combattre la procrastination grâce à son suivi d'objectifs personnalisés.",
+    "benefits": {
+    "title":"Un cadre structuré pour votre apprentissage",
+    "focusTitle": "Améliorez votre concentration",
+    "seoContentDivider":"Découvrez Studie",
+    "focusDescription": "La méthode Pomodoro peut aider les personnes ayant du mal à se concentrer (TDAH, ...) à maintenir leur attention.",
+    "progressTitle": "Visualisez votre progression",
+    "progressDescription": "Obtenez des données objectives sur votre temps d'étude.",
+    "structureTitle": "Structurez votre apprentissage",
+    "structureDescription": "Définissez des objectifs personnalisés et suivez votre progression réelle.",
+    "regularityTitle": "Intégrez une routine",
+    "regularityDescription": "Établissez des habitudes régulières pour maximiser vos résultats sur le long terme."
+  },
+  "faq": {
+    "question1": "Comment la technique Pomodoro peut-elle m'aider à rester concentré ?",
+    "answer1": "La technique Pomodoro est particulièrement efficace pour les personnes ayant des troubles de l'attention (comme les personnes atteintes de TDAH) car elle fournit une structure externe, décompose le travail en sessions courtes et gérables, et alterne entre concentration et pauses, ce qui correspond bien aux fluctuations naturelles d'attention.",
+    "question2": "Comment visualiser ma progression ?",
+    "answer2": " En vous inscrivant sur Studie, vous avez la possibilité de créer des objectifs et de leur attribuer des jours et des durées. Le timer est appliqué sur l'objectif que vous souhaitez et vous permet de visualiser le temps précis passé dessus. Cela vous aide à éviter la surestimation ou sous-estimation de vos progrès (effet Dunning-Kruger) et de vérifier que vos objectifs fixés sont bien atteignables.",
+    "question3": "Comment paramétrer des objectifs d'étude réalistes ?",
+    "answer3": "Avec Studie, vous pouvez définir des objectifs personnalisés en spécifiant la durée cible pour chaque jour de la semaine, ce qui vous permet d'adapter vos objectifs à votre emploi du temps réel et à vos capacités de concentration."
+  }
+
+
   },
   "roadmap": {
     "aboutCourse": "Découvrez Studie Langues!",

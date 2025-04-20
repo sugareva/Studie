@@ -503,8 +503,9 @@
     "links": {
       "dashboard": "Dashboard",
       "activity": "Activity",
-      "language": "Switch language"
+      "studiePet": "Studie Pet"
     },
+    
     "buttons": {
       "darkMode": "Dark mode",
       "lightMode": "Light mode",
@@ -520,6 +521,57 @@
       "fetchSettingsError": "Error fetching user settings:",
       "fetchSettingsCatchError": "Error in fetchUserSettings:",
       "invalidOpenModalFunction": "onOpenUserModal is not a valid function"
+    }
+  },
+  "studiePet": {
+    "title": "My Study Pet",
+    "loading": "Loading...",
+    "createYourPet": "Create your study pet",
+    "petName": "Pet name",
+    "petNamePlaceholder": "Give your pet a name",
+    "createPetButton": "Create my pet",
+    "enterPetName": "Please enter a name",
+    "noName": "Unnamed",
+    "feedPet": "Feed",
+    "noCroquettes": "No treats available",
+    "croquettes": "Treats",
+    "days": "Days",
+    "level": "Level",
+    "currentLevel": "Current level",
+    "nextLevel": "Next level",
+    "nextUnlockIn": "Next level in",
+    "claimCroquettes": "Claim treats",
+    "claim": "Claim",
+    "obtained": "Claimed",
+    "noGoalsToday": "No goals scheduled for today",
+    "fedTimeToday": "Fed {{time}}",
+    "fedTimeYesterday": "Fed yesterday at {{time}}",
+    "fedTimeDateFull": "Fed on {{date}} at {{time}}",
+    "happyCat": "Happy cat",
+    "sadCat": "Sad cat",
+    "vacationMode": "Vacation mode",
+    "vacationOn": "Vacation active",
+    "todaysGoals": "Today's goals",
+    "helpTitle": "How does Studie Pet work?",
+    "helpDescription": "Studie Pet is a feature that motivates you to study regularly:",
+    "helpComplete": "Complete your daily goals to get treats",
+    "helpFeed": "Feed your pet with treats to keep it happy",
+    "helpHappiness": "If it's not fed, it will become sad and might run away",
+    "helpLevels": "Your pet gains levels as you study regularly",
+    "helpVacation": "Activate vacation mode when you can't study",
+    "understood": "Got it!",
+    "mood": {
+      "veryHappy": "{{petName}} is very happy and in great shape!",
+      "happy": "{{petName}} is happy and content.",
+      "hungry": "{{petName}} is starting to get hungry...",
+      "sad": "{{petName}} is sad and needs attention.",
+      "verySad": "{{petName}} is very unhappy and might run away."
+    },
+    "fedMessage": "{{petName}} was fed at {{time}}",
+    "errors": {
+      "fetchError": "Unable to fetch pet data",
+      "createError": "Unable to create pet",
+      "updateError": "Unable to update data"
     }
   },
   

@@ -378,25 +378,25 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
   
   const stopTimer = async () => {
     if (displayTime === 0) return;
-    
+  
     // Mettre en pause et calculer le temps final
     pauseTimer();
-    
+  
     const storedState = getTimerState();
     let finalTime = displayTime;
-    
+  
     if (storedState) {
       const now = Date.now();
       const elapsedSinceSave = Math.floor((now - storedState.timestamp) / 1000);
       finalTime = storedState.elapsedTime + (storedState.isRunning ? elapsedSinceSave : 0);
     }
-    
+  
     if (finalTime > 0 && selectedGoal) {
       try {
         // Mise à jour de la durée complétée de l'objectif
         const newCompletedDuration = (selectedGoal.completed_duration || 0) + finalTime;
-        
-        const { data, error: updateError } = await supabase
+  
+        const { data, error: updateGoalError } = await supabase
           .from('goals')
           .update({
             completed_duration: newCompletedDuration,
@@ -404,32 +404,77 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
           })
           .eq('id', selectedGoal.id)
           .select();
-          
-        if (updateError) throw updateError;
-        
+  
+        if (updateGoalError) throw updateGoalError;
+  
         // Enregistrer la session
-        const { error: insertError } = await supabase.from('study_sessions').insert({
+        const { error: insertSessionError } = await supabase.from('study_sessions').insert({
           user_id: user.id,
           goal_id: parseInt(selectedGoal.id),
           duration: finalTime,
           created_at: new Date().toISOString()
         });
-        
-        if (insertError) throw insertError;
-        
+  
+        if (insertSessionError) throw insertSessionError;
+  
         // Mettre à jour la progression quotidienne dans localStorage
         const today = getTodayDate();
         const key = `${DAILY_PROGRESS_KEY}_${selectedGoal.id}_${today}`;
-        
-        let currentProgress = 0;
+  
+        let todayProgress = 0;
         const storedProgress = localStorage.getItem(key);
         if (storedProgress) {
-          currentProgress = parseInt(storedProgress, 10);
+          todayProgress = parseInt(storedProgress, 10);
         }
-        
-        const newProgress = currentProgress + finalTime;
+  
+        const newProgress = finalTime; // Utiliser todayProgress au lieu de 0
         localStorage.setItem(key, newProgress.toString());
-        
+  
+        // **Ajout pour incrémenter les croquettes (CORRIGÉ)**
+        // Récupérer la progression quotidienne actuelle
+        const currentDailyProgress = localStorage.getItem(`${DAILY_PROGRESS_KEY}_${selectedGoal.id}_${getTodayDate()}`);
+        const currentDailyProgressValue = currentDailyProgress ? parseInt(currentDailyProgress, 10) : 0;
+  
+        // Calculer le pourcentage de complétion
+        const goalCompletionPercentage = selectedGoal.duration > 0
+          ? (currentDailyProgressValue / selectedGoal.duration) * 100
+          : 0; // Éviter la division par zéro
+  
+        // Vérifier si l'objectif est complété à 100% ou plus
+        if (goalCompletionPercentage >= 100) {
+          if (user) {
+            // 1. Récupérer l'objet pet actuel
+            const { data: userSettingsData, error: fetchError } = await supabase
+              .from('user_settings')
+              .select('pet')
+              .eq('user_id', user.id)
+              .single();
+  
+            if (fetchError) {
+              console.error('Error fetching user settings:', fetchError);
+            }
+  
+            if (userSettingsData?.pet) {
+              // 2. Incrémenter le nombre de croquettes
+              const updatedPet = { ...userSettingsData.pet, croquettes: (userSettingsData.pet.croquettes || 0) + 1 };
+  
+              // 3. Mettre à jour l'objet pet dans la base de données
+              const { error: updatePetError } = await supabase
+                .from('user_settings')
+                .update({ pet: updatedPet })
+                .eq('user_id', user.id);
+  
+              if (updatePetError) {
+                console.error('Error updating pet with croquettes:', updatePetError);
+              } else {
+                console.log('Croquette ajoutée pour la complétion de la session !');
+                // Optionnel : Mettre à jour l'état local des croquettes si nécessaire
+              }
+            }
+          }
+        }
+        // Fin de l'ajout pour les croquettes
+  
         // Appeler le callback
         if (onTimerStop && data && data.length > 0) {
           onTimerStop(selectedGoal.id, finalTime, data[0]);
@@ -438,7 +483,7 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
         console.error(t('timer.errorSavingStudySession'), error);
       }
     }
-    
+  
     // Réinitialiser le timer
     resetTimer();
   };

@@ -1,6 +1,6 @@
 // src/components/Navbar.jsx
 import { useState, useEffect } from 'react';
-import { User, Grid, BarChart2, Sun, Moon, Map, Menu, X } from 'lucide-react';
+import { User, Grid, BarChart2, Sun, Moon, Map, Menu, X, PawPrint } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -116,7 +116,14 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
               <BarChart2 size={16} className="mr-1" />
               {t('navbar.links.activity')}
             </Link>
-            
+            <Link 
+              to="/studie-pet" 
+              className={`btn justify-start ${location.pathname === '/studie-pet' ? 'tab-active' : ''}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <PawPrint size={16} className="mr-2" />
+              {t('navbar.links.studiePet')}
+            </Link>
           </div>
         </div>
         
@@ -197,6 +204,14 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
             >
               <BarChart2 size={16} className="mr-2" />
               {t('navbar.links.activity')}
+            </Link>
+            <Link 
+              to="/studie-pet" 
+              className={`btn justify-start ${location.pathname === '/activity' ? 'btn-soft btn-secondary' : 'btn-ghost'}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <PawPrint size={16} className="mr-2" />
+              {t('navbar.links.studiePet')}
             </Link>
             
             

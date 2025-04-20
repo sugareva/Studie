@@ -1,12 +1,15 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { HelmetProvider } from 'react-helmet-async';
 import Dashboard from './pages/Dashboard';
 import Activity from './pages/Activity';
 import Login from './pages/Login';
 import HomePage from './pages/HomePage';
+import StudiePetPage from './pages/StudiePetPage'; 
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import './i18n';
+
 
 // Composant pour protéger les routes privées
 function PrivateRoute({ children }) {
@@ -51,6 +54,11 @@ function App() {
           <Route path="/activity" element={
             <PrivateRoute>
               <Activity />
+            </PrivateRoute>
+          } />
+          <Route path="/studie-pet" element={
+            <PrivateRoute>
+              <StudiePetPage />
             </PrivateRoute>
           } />
           
