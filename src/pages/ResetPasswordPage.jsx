@@ -27,7 +27,6 @@ function ResetPasswordPage() {
         
         // Vérifier si le code est présent
         if (!code) {
-          console.log('No code found in URL');
           setError(t('resetPassword.errors.noCode'));
           return;
         }
@@ -42,7 +41,6 @@ function ResetPasswordPage() {
         }
         
         // Session établie avec succès
-        console.log('Session established successfully');
         setSessionEstablished(true);
       } catch (err) {
         console.error('Error during session establishment:', err);

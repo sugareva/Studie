@@ -85,9 +85,7 @@ function AuthForm({ setIsLoading: setParentLoading }) {
       } else {
         result = await signUp(email, password);
       }
-      
-      console.log(t('auth.debugMessages.authResult'), result); // Log pour déboguer
-      
+            
       if (result.error) {
         setError(result.error.message);
       } else if (result.data.session) {

@@ -1176,7 +1176,7 @@ const [selectedSkillInfo, setSelectedSkillInfo] = useState({ id: '', title: '' }
             setSelectedLanguage(progressResult.data.target_language || 'french');
             setCompletedSkills(progressResult.data.completed_skills || []);
           } else {
-            console.log("Aucune progression linguistique trouvée pour cet utilisateur. Utilisation des valeurs par défaut.");
+            
           }
         }
 

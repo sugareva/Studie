@@ -442,7 +442,7 @@ useEffect(() => {
     // Vérifier si cette croquette a déjà été réclamée
     const isAlreadyClaimed = claimedCroquettes.includes(goalProgress.claimKey);
     if (isAlreadyClaimed) {
-      console.log('Cette croquette a déjà été réclamée:', goalProgress.claimKey);
+     
       return false;
     }
     
@@ -456,7 +456,7 @@ useEffect(() => {
       
       // Sauvegarder dans localStorage pour persistance
       localStorage.setItem(CLAIMED_CROQUETTES_KEY, JSON.stringify(newClaimedCroquettes));
-      console.log('Croquettes réclamées sauvegardées:', newClaimedCroquettes);
+     
       
       // Mettre à jour en base de données
       await updatePetData({ croquettes: newCroquettes });
@@ -563,9 +563,7 @@ useEffect(() => {
           
           if (isMounted) {
             setGoals(goalsData || []);
-            
-            // S'assurer que les croquettes réclamées sont chargées avant de traiter les objectifs
-            console.log('Croquettes réclamées au moment de charger les objectifs:', claimedCroquettes);
+          
             
             // Traiter les données des objectifs
             processGoalsData(goalsData || []);
@@ -604,7 +602,7 @@ useEffect(() => {
       console.error('Error loading claimed croquettes in processGoalsData:', error);
     }
     
-    console.log('Traitement des objectifs avec croquettes réclamées:', currentClaimedCroquettes);
+
     
     for (const goal of goalsData) {
       const key = `${DAILY_PROGRESS_KEY}_${goal.id}_${today}`;
@@ -618,7 +616,7 @@ useEffect(() => {
       const goalClaimedKey = `${goal.id}_${today}`;
       const isClaimedCroquette = currentClaimedCroquettes.includes(goalClaimedKey);
       
-      console.log(`Objectif ${goal.name} - clé ${goalClaimedKey} - réclamé: ${isClaimedCroquette}`);
+
       
       if (isCompleted && isScheduledToday) {
         anyGoalCompleted = true;

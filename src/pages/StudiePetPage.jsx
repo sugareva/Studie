@@ -253,7 +253,6 @@ const [editedPetName, setEditedPetName] = useState(petName);
   const renderPetImage = () => {
     // Détermine l'humeur du chat (happy, sad)
     const mood = currentHappiness > 12 ? 'happy' : 'sad'; 
-    console.log("Rendering pet with mood:", mood, "currentHappiness:", currentHappiness);
     const getTimeOfDay = () => {
       // Si une heure de test est définie, l'utiliser
       if (window._testTimeOfDay) {

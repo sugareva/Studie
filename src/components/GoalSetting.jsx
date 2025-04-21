@@ -316,11 +316,10 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
         .map(session => session.id);
       
       if (orphanedSessionIds.length === 0) {
-        console.log('Aucune session orpheline à nettoyer');
         return;
       }
       
-      console.log(`${orphanedSessionIds.length} sessions orphelines trouvées, nettoyage en cours...`);
+      
       
       // 4. Supprimer les sessions orphelines une par une pour éviter les problèmes avec null
       for (const sessionId of orphanedSessionIds) {
@@ -335,7 +334,7 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
         }
       }
       
-      console.log('Nettoyage des sessions orphelines terminé');
+
       
     } catch (err) {
       console.error('Erreur lors du nettoyage des sessions orphelines:', err);

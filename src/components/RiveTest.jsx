@@ -27,7 +27,7 @@ const RiveTest = ({
       animation: "CroquetteFeeding"
     },
     sleeping: {
-      file: "cat_sleeping.riv",
+      file: "cat_sleep.riv",
       stateMachine: "Sleep",
       animation: "Sleep"
     }
@@ -50,7 +50,7 @@ const RiveTest = ({
   useEffect(() => {
     const newFileType = getFileType();
     if (newFileType !== currentFileType) {
-      console.log(`Changing Rive file type: ${currentFileType} -> ${newFileType}`);
+
       setCurrentFileType(newFileType);
       setKey(prev => prev + 1); // Force un rechargement complet
     }
@@ -67,9 +67,7 @@ const RiveTest = ({
     autoplay: true,
     onLoadError: (err) => console.error("ERROR LOADING RIVE", currentConfig.file, err),
     onLoad: (r) => {
-      console.log("LOADED RIVE", currentConfig.file);
-      console.log("Available animations:", r.animationNames);
-      console.log("Available state machines:", r.stateMachineNames);
+     
       riveInstance.current = r;
     },
     layout: new Layout({
@@ -78,17 +76,6 @@ const RiveTest = ({
     })
   });
   
-  // Logging pour le débogage
-  console.log("RiveTest rendering with:", {
-    mood,
-    isFeeding,
-    timeOfDay,
-    fileType: currentFileType,
-    file: currentConfig.file,
-    animation: currentConfig.animation,
-    stateMachine: currentConfig.stateMachine,
-    key
-  });
   
   return (
     <div className="w-full h-full">

@@ -162,9 +162,6 @@ function Activity() {
           throw sessionsError;
         }
         
-        console.log(t('activity.debug.sessionsLoaded'), sessionsData?.length);
-        console.log(t('activity.debug.goalsLoaded'), goalsData?.length);
-        console.log(t('activity.debug.availableGoals'), goalsData?.map(g => ({ id: g.id, type: typeof g.id, name: g.name })));
         
         // Pour chaque objectif, vérifier si nous avons une entrée pour aujourd'hui
         const today = getTodayDate();
@@ -182,13 +179,11 @@ function Activity() {
         // Définir l'objectif sélectionné par défaut (le premier)
         if (goalsData && goalsData.length > 0) {
           const firstGoal = goalsData[0];
-          console.log(t('activity.debug.settingDefaultGoal'), firstGoal.name, firstGoal.id, typeof firstGoal.id);
           setSelectedGoal(firstGoal);
           
           // Préparer les données pour les graphiques
           prepareChartData(sessionsData || [], firstGoal);
         } else {
-          console.log(t('activity.debug.noGoalsFound'));
           prepareChartData(sessionsData || [], null);
         }
         
@@ -261,7 +256,6 @@ function Activity() {
     
     // Données de complétion d'objectif pour la visualisation hebdomadaire
     if (goal) {
-      console.log(t('activity.debug.preparingChartData'), goal.name, goal.id);
       
       try {
         // Assurer que days est un tableau valide
@@ -309,7 +303,6 @@ function Activity() {
           }
           // Pour les jours futurs, totalSeconds reste à 0
           
-          console.log(t('activity.debug.dayDebugInfo', { day: dayStr, dayShort, totalSeconds, isScheduled }));
           
           // Déterminer si l'objectif a été atteint pour ce jour
           const isCompleted = totalSeconds >= goalDuration;
@@ -334,7 +327,6 @@ function Activity() {
         setGoalCompletionData([]);
       }
     } else {
-      console.log(t('activity.debug.noGoalSelected'));
       setGoalCompletionData([]);
     }
   };
@@ -342,7 +334,6 @@ function Activity() {
   // Gérer le changement d'objectif sélectionné
   const handleGoalChange = (event) => {
     const goalId = event.target.value;
-    console.log(t('activity.debug.goalSelected'), goalId, typeof goalId);
     
     // Convertir l'ID en nombre si nécessaire (les valeurs de select sont souvent des chaînes)
     // Certaines bases de données utilisent des IDs numériques
@@ -357,10 +348,6 @@ function Activity() {
       goal = goals.find(g => g.id === searchIdNumber);
     }
     
-    // Log détaillé pour comprendre le problème
-    console.log(t('activity.debug.searchingForGoal'), searchId, t('activity.debug.or'), searchIdNumber);
-    console.log(t('activity.debug.availableGoals'), goals.map(g => ({ id: g.id, type: typeof g.id, name: g.name })));
-    console.log(t('activity.debug.foundGoal'), goal);
     
     if (goal) {
       setSelectedGoal(goal);
@@ -371,7 +358,6 @@ function Activity() {
       
       // Solution de repli : s'il y a des objectifs disponibles, sélectionner le premier
       if (goals.length > 0) {
-        console.log(t('activity.debug.fallingBackToFirstGoal'), goals[0]);
         setSelectedGoal(goals[0]);
         prepareChartData(sessions, goals[0]);
       }

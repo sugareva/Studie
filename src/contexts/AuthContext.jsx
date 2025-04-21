@@ -60,7 +60,7 @@ export function AuthProvider({ children }) {
           }
         });
         
-        console.log("Réponse de signIn:", response); // Log pour déboguer
+       
         return response;
       } catch (error) {
         console.error("Erreur dans signIn:", error);
@@ -86,7 +86,7 @@ export function AuthProvider({ children }) {
           }
         });
         
-        console.log("Réponse de signUp:", response); // Log pour déboguer
+
         return response;
       } catch (error) {
         console.error("Erreur dans signUp:", error);
