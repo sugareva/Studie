@@ -17,7 +17,6 @@ export const refreshTokenIfNeeded = async () => {
   const { data } = await supabase.auth.getSession();
   
   if (!data.session) {
-    console.log('Pas de session active, impossible de rafraîchir');
     return false;
   }
   
@@ -29,7 +28,6 @@ export const refreshTokenIfNeeded = async () => {
   
   // Rafraîchir si moins de 10 minutes restantes
   if (timeUntilExpiry < 10 * 60 * 1000) {
-    console.log('Rafraîchissement du token (expiration dans', Math.round(timeUntilExpiry / 1000 / 60), 'minutes)');
     const { data: refreshData, error } = await supabase.auth.refreshSession();
     
     if (error) {
@@ -42,7 +40,6 @@ export const refreshTokenIfNeeded = async () => {
       if (refreshData.session && refreshData.session.expires_at) {
         const newExpiryTime = new Date(refreshData.session.expires_at * 1000);
         localStorage.setItem(TOKEN_EXPIRY_KEY, newExpiryTime.toString());
-        console.log('Nouveau token valide jusqu\'à', newExpiryTime);
       }
     } catch (e) {
       console.error('Erreur lors de la mise à jour de l\'expiration', e);
@@ -50,7 +47,6 @@ export const refreshTokenIfNeeded = async () => {
     
     return !!refreshData.session;
   } else {
-    console.log('Token encore valide pour', Math.round(timeUntilExpiry / 1000 / 60), 'minutes');
   }
   
   return true;
@@ -67,7 +63,6 @@ export const setupPeriodicTokenRefresh = () => {
     if (!isActive) {
       // Si on ne peut pas rafraîchir, arrêter l'intervalle
       clearInterval(intervalId);
-      console.log('Arrêt du rafraîchissement périodique - session inactive');
     }
   }, REFRESH_INTERVAL);
   
@@ -83,7 +78,6 @@ export const setupSessionPersistence = () => {
   // Rafraîchir le token lorsque l'application revient au premier plan
   const visibilityChangeHandler = () => {
     if (document.visibilityState === 'visible') {
-      console.log('Application revenue au premier plan, vérification de la session');
       refreshTokenIfNeeded();
     }
   };
@@ -92,7 +86,6 @@ export const setupSessionPersistence = () => {
   
   // Configurer la détection de connexion/déconnexion réseau
   const onlineHandler = () => {
-    console.log('Connexion internet rétablie, vérification de la session');
     refreshTokenIfNeeded();
   };
   
@@ -103,6 +96,5 @@ export const setupSessionPersistence = () => {
     clearInterval(refreshIntervalId);
     document.removeEventListener('visibilitychange', visibilityChangeHandler);
     window.removeEventListener('online', onlineHandler);
-    console.log('Nettoyage du système de persistance de session');
   };
 };

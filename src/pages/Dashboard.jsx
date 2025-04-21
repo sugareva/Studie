@@ -82,6 +82,7 @@ const updateDailyProgress = (goalId, duration) => {
   // Fonction pour gérer l'arrêt du timer avec mise à jour directe des données
   const handleTimerStop = (goalId, elapsedTime, updatedGoal) => {
     updateDailyProgress(goalId, elapsedTime);
+    setRefreshTrigger(prev => prev + 1);
   
     // Mise à jour directe à partir des données de la DB
     if (updatedGoal) {

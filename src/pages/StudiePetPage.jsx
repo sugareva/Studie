@@ -29,8 +29,6 @@ import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { PetProvider, usePet } from '../contexts/PetContext';
 import UserOptionsModal from '../components/UserOptionsModal';
-import catHappy from '../../public/pet/cat_happy.svg';
-import catSad from '../../public/pet/cat_sad.svg';
 import RiveTest from '../components/RiveTest';
 
 
@@ -225,7 +223,6 @@ const [editedPetName, setEditedPetName] = useState(petName);
             // Réinitialiser les états locaux
             setResetTime(null);
             setShowResetWarning(false);
-            setConsecutiveDays(0);
             
             // Afficher une notification ou une alerte
             alert(`${petName} a perdu tous ses niveaux par manque de nourriture !`);
@@ -294,12 +291,13 @@ const [editedPetName, setEditedPetName] = useState(petName);
           alt={`${petName} - ${t(`studiePet.mood.${mood}`)}`}
           className="w-auto h-auto max-w-full max-h-full object-contain transition-all duration-500"
         />*/}
-               <RiveTest 
-          mood={mood}
-          isFeeding={feedAnimation}
-          timeOfDay={getTimeOfDay()}
-          customAnimation={null} // Utilisez cette prop pour des animations spéciales
-        />
+<RiveTest 
+        mood={mood}
+        isFeeding={feedAnimation}
+        timeOfDay={getTimeOfDay()}
+        customAnimation={null}
+        currentPose={currentPose} // Ajout de la prop currentPose si nécessaire
+      />
         {/* Compteur de niveau */}
         <div className="absolute top-4 left-4 badge badge-lg badge-soft badge-primary gap-1 p-3">
           <Star className="w-4 h-4" />
@@ -401,8 +399,11 @@ const [editedPetName, setEditedPetName] = useState(petName);
           <div className="mb-6">
             <div className="flex justify-center mb-6">
             <RiveTest 
-         
-        />
+  mood="happy"  // Valeur par défaut
+  isFeeding={false}
+  timeOfDay="day"  // Valeur par défaut
+  customAnimation={null}
+/>
             </div>
             <label htmlFor="petName" className="label">
               <span className="label-text text-lg font-medium">{t('studiePet.petName')}</span>

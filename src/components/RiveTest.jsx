@@ -1,6 +1,5 @@
-// src/components/RiveTest.jsx
 import { useRive, Layout, Fit, Alignment } from "@rive-app/react-canvas";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const RiveTest = ({
   mood = "happy",
@@ -8,33 +7,70 @@ const RiveTest = ({
   timeOfDay = "day",
   customAnimation = null
 }) => {
-  // Suivi de l'état précédent pour détecter les changements
-  const [prevFeeding, setPrevFeeding] = useState(isFeeding);
+  const riveInstance = useRef(null);
   
-  // Utiliser un fichier unique pour tous les états si possible
-  // Sinon, sélectionnez le fichier en fonction de l'humeur de base
-  const baseFile = mood === "happy" ? 
-    (timeOfDay === "night" ? "cat_sleep.riv" : "cat_idle.riv") : 
-    "cat_sad.riv";
+  // Configuration spécifique pour chaque fichier Rive
+  const riveFiles = {
+    idle: {
+      file: "cat_idle.riv",
+      stateMachine: "Idle",
+      animation: "Timeline1"
+    },
+    sad: {
+      file: "cat_sad.riv",
+      stateMachine: "Cat_Sad",
+      animation: "Timeline1"
+    },
+    feeding: {
+      file: "cat_feeding.riv",
+      stateMachine: "Feeding",
+      animation: "CroquetteFeeding"
+    },
+    sleeping: {
+      file: "cat_sleeping.riv",
+      stateMachine: "Sleep",
+      animation: "Sleep"
+    }
+  };
   
+  // Déterminer quel type de fichier utiliser
+  const getFileType = () => {
+    if (isFeeding) return "feeding";
+    if (timeOfDay === "night") return "sleeping";
+    return mood === "happy" ? "idle" : "sad";
+  };
+  
+  // État pour le type de fichier actuel
+  const [currentFileType, setCurrentFileType] = useState(getFileType());
+  
+  // Force un rechargement quand le type de fichier change
+  const [key, setKey] = useState(0);
+  
+  // Mettre à jour le type de fichier quand l'état change
+  useEffect(() => {
+    const newFileType = getFileType();
+    if (newFileType !== currentFileType) {
+      console.log(`Changing Rive file type: ${currentFileType} -> ${newFileType}`);
+      setCurrentFileType(newFileType);
+      setKey(prev => prev + 1); // Force un rechargement complet
+    }
+  }, [mood, isFeeding, timeOfDay, currentFileType]);
+  
+  // Obtenir la configuration pour le type de fichier actuel
+  const currentConfig = riveFiles[currentFileType];
+  
+  // Charger le fichier Rive
   const { rive, RiveComponent } = useRive({
-    src: baseFile,
+    src: currentConfig.file,
+    animations: currentConfig.animation,
+    stateMachines: currentConfig.stateMachine,
     autoplay: true,
-    onLoadError: () => console.log("ERROR LOADING RIVE", baseFile),
+    onLoadError: (err) => console.error("ERROR LOADING RIVE", currentConfig.file, err),
     onLoad: (r) => {
-      console.log("LOADED RIVE", baseFile);
-      
-      // Si le chat est en train d'être nourri au chargement
-      if (isFeeding) {
-        // Essayez de jouer l'animation de nourrissage directement
-        try {
-          // Le nom de l'animation dans votre fichier Rive (pas le nom du fichier)
-          r.play("feeding"); // Remplacez par le nom réel de l'animation
-          console.log("Playing feeding animation on load");
-        } catch (err) {
-          console.error("Error playing feeding animation on load:", err);
-        }
-      }
+      console.log("LOADED RIVE", currentConfig.file);
+      console.log("Available animations:", r.animationNames);
+      console.log("Available state machines:", r.stateMachineNames);
+      riveInstance.current = r;
     },
     layout: new Layout({
       fit: Fit.Contain,
@@ -42,40 +78,21 @@ const RiveTest = ({
     })
   });
   
-  // Effet pour suivre les changements d'état de nourrissage
-  useEffect(() => {
-    // Si l'état de nourrissage a changé
-    if (prevFeeding !== isFeeding) {
-      // Mettre à jour l'état précédent
-      setPrevFeeding(isFeeding);
-      
-      if (!rive) return;
-      
-      try {
-        if (isFeeding) {
-          // Le nom correct de l'animation dans votre fichier Rive
-          console.log("Trying to play feeding animation");
-          rive.play("feeding"); // Remplacez par le nom réel de l'animation
-        } else if (customAnimation) {
-          console.log("Playing custom animation:", customAnimation);
-          rive.play(customAnimation);
-        } else {
-          // Revenir à l'animation par défaut
-          console.log("Playing default animation");
-          rive.play("idle"); // Remplacez par le nom de l'animation par défaut
-        }
-      } catch (err) {
-        console.error("Error triggering Rive animation:", err);
-      }
-    }
-  }, [rive, isFeeding, customAnimation, prevFeeding]);
-  
   // Logging pour le débogage
-  console.log("RiveTest rendering with mood:", mood, "isFeeding:", isFeeding, "file:", baseFile);
+  console.log("RiveTest rendering with:", {
+    mood,
+    isFeeding,
+    timeOfDay,
+    fileType: currentFileType,
+    file: currentConfig.file,
+    animation: currentConfig.animation,
+    stateMachine: currentConfig.stateMachine,
+    key
+  });
   
   return (
     <div className="w-full h-full">
-      <RiveComponent />
+      <RiveComponent key={key} />
     </div>
   );
 };
