@@ -861,8 +861,75 @@
     "examples": "Examples",
     "tips": "Tips",
     "noDetailsAvailable": "No content available for that language"
-  }
+  },
   
+    "homepage": {
+      "title": "Discover Studie and Organize Your Learning Effectively",
+      "button": "Sign-up today",
+      "maintitle": "Studie: Personalized Pomodoro Timer and Goal Tracking for Optimal Focus",
+      "metaDescription": "Studie: Flexible Pomodoro Timer, personalized goal tracking, and visualization of your study time. Designed to improve focus, especially for individuals with ADHD. Start for free!",
+      "metaKeywords": "pomodoro timer, pomodoro technique, concentration, focus, goal tracking, study organization, ADHD, learning productivity",
+      "subtitle": "Manage Your Study Path",
+      "feature1": {
+        "title": "Plan Your Work",
+        "description": "Define personalized study goals in terms of duration and days. Clearly visualize your daily schedule and track your work progress."
+      },
+      "feature2": {
+        "title": "Improve Your Focus",
+        "description": "Use the Pomodoro Technique to optimize your attention, an approach that can benefit everyone, including those with concentration difficulties (ADHD)."
+      },
+      "feature3": {
+        "title": "Track Your Progress Objectively",
+        "description": "Get factual information about the time spent on each subject. Accurately assess your efforts and adjust your strategies."
+      },
+      "feature4": {
+        "title": "Develop Sustainable Habits",
+        "description": "Integrate a regular study routine to maximize your long-term efficiency."
+      },
+      "adhdSection": {
+        "subtitle": "What You might be Facing",
+        "title": "Designed to Facilitate Learning, Especially for ADHD",
+        "challenge1": "Frequent need for stimulation and sensitivity to environmental distractions.",
+        "challenge2": "Difficulty maintaining attention on a single task for an extended period.",
+        "challenge3": "Tendency to postpone tasks perceived as difficult or uninteresting."
+      },
+      "studieHelp": {
+        "title": "How Studie Can Help You:",
+        "item1": {
+          "title": "Adaptable Structure",
+          "description": "Adjust your goals according to your daily rhythm and abilities."
+        },
+        "item2": {
+          "title": "Integrated Pomodoro Timer",
+          "description": "Alternate focus periods with scheduled breaks to support your attention."
+        },
+        "item3": {
+          "title": "Focus Mode",
+          "description": "Minimize visual distractions to fully concentrate on your work."
+        },
+        "item4": {
+          "title": "Your Studie Pet: A Playful Companion",
+          "description": "Follow the evolution of your virtual companion as you achieve your goals, adding an engaging dimension to your learning."
+        }
+      },
+      "faq": {
+        "title": "Frequently Asked Questions:",
+        "item1": {
+          "question": "How can the Pomodoro Technique help my concentration?",
+          "answer": "The Pomodoro Technique offers a time-based structure with defined work and break phases. This organization can make it easier to maintain attention, especially for individuals with attention disorders."
+        },
+        "item2": {
+          "question": "How can I visualize my progress and ensure my goals are realistic?",
+          "answer": "After signing up, you can create goals with specific durations and days. The integrated timer allows you to see the time spent on each task, helping with a more accurate assessment of your work and the feasibility of your goals."
+        },
+        "item3": {
+          "question": "How does Studie contribute to establishing a study routine?",
+          "answer": "By allowing the planning of sessions and the tracking of goal completion, Studie encourages the adoption of regular study habits. The visualization of progress and the playful aspect of the Studie Pet can reinforce this dynamic."
+        }
+      },
+      "cta": "Ready to Optimize Your Learning?",
+      "ctaButton": "Create a free account and get started today."
+    }
   
   
 }

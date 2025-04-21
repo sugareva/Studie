@@ -118,7 +118,7 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
             </Link>
             <Link 
               to="/studie-pet" 
-              className={`btn justify-start ${location.pathname === '/studie-pet' ? 'tab-active' : ''}`}
+              className={`tab justify-start ${location.pathname === '/studie-pet' ? 'tab-active' : ''}`}
               onClick={() => setIsMenuOpen(false)}
             >
               <PawPrint size={16} className="mr-2" />
@@ -207,7 +207,7 @@ function Navbar({ onOpenUserModal, userSettings: propUserSettings, learningLangu
             </Link>
             <Link 
               to="/studie-pet" 
-              className={`btn justify-start ${location.pathname === '/activity' ? 'btn-soft btn-secondary' : 'btn-ghost'}`}
+              className={`btn justify-start ${location.pathname === '/studie-pet' ? 'btn-soft btn-secondary' : 'btn-ghost'}`}
               onClick={() => setIsMenuOpen(false)}
             >
               <PawPrint size={16} className="mr-2" />

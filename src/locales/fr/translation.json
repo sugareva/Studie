@@ -867,6 +867,73 @@
     "examples": "Exemples",
     "tips": "Conseils",
     "noDetailsAvailable": "Pas de détails disponibles pour cette compétence."
+  },
+  "homepage": {
+    "title": "Découvrez Studie et organisez votre apprentissage",
+    "button": "Créez un compte",
+    "maintitle": "Studie : Timer Pomodoro Personnalisé et Suivi d'Objectifs pour une Concentration Optimale",
+    "metaDescription": "Studie : Timer Pomodoro flexible, suivi d'objectifs sur mesure et visualisation de votre temps d'étude. Conçu pour améliorer la concentration, notamment pour les personnes avec TDAH/ADHD. Commencez gratuitement !",
+    "metaKeywords": "timer pomodoro, technique pomodoro, concentration, focus, suivi objectifs, organisation étude, TDAH, ADHD, productivité apprentissage",
+    "subtitle": "Gérez votre parcours d'études",
+    "feature1": {
+      "title": "Planifiez Votre Travail",
+      "description": "Définissez des objectifs d'étude personnalisés en termes de durée et de jours. Visualisez clairement votre programme quotidien et suivez l'avancement de votre travail."
+    },
+    "feature2": {
+      "title": "Améliorez Votre Concentration",
+      "description": "Utilisez la technique Pomodoro pour optimiser votre attention, une approche qui peut être bénéfique pour tous, y compris ceux qui ont des difficultés de concentration (TDAH/ADHD)."
+    },
+    "feature3": {
+      "title": "Suivez Votre Progression Objectivement",
+      "description": "Obtenez des informations factuelles sur le temps consacré à chaque sujet. Évaluez précisément vos efforts et ajustez vos stratégies."
+    },
+    "feature4": {
+      "title": "Développez des Habitudes Durables",
+      "description": "Intégrez une routine d'étude régulière pour maximiser votre efficacité sur le long terme."
+    },
+    "adhdSection": {
+      "subtitle": "Les défis auxquels vous pouvez faire face",
+      "title": "Pensé pour faciliter l'apprentissage, notamment en cas de TDAH",
+      "challenge1": "Besoin fréquent de stimulation et sensibilité aux distractions environnementales.",
+      "challenge2": "Difficulté à maintenir l'attention sur une tâche unique pendant une période prolongée.",
+      "challenge3": "Tendance à remettre à plus tard les tâches perçues comme ardues ou peu intéressantes."
+    },
+    "studieHelp": {
+      "title": "Comment Studie Peut Vous Aider :",
+      "item1": {
+        "title": "Structure Adaptable",
+        "description": "Ajustez vos objectifs en fonction de votre rythme et de vos capacités au quotidien."
+      },
+      "item2": {
+        "title": "Timer Pomodoro Intégré",
+        "description": "Alternez des périodes de concentration avec des pauses planifiées pour soutenir votre attention."
+      },
+      "item3": {
+        "title": "Mode Focus",
+        "description": "Minimisez les distractions visuelles pour vous concentrer pleinement sur votre travail."
+      },
+      "item4": {
+        "title": "Votre Studie Pet : Un Accompagnement Ludique",
+        "description": "Obtenez un animal virtuel et suivez son évolution en atteignant vos objectifs, afin de garder la motivation"
+      }
+    },
+    "faq": {
+      "title": "Questions fréquentes :",
+      "item1": {
+        "question": "Comment la méthode Pomodoro peut-elle aider ma concentration ?",
+        "answer": "La méthode Pomodoro propose une structure temporelle avec des phases de travail et de pause définies. Cette organisation peut faciliter le maintien de l'attention, en particulier pour les personnes ayant des troubles de l'attention."
+      },
+      "item2": {
+        "question": "Comment puis-je visualiser mes progrès et m'assurer que mes objectifs sont réalistes ?",
+        "answer": "Après inscription, vous pouvez créer des objectifs avec des durées et des jours spécifiques. Le minuteur intégré vous permet de voir le temps passé sur chaque tâche, aidant ainsi à une évaluation plus précise de votre travail et de la faisabilité de vos objectifs."
+      },
+      "item3": {
+        "question": "Comment Studie contribue-t-il à établir une routine d'étude ?",
+        "answer": "En permettant la planification des sessions et le suivi de la réalisation des objectifs, Studie encourage l'adoption d'habitudes d'étude régulières. La visualisation de l'avancement et l'aspect ludique de Studie peuvent renforcer cette dynamique."
+      }
+    },
+    "cta": "Prêt à optimiser votre apprentissage ?",
+    "ctaButton": "Créez un compte gratuitement et commencez dès aujourd'hui."
   }
   
 

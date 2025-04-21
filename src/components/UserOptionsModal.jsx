@@ -75,7 +75,6 @@ const fetchUserSettings = async () => {
     setError(null);
     
     // Récupérer les données de langue cible
-    // Récupérer les données de langue cible
 try {
   const { data: langData, error: langError } = await supabase
     .from('language_progress')

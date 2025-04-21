@@ -320,6 +320,13 @@ const Timer = ({ selectedGoal, onTimerStop }) => {
     }
     
     setIsRunning(true);
+
+    window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    'event': 'timerInteraction',
+    'timerAction': 'start',
+    'timerLabel': 'Homepage Timer'
+  });
     
     // Mettre à jour le titre lors du démarrage
     updatePageTitle(displayTime);

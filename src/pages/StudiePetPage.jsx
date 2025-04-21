@@ -62,7 +62,6 @@ const StudiePetContent = () => {
   } = usePet();
   
   // États locaux
-  const [showTestPanel, setShowTestPanel] = useState(false);
   const [showCroquetteAnimation, setShowCroquetteAnimation] = useState(false);
   const [feedAnimation, setFeedAnimation] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
@@ -722,80 +721,7 @@ const [editedPetName, setEditedPetName] = useState(petName);
     </div>
   </div>
 </div>
-{/* Bouton pour afficher/masquer le panneau de test */}
-<div className="fixed bottom-4 right-4">
-  <button 
-    onClick={() => setShowTestPanel(!showTestPanel)} 
-    className="btn btn-circle btn-sm btn-primary"
-  >
-    {showTestPanel ? 'X' : 'T'}
-  </button>
-</div>
 
-{/* Panneau de test */}
-{showTestPanel && (
-  <div className="fixed bottom-16 right-4 bg-base-200 p-4 rounded-lg shadow-lg z-50 w-64">
-    <h3 className="text-sm font-bold mb-2">Panneau de test</h3>
-    
-    <div className="space-y-2">
-      {/* Test d'humeur */}
-      <div className="form-control">
-        <label className="label cursor-pointer justify-start gap-2">
-          <span className="label-text">Chat triste</span>
-          <input 
-            type="checkbox" 
-            className="toggle toggle-primary toggle-sm" 
-            checked={currentHappiness <= 12}
-            onChange={() => setCurrentHappiness(currentHappiness > 12 ? 6 : 18)}
-          />
-        </label>
-      </div>
-      
-      {/* Test de nourrissage */}
-      <button 
-        onClick={() => {
-          setFeedAnimation(true);
-          setTimeout(() => setFeedAnimation(false), 3000);
-        }}
-        className="btn btn-xs btn-primary w-full"
-      >
-        Tester nourrissage (3s)
-      </button>
-      
-      {/* Test d'heure */}
-      <div>
-        <p className="text-xs mb-1">Simuler heure du jour:</p>
-        <div className="grid grid-cols-4 gap-1">
-          {['Matin', 'Jour', 'Soir', 'Nuit'].map(time => (
-            <button 
-              key={time}
-              onClick={() => {
-                // Ici, nous simulons un changement d'heure en forçant
-                // la fonction getTimeOfDay à retourner une valeur spécifique
-                // Vous devrez adapter cette partie à votre code
-                window._testTimeOfDay = time.toLowerCase();
-                // Force refresh
-                setFeedAnimation(true);
-                setTimeout(() => setFeedAnimation(false), 10);
-              }}
-              className="btn btn-xs"
-            >
-              {time}
-            </button>
-          ))}
-        </div>
-      </div>
-      
-      {/* Informations sur l'état actuel */}
-      <div className="bg-base-300 p-2 rounded text-xs">
-        <p>Bonheur: {currentHappiness}/24</p>
-        <p>Humeur: {currentHappiness > 12 ? 'Content' : 'Triste'}</p>
-        <p>Heure: {window._testTimeOfDay || 'Normale'}</p>
-        <p>Animation: {feedAnimation ? 'Nourrissage' : 'Standard'}</p>
-      </div>
-    </div>
-  </div>
-)}
       
       {/* Help Modal */}
       {isHelpModalOpen && (

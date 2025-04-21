@@ -202,23 +202,23 @@ const HomePage = () => {
   // Données des avantages pour le contenu SEO
   const benefits = [
     {
-      title: t('home.benefits.focusTitle', 'Améliorez votre concentration'),
-      description: t('home.benefits.focusDescription', 'La technique Pomodoro aide particulièrement les personnes avec TDAH/ADHD à maintenir leur attention.'),
+      title: t('homepage.feature1.title'),
+      description: t('homepage.feature1.description'),
       icon: Brain
     },
     {
-      title: t('home.benefits.structureTitle', 'Structurez votre apprentissage'),
-      description: t('home.benefits.structureDescription', 'Définissez des objectifs personnalisés et suivez votre progression réelle.'),
+      title: t('homepage.feature2.title'),
+      description: t('homepage.feature2.description'),
       icon: Target
     },
     {
-      title: t('home.benefits.progressTitle', 'Visualisez votre progression'),
-      description: t('home.benefits.progressDescription', 'Combattez l\'effet Dunning-Kruger grâce à des données objectives sur votre temps d\'étude.'),
+      title: t('homepage.feature3.title'),
+      description: t('homepage.feature3.description'),
       icon: BarChart2
     },
     {
-      title: t('home.benefits.regularityTitle', 'Créez une routine d\'apprentissage'),
-      description: t('home.benefits.regularityDescription', 'Établissez des habitudes régulières pour maximiser vos résultats sur le long terme.'),
+      title: t('homepage.feature4.title'),
+      description: t('homepage.feature4.description'),
       icon: CheckCircle
     }
   ];
@@ -226,16 +226,16 @@ const HomePage = () => {
   // FAQ pour le contenu SEO
   const faqItems = [
     {
-      question: t('home.faq.question1', 'Comment la technique Pomodoro aide-t-elle les personnes avec TDAH/ADHD ?'),
-      answer: t('home.faq.answer1', 'La technique Pomodoro est particulièrement efficace pour les personnes avec TDAH/ADHD car elle fournit une structure externe, décompose le travail en sessions courtes et gérables, et alterne entre concentration et pauses, ce qui correspond bien aux fluctuations naturelles d\'attention.')
+      question: t('homepage.faq.item1.question'),
+      answer: t('homepage.faq.item1.answer'),
     },
     {
-      question: t('home.faq.question2', 'Comment visualiser ma progression dans l\'apprentissage ?'),
-      answer: t('home.faq.answer2', 'StudyApp vous permet de visualiser concrètement le temps que vous consacrez à chaque objectif grâce à des graphiques et statistiques. Cette vision objective vous aide à éviter la surestimation ou sous-estimation de vos progrès (effet Dunning-Kruger).')
+      question: t('homepage.faq.item2.question'),
+      answer: t('homepage.faq.item2.answer'),
     },
     {
-      question: t('home.faq.question3', 'Comment paramétrer des objectifs d\'étude réalistes ?'),
-      answer: t('home.faq.answer3', 'Dans StudyApp, vous pouvez définir des objectifs personnalisés en spécifiant la durée cible pour chaque jour de la semaine, ce qui vous permet d\'adapter vos objectifs à votre emploi du temps réel et à vos capacités de concentration.')
+      question: t('homepage.faq.item3.question'),
+      answer: t('homepage.faq.item3.answer'),
     }
   ];
 
@@ -373,65 +373,77 @@ const HomePage = () => {
   // Rendu normal de la page avec améliorations SEO
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden bg-base-100">
-      <Helmet>
-        <title>Studie| Timer Pomodoro et Suivi d'Objectifs personnalisés</title>
-        <meta name="description" content="StudyApp: Timer Pomodoro, suivi d'objectifs et visualisation de progression conçus pour les personnes ayant des difficultés de concentration (TDAH/ADHD). Essayez gratuitement!" />
-        <meta name="keywords" content="pomodoro timer, technique pomodoro, TDAH, ADHD, concentration, suivi objectifs, tracker temps d'étude" />
-        
-        {/* Structured data pour application */}
-        <script type="application/ld+json">
-          {`
+     <Helmet>
+    <title>{t('homepage.maintitle')}</title>
+    <meta
+          name="description"
+          content={t(
+            'homepage.metaDescription',
+            'Studie : Timer Pomodoro flexible, suivi d\'objectifs sur mesure et visualisation de votre temps d\'étude. Conçu pour améliorer la concentration, notamment pour les personnes avec TDAH/ADHD. Commencez gratuitement !'
+          )}
+        />
+    <meta
+          name="keywords"
+          content={t(
+            'homepage.metaKeywords',
+            'timer pomodoro, technique pomodoro, concentration, focus, suivi objectifs, organisation étude, TDAH, ADHD, productivité apprentissage'
+          )}
+        />
+
+    {/* Structured data pour application */}
+    <script type="application/ld+json">
+      {`
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "Studie",
+          "applicationCategory": "EducationalApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+          },
+          "description": "Studie : Timer Pomodoro personnalisé et suivi d'objectifs pour optimiser votre concentration et structurer votre apprentissage."
+        }
+      `}
+    </script>
+
+    {/* Structured data pour FAQ (basé sur les questions fréquentes réécrites) */}
+    <script type="application/ld+json">
+      {`
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
             {
-              "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              "name": "Studie",
-              "applicationCategory": "EducationalApplication",
-              "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "EUR"
-              },
-              "description": "Timer Pomodoro et suivi d'objectifs pour personnes avec TDAH/ADHD"
-            }
-          `}
-        </script>
-        
-        {/* Structured data pour FAQ */}
-        <script type="application/ld+json">
-          {`
+              "@type": "Question",
+              "name": "Comment la méthode Pomodoro peut-elle aider ma concentration ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "La méthode Pomodoro propose une structure temporelle avec des phases de travail et de pause définies. Cette organisation peut faciliter le maintien de l'attention, en particulier pour les personnes ayant des troubles de l'attention."
+              }
+            },
             {
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              "mainEntity": [
-                {
-                  "@type": "Question",
-                  "name": "Comment la technique Pomodoro aide-t-elle les personnes avec TDAH/ADHD ?",
-                  "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "La technique Pomodoro est particulièrement efficace pour les personnes avec TDAH/ADHD car elle fournit une structure externe, décompose le travail en sessions courtes et gérables, et alterne entre concentration et pauses, ce qui correspond bien aux fluctuations naturelles d'attention."
-                  }
-                },
-                {
-                  "@type": "Question",
-                  "name": "Comment visualiser ma progression dans l'apprentissage ?",
-                  "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "StudyApp vous permet de visualiser concrètement le temps que vous consacrez à chaque objectif grâce à des graphiques et statistiques. Cette vision objective vous aide à éviter la surestimation ou sous-estimation de vos progrès (effet Dunning-Kruger)."
-                  }
-                },
-                {
-                  "@type": "Question",
-                  "name": "Comment paramétrer des objectifs d'étude réalistes ?",
-                  "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Dans StudyApp, vous pouvez définir des objectifs personnalisés en spécifiant la durée cible pour chaque jour de la semaine, ce qui vous permet d'adapter vos objectifs à votre emploi du temps réel et à vos capacités de concentration."
-                  }
-                }
-              ]
+              "@type": "Question",
+              "name": "Comment puis-je visualiser mes progrès et m'assurer que mes objectifs sont réalistes ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Après inscription, vous pouvez créer des objectifs avec des durées et des jours spécifiques. Le minuteur intégré vous permet de voir le temps passé sur chaque tâche, aidant ainsi à une évaluation plus précise de votre travail et de la faisabilité de vos objectifs."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Comment Studie contribue-t-il à établir une routine d'étude ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "En permettant la planification des sessions et le suivi de la réalisation des objectifs, Studie encourage l'adoption d'habitudes d'étude régulières. La visualisation de l'avancement et l'aspect ludique du Studie Pet peuvent renforcer cette dynamique."
+              }
             }
-          `}
-        </script>
-      </Helmet>
+          ]
+        }
+      `}
+    </script>
+  </Helmet>
       
       {/* Contenu principal */}
       <div className="flex flex-col min-h-screen items-center py-4 px-4">
@@ -643,14 +655,14 @@ const HomePage = () => {
         <div ref={mainContentRef} className="max-w-5xl mx-auto mt-24 pt-12 w-full">
           <div className="divider mb-12">
             <span className="text-base-content opacity-60">
-              {t('home.seoContentDivider', 'Découvrez Studie')}
+              {t('homepage.title')}
             </span>
           </div>
           
           {/* Section principale - avantages */}
           <section className="mb-16">
             <h2 className="text-3xl font-bold text-center mb-12">
-              {t('home.benefits.title', 'Un cadre structuré pour votre apprentissage')}
+            {t('homepage.subtitle')}
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -661,9 +673,9 @@ const HomePage = () => {
                     <div className="card-body">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="p-2 rounded-full bg-primary bg-opacity-10">
-                          <Icon size={22} className="text-primary" />
+                          <Icon size={22} className="text-neutral" />
                         </div>
-                        <h3 className="card-title text-lg">{benefit.title}</h3>
+                        <h3 className="card-title">{benefit.title}</h3>
                       </div>
                       <p className="text-base-content opacity-80">{benefit.description}</p>
                     </div>
@@ -677,59 +689,59 @@ const HomePage = () => {
           {/* Section TDAH/ADHD */}
           <section className="mb-16">
             <h2 className="text-3xl font-bold text-center mb-8">
-              {t('home.seoContent.tdah.title', 'Conçu pour les personnes avec TDAH')}
+              {t('homepage.adhdSection.title')}
             </h2>
             
             <div className="bg-primary text-primary-content p-8 rounded-2xl">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-xl font-semibold mb-4">
-                    {t('home.seoContent.tdah.challenges', 'Les défis de l\'apprentissage avec TDAH/ADHD')}
+                  {t('homepage.adhdSection.subtitle')}
                   </h3>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-2">
                       <div className="bg-white bg-opacity-20 p-1 rounded-full mt-1">
                         <Check size={14} />
                       </div>
-                      <span>{t('home.seoContent.tdah.challenge1', 'Difficulté à maintenir l\'attention sur une tâche')}</span>
+                      <span>{t('homepage.adhdSection.challenge1')}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="bg-white bg-opacity-20 p-1 rounded-full mt-1">
                         <Check size={14} />
                       </div>
-                      <span>{t('home.seoContent.tdah.challenge2', 'Tendance à procrastiner et éviter les tâches complexes')}</span>
+                      <span>{t('homepage.adhdSection.challenge2')}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="bg-white bg-opacity-20 p-1 rounded-full mt-1">
                         <Check size={14} />
                       </div>
-                      <span>{t('home.seoContent.tdah.challenge3', 'Besoin constant de stimulation et susceptibilité aux distractions')}</span>
+                      <span>{t('homepage.adhdSection.challenge3')}</span>
                     </li>
                   </ul>
                 </div>
                 
                 <div>
                   <h3 className="text-xl font-semibold mb-4">
-                    {t('home.seoContent.tdah.solutions', 'Comment Studie vous aide')}
+                    {t('homepage.studieHelp.title')}
                   </h3>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-2">
                       <div className="bg-white bg-opacity-20 p-1 rounded-full mt-1">
                         <Check size={14} />
                       </div>
-                      <span>{t('home.seoContent.tdah.solution1', 'Timer Pomodoro avec alternance travail/pause adaptée aux fluctuations d\'attention')}</span>
+                      <span>{t('homepage.studieHelp.item1.description')}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="bg-white bg-opacity-20 p-1 rounded-full mt-1">
                         <Check size={14} />
                       </div>
-                      <span>{t('home.seoContent.tdah.solution2', 'Mode focus plein écran pour éliminer les distractions visuelles')}</span>
+                      <span>{t('homepage.studieHelp.item3.description')}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="bg-white bg-opacity-20 p-1 rounded-full mt-1">
                         <Check size={14} />
                       </div>
-                      <span>{t('home.seoContent.tdah.solution3', 'Structure flexible adaptée à vos capacités réelles')}</span>
+                      <span>{t('homepage.studieHelp.item4.description')}</span>
                     </li>
                   </ul>
                 </div>
@@ -740,7 +752,7 @@ const HomePage = () => {
           {/* FAQ Section */}
           <section className="mb-16">
             <h2 className="text-3xl font-bold text-center mb-8">
-              {t('home.seoContent.faq.title', 'Questions fréquentes')}
+              {t('homepage.faq.title')}
             </h2>
             
             <div className="space-y-4">
@@ -761,30 +773,20 @@ const HomePage = () => {
           {/* CTA final */}
           <section className="mb-16 text-center">
             <h2 className="text-3xl font-bold mb-6">
-              {t('home.seoContent.cta.title', 'Prêt à transformer votre façon d\'apprendre ?')}
+              {t('homepage.cta')}
             </h2>
             <p className="text-xl opacity-80 max-w-2xl mx-auto mb-8">
-              {t('home.seoContent.cta.description', 'Créez un compte gratuit et commencez à structurer votre apprentissage dès aujourd\'hui.')}
+            {t('homepage.ctaButton')}
             </p>
             <Link to="/login" className="btn btn-primary btn-lg">
-              {t('home.seoContent.cta.button', 'Créer un compte gratuit')}
+            {t('homepage.button')}
             </Link>
           </section>
         </div>
         
         {/* Footer */}
         <footer className="text-center text-base-content text-opacity-60 py-6 text-sm">
-          <div className="mb-4 flex justify-center gap-4">
-            <Link to="/technique-pomodoro-tdah" className="hover:underline">
-              {t('home.footer.pomodoro', 'Technique Pomodoro')}
-            </Link>
-            <Link to="/fonctionnalites" className="hover:underline">
-              {t('home.footer.features', 'Fonctionnalités')}
-            </Link>
-            <Link to="/login" className="hover:underline">
-              {t('home.footer.login', 'Se connecter')}
-            </Link>
-          </div>
+         
           <p>© 2025 Studie - {t('home.footerText')}</p>
         </footer>
       </div>
