@@ -438,59 +438,62 @@ function Activity() {
     try {
       setLoading(true);
       
-      // 1. Récupérer l'objectif associé pour connaître sa durée actuelle
-      const { data: goalData, error: goalError } = await supabase
-        .from('goals')
-        .select('completed_duration')
-        .eq('id', sessionToDelete.goal_id)
-        .single();
-      
-      if (goalError) {
-        throw goalError;
+      // Vérifiez d'abord si goal_id est null
+      if (sessionToDelete.goal_id) {
+        // 1. Récupérer l'objectif associé pour connaître sa durée actuelle
+        const { data: goalData, error: goalError } = await supabase
+          .from('goals')
+          .select('completed_duration')
+          .eq('id', sessionToDelete.goal_id)
+          .single();
+        
+        if (goalError) {
+          console.error("Erreur lors de la récupération de l'objectif:", goalError);
+          // Continuer avec la suppression même si on ne peut pas mettre à jour l'objectif
+        } else if (goalData) {
+          // 3. Mettre à jour la durée complétée de l'objectif
+          const newCompletedDuration = Math.max(0, (goalData.completed_duration || 0) - sessionToDelete.duration);
+          
+          const { error: updateError } = await supabase
+            .from('goals')
+            .update({ completed_duration: newCompletedDuration })
+            .eq('id', sessionToDelete.goal_id);
+          
+          if (updateError) {
+            console.error("Erreur lors de la mise à jour de l'objectif:", updateError);
+            // Continuer avec la suppression même si la mise à jour échoue
+          }
+        }
       }
       
-      // 2. Supprimer la session
+      // 2. Supprimer la session (toujours effectué, que goal_id soit null ou non)
       const { error: sessionError } = await supabase
         .from('study_sessions')
         .delete()
         .eq('id', sessionToDelete.id);
       
-      if (sessionError) {
-        throw sessionError;
-      }
+      if (sessionError) throw sessionError;
       
-      // 3. Mettre à jour la durée complétée de l'objectif
-      if (goalData) {
-        const newCompletedDuration = Math.max(0, (goalData.completed_duration || 0) - sessionToDelete.duration);
-        
-        const { error: updateError } = await supabase
-          .from('goals')
-          .update({ completed_duration: newCompletedDuration })
-          .eq('id', sessionToDelete.goal_id);
-        
-        if (updateError) {
-          throw updateError;
+      // 4. Si la session est d'aujourd'hui et que goal_id n'est pas null, mettre à jour la progression quotidienne
+      if (sessionToDelete.goal_id) {
+        const sessionDate = new Date(sessionToDelete.created_at);
+        if (isToday(sessionDate)) {
+          const today = getTodayDate();
+          const key = `${DAILY_PROGRESS_KEY}_${sessionToDelete.goal_id}_${today}`;
+          
+          // Récupérer la progression existante
+          let currentProgress = 0;
+          const storedProgress = localStorage.getItem(key);
+          if (storedProgress) {
+            currentProgress = parseInt(storedProgress, 10);
+          }
+          
+          // Calculer la nouvelle progression (en s'assurant qu'elle ne devient pas négative)
+          const newProgress = Math.max(0, currentProgress - sessionToDelete.duration);
+          
+          // Mettre à jour le localStorage
+          localStorage.setItem(key, newProgress.toString());
         }
-      }
-      
-      // 4. Si la session est d'aujourd'hui, mettre à jour la progression quotidienne
-      const sessionDate = new Date(sessionToDelete.created_at);
-      if (isToday(sessionDate)) {
-        const today = getTodayDate();
-        const key = `${DAILY_PROGRESS_KEY}_${sessionToDelete.goal_id}_${today}`;
-        
-        // Récupérer la progression existante
-        let currentProgress = 0;
-        const storedProgress = localStorage.getItem(key);
-        if (storedProgress) {
-          currentProgress = parseInt(storedProgress, 10);
-        }
-        
-        // Calculer la nouvelle progression (en s'assurant qu'elle ne devient pas négative)
-        const newProgress = Math.max(0, currentProgress - sessionToDelete.duration);
-        
-        // Mettre à jour le localStorage
-        localStorage.setItem(key, newProgress.toString());
       }
       
       // 5. Mettre à jour la liste locale des sessions
@@ -510,7 +513,6 @@ function Activity() {
       setLoading(false);
     }
   };
-
   // Gestionnaire de mise à jour des paramètres utilisateur
   const handleUpdateSettings = (updatedSettings) => {
     setUserSettings(updatedSettings);

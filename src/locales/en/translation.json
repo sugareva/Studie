@@ -503,7 +503,8 @@
     "links": {
       "dashboard": "Dashboard",
       "activity": "Activity",
-      "studiePet": "Studie Pet"
+      "studiePet": "Studie Pet",
+      "language": "Choose your language"
     },
     
     "buttons": {
@@ -552,14 +553,22 @@
     "vacationMode": "Vacation mode",
     "vacationOn": "Vacation active",
     "todaysGoals": "Today's goals",
+    "consecutiveDays":"Streak of days feeding",
     "helpTitle": "How does Studie Pet work?",
     "helpDescription": "Studie Pet is a feature that motivates you to study regularly:",
     "helpComplete": "Complete your daily goals to get treats",
     "helpFeed": "Feed your pet with treats to keep it happy",
-    "helpHappiness": "If it's not fed, it will become sad and might run away",
+    "helpHappiness": "If it's not starving during 24h, it will go back to level 1",
+    "helpAccessories": "Your pet can level up to get new attributes",
     "helpLevels": "Your pet gains levels as you study regularly",
     "helpVacation": "Activate vacation mode when you can't study",
     "understood": "Got it!",
+    "vacation": {
+      "vacationOn": "Vacation Mode is on",
+      "VacationAlert":"You can't feed your pet while on vacation mode",
+      "vacationDescription": "{{petName}} is waiting for your return and is not losing happiness",
+      "vacationButton": "I'm back"
+    },
     "mood": {
       "veryHappy": "{{petName}} is very happy and in great shape!",
       "happy": "{{petName}} is happy and content.",

@@ -309,7 +309,7 @@ const [editedPetName, setEditedPetName] = useState(petName);
         
         {/* Indicateur de bonheur */}
         <div className="absolute top-4 right-4 z-10">
-    <div className="tooltip tooltip-bottom" data-tip={`Bonheur: ${currentHappiness}/24`}>
+    <div className="tooltip tooltip-bottom" data-tip={`${currentHappiness}/24`}>
       <div className="flex items-center gap-2 bg-base-100 bg-opacity-60 backdrop-blur-sm rounded-full px-3 py-1 shadow-md">
         <Heart
           className={`${currentHappiness >= 12 ? "text-error" : "text-error opacity-50"} w-5 h-5`}
@@ -457,15 +457,15 @@ const [editedPetName, setEditedPetName] = useState(petName);
     {isOnVacation && (
       <div className="absolute inset-0 bg-base-300 bg-opacity-80 backdrop-blur-sm rounded-3xl z-30 flex flex-col items-center justify-center p-4">
         <Moon className="w-12 h-12 text-info mb-4" />
-        <h2 className="text-xl font-bold text-center mb-2">Mode vacances actif</h2>
+        <h2 className="text-xl font-bold text-center mb-2"> {t('studiePet.vacation.vacationOn')}</h2>
         <p className="text-center text-base-content opacity-80 max-w-xs">
-          {petName} ne perd plus de bonheur jusqu'à ce que vous désactiviez le mode vacances.
+          {t('studiePet.vacation.vacationDescription',{petName: petName})}
         </p>
         <button 
           onClick={toggleVacationMode}
           className="btn btn-outline btn-info mt-4"
         >
-          Désactiver le mode vacances
+          {t('studiePet.vacation.vacationButton')}
         </button>
       </div>
     )}
@@ -515,7 +515,7 @@ const [editedPetName, setEditedPetName] = useState(petName);
           {/* Mode vacances */}
           <div>
   <label className="label cursor-pointer justify-start gap-2">
-    <span className="label-text text-sm">Mode vacances</span>
+    <span className="label-text text-sm">{t('studiePet.vacationMode')}</span>
     <input 
       type="checkbox" 
       className="toggle toggle-info toggle-sm" 
@@ -542,10 +542,11 @@ const [editedPetName, setEditedPetName] = useState(petName);
             </div>
             
             {/* Badge jours consécutifs */}
+            <div className="tooltip tooltip-bottom" data-tip={t('studiePet.consecutiveDays')}>
             <div className="badge badge-soft badge-secondary bg-opacity-20 text-secondary font-bold gap-1 p-2">
               <CalendarDays className="w-3 h-3" />
               <span>{consecutiveDays}</span>
-            </div>
+            </div></div>
           </div>
         </div>
         
@@ -674,9 +675,9 @@ const [editedPetName, setEditedPetName] = useState(petName);
       
     {/* Si en mode vacances, afficher un message explicatif */}
     {isOnVacation && (
-      <div className="alert alert-info mt-2 py-2 text-xs">
+      <div className="alert alert-warning alert-soft mt-2 py-2 text-xs">
         <Info className="w-3 h-3" />
-        <span>Vous ne pouvez pas réclamer de croquettes en mode vacances.</span>
+        <span>{t('studiePet.vacation.VacationAlert')}</span>
       </div>
     )}
     

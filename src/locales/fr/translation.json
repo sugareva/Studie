@@ -525,6 +525,7 @@
     "fedTimeYesterday": "Nourri hier à {{time}}",
     "fedTimeDateFull": "Nourri le {{date}} à {{time}}",
     "happyCat": "Chat content",
+    "consecutiveDays":"Jours consécutifs",
     "sadCat": "Chat triste",
     "vacationMode": "Mode vacances",
     "vacationOn": "Vacances actives",
@@ -533,10 +534,17 @@
     "helpDescription": "Studie Pet est une fonctionnalité qui te motive à étudier régulièrement :",
     "helpComplete": "Complète tes objectifs quotidiens pour obtenir des croquettes",
     "helpFeed": "Nourris ton animal avec les croquettes pour le garder heureux",
-    "helpHappiness": "S'il n'est pas nourri, il deviendra triste et finira par s'enfuir",
+    "helpHappiness": "Si il est affamé durant 24 heures, il revient au niveau 1",
     "helpLevels": "Ton animal gagne des niveaux au fur et à mesure que tu étudies régulièrement",
+    "helpAccessories": "En gagnant des niveaux, ton animal améliore son apparence",
     "helpVacation": "Active le mode vacances quand tu ne peux pas étudier",
     "understood": "J'ai compris !",
+    "vacation": {
+      "vacationOn": "Mode vacances actif",
+      "VacationAlert": "Vous ne pouvez pas réclamer de croquettes en mode vacances.",
+      "vacationDescription": "{{petName}} ne perd pas de bonheur en attendant ton retour",
+      "vacationButton": "Désactiver le mode vacances"
+    },
     "mood": {
       "veryHappy": "Il est très content et en pleine forme !",
       "happy": "Il est heureux et satisfait.",
@@ -556,7 +564,8 @@
     "links": {
       "dashboard": "Dashboard",
       "activity": "Activité",
-      "studiePet": "Studie Pet"
+      "studiePet": "Studie Pet",
+      "language": "Langue"
     },
     "buttons": {
       "darkMode": "Mode sombre",

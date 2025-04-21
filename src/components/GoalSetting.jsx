@@ -142,11 +142,29 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
 
   // Effet pour le chargement initial
   useEffect(() => {
-    if (user) {
-      fetchGoals();
+    async function fetchData() {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        
+        // Nettoyer d'abord les sessions orphelines
+        await cleanupOrphanedSessions();
+        
+        // Puis charger les objectifs
+        await fetchGoals();
+        
+      } catch (err) {
+        console.error(t('errors.dataLoadError'), err);
+        setError(t('errors.unableToLoadData'));
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [user]); // Dépend seulement de user
-
+  
+    fetchData();
+  }, [user, t]);
+  
   useEffect(() => {
     // Si des objectifs sont chargés, recalculer leurs progressions
     if (goals.length > 0) {
@@ -221,6 +239,11 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
         return;
       }
       
+      // Convertir chaque jour au format de stockage (français)
+      const storedDaysOfWeek = newGoal.daysOfWeek.map(day => 
+        convertToStoredFormat(day, i18n.language)
+      );
+      
       const { data, error } = await supabase
         .from('goals')
         .insert([
@@ -229,7 +252,7 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
             name: newGoal.name,
             duration: newGoal.timeUnit === 'minutes' ? newGoal.dailyTime * 60 : newGoal.dailyTime * 3600,
             completed_duration: 0,
-            days_of_week: newGoal.daysOfWeek,
+            days_of_week: storedDaysOfWeek, // Utiliser les jours convertis
             time_unit: newGoal.timeUnit,
             color: newGoal.color
           }
@@ -260,6 +283,65 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
       setLoading(false);
     }
   };
+
+  const cleanupOrphanedSessions = async () => {
+    if (!user) return;
+    
+    try {
+      // 1. Récupérer tous les IDs des objectifs existants
+      const { data: existingGoals, error: goalsError } = await supabase
+        .from('goals')
+        .select('id')
+        .eq('user_id', user.id);
+      
+      if (goalsError) throw goalsError;
+      
+      // Créer un ensemble (Set) des IDs d'objectifs valides pour une recherche rapide
+      const validGoalIds = new Set(existingGoals.map(g => g.id));
+      
+      // 2. Récupérer toutes les sessions
+      const { data: allSessions, error: sessionsError } = await supabase
+        .from('study_sessions')
+        .select('id, goal_id')
+        .eq('user_id', user.id);
+      
+      if (sessionsError) throw sessionsError;
+      
+      // 3. Identifier les sessions orphelines (dont l'objectif n'existe plus ou est null)
+      const orphanedSessionIds = allSessions
+        .filter(session => 
+          // Vérifier si goal_id est null ou s'il n'existe pas dans validGoalIds
+          session.goal_id === null || !validGoalIds.has(session.goal_id)
+        )
+        .map(session => session.id);
+      
+      if (orphanedSessionIds.length === 0) {
+        console.log('Aucune session orpheline à nettoyer');
+        return;
+      }
+      
+      console.log(`${orphanedSessionIds.length} sessions orphelines trouvées, nettoyage en cours...`);
+      
+      // 4. Supprimer les sessions orphelines une par une pour éviter les problèmes avec null
+      for (const sessionId of orphanedSessionIds) {
+        const { error: deleteError } = await supabase
+          .from('study_sessions')
+          .delete()
+          .eq('id', sessionId);
+        
+        if (deleteError) {
+          console.error(`Erreur lors de la suppression de la session ${sessionId}:`, deleteError);
+          // Continuer avec les autres sessions même si celle-ci échoue
+        }
+      }
+      
+      console.log('Nettoyage des sessions orphelines terminé');
+      
+    } catch (err) {
+      console.error('Erreur lors du nettoyage des sessions orphelines:', err);
+    }
+  };
+  
 
   const handleUpdateGoal = async (e) => {
     e.preventDefault();
@@ -321,6 +403,15 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
     try {
       setLoading(true);
       
+      // 1. Supprimer d'abord toutes les sessions associées à cet objectif
+      const { error: sessionsError } = await supabase
+        .from('study_sessions')
+        .delete()
+        .eq('goal_id', goalId);
+      
+      if (sessionsError) throw sessionsError;
+      
+      // 2. Ensuite, supprimer l'objectif lui-même
       const { error } = await supabase
         .from('goals')
         .delete()
@@ -340,7 +431,7 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
           localStorage.removeItem(key);
         }
       });
-
+  
       // Refresh goals list
       await fetchGoals();
       
@@ -370,9 +461,12 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
   };
 
   const handleDaySelection = (days, setFunction) => {
+    // Assurez-vous que les jours sont au format de stockage (français)
+    const storedDays = days.map(day => convertToStoredFormat(day, i18n.language));
+    
     setFunction(prev => ({
       ...prev,
-      daysOfWeek: days
+      daysOfWeek: storedDays
     }));
   };
 
@@ -415,7 +509,7 @@ const GoalSetting = ({ onGoalSelect, refreshTrigger = 0, currentDay = null, igno
       }
     };
   
-  // Filtrer les objectifs en fonction du jour de la semaine
+
 // Filtrer les objectifs en fonction du jour de la semaine
 const filteredGoals = useMemo(() => {
   if (!goals || goals.length === 0) return [];
@@ -426,9 +520,11 @@ const filteredGoals = useMemo(() => {
   // Convertir le jour actuel au format stocké (français)
   const storedFormatDay = convertToStoredFormat(currentDay, i18n.language);
   
-  // Comparer avec les jours stockés
+  // Vérifier que les jours de la semaine sont bien définis pour chaque objectif
+  // et comparer avec le jour stocké
   return goals.filter(goal => {
-    return goal.days_of_week && goal.days_of_week.includes(storedFormatDay);
+    return goal.days_of_week && Array.isArray(goal.days_of_week) && 
+           goal.days_of_week.some(day => day === storedFormatDay);
   });
 }, [goals, currentDay, ignoreDate, i18n.language]);
 
@@ -523,22 +619,23 @@ const filteredGoals = useMemo(() => {
                   {formatTime(goal.time_unit === 'minutes' ? goal.duration / 60 : goal.duration / 3600, goal.time_unit)} 
                   <span className="mx-1">•</span>
                   <span className="inline-flex gap-1">
-                    {DAYS_KEYS.map((day, index) => {
-                      const storedFormatDay = convertToStoredFormat(DAYS[index], i18n.language);
-                      return (
-                        <span
-                          key={day}
-                          className={`text-xs ${
-                            goal.days_of_week.includes(storedFormatDay)
-                              ? 'font-bold'
-                              : 'opacity-30'
-                          }`}
-                        >
-                          {t(`days.${day}Short`)}
-                        </span>
-                      );
-                    })}
-                  </span>
+  {DAYS_KEYS.map((day, index) => {
+    // Obtenir le jour dans le format stocké (français)
+    const storedFormatDay = convertToStoredFormat(DAYS[index], i18n.language);
+    return (
+      <span
+        key={day}
+        className={`text-xs ${
+          goal.days_of_week && goal.days_of_week.includes(storedFormatDay)
+            ? 'font-bold'
+            : 'opacity-30'
+        }`}
+      >
+        {t(`days.${day}Short`)}
+      </span>
+    );
+  })}
+</span>
                 </div>
               </div>
             </div>
